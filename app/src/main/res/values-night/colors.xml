@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#1B99D3</color>
+    <color name="primary">#195BFF</color>
     <color name="primary_80">#49ADDC</color>
     <color name="primaryContainer">#F2F8FF</color>
     <color name="primaryVariant">#7BD5FF</color>
     <color name="secondary">#43A591</color>
     <color name="tertiary">#F6CD4B</color>
 
-    <color name="onPrimary">#FFFFFFFF</color>
+    <color name="onPrimary">#FF000000</color>
 
-    <color name="background">#FFFFFFFF</color>
+    <color name="background">#FF000000</color>
     <color name="greyBackground">#F3F3F3</color>
     <color name="error">#FF4545</color>
 

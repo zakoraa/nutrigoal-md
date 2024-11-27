@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    tools:context=".ui.auth.RegisterActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".ui.auth.SignUpActivity"
+        android:paddingBottom="100dp"
+        >
+
+        <com.nutrigoal.nutrigoal.ui.auth.AuthDecorationView
+            android:id="@+id/decoration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_app_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/app_logo_desc"
+            android:src="@drawable/nutrigoal_logo_circle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/decoration" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
+            android:layout_marginTop="30dp"
+            android:text="@string/register_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_app_logo" />
+
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/register_desc"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+        <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            android:id="@+id/ed_username"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/edt_height"
+            android:layout_marginTop="30dp"
+            android:drawableStart="@drawable/ic_person"
+            android:hint="@string/username"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+
+        <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            android:id="@+id/ed_email"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/edt_height"
+            android:layout_marginTop="@dimen/edt_gap"
+            android:drawableStart="@drawable/ic_email"
+            android:hint="@string/email"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/ed_username" />
+
+        <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            android:id="@+id/ed_password"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/edt_height"
+            android:layout_marginTop="@dimen/edt_gap"
+            android:drawableStart="@drawable/ic_pass"
+            android:drawableEnd="@drawable/ic_invisible_pass"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/ed_email" />
+
+        <Button
+            android:id="@+id/btn_register"
+            style="@style/TextOnButton"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginTop="@dimen/edt_gap"
+            android:text="@string/register"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/ed_password" />
+
+        <LinearLayout
+            android:id="@+id/ll_bellow_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/bellow_auth_button_gap"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_register">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:text="@string/already_have_an_account" />
+
+            <TextView
+                android:id="@+id/tv_back_to_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login"
+                android:textColor="@color/primary" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider_left"
+            android:layout_width="0dp"
+            android:layout_height="0.8dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/grey"
+            app:layout_constraintBottom_toBottomOf="@id/tv_or"
+            app:layout_constraintEnd_toStartOf="@id/tv_or"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toTopOf="@id/tv_or" />
+
+        <TextView
+            android:id="@+id/tv_or"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="@string/or"
+            android:textColor="@color/grey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_bellow_btn" />
+
+        <View
+            android:id="@+id/divider_right"
+            android:layout_width="0dp"
+            android:layout_height="0.8dp"
+            android:layout_marginStart="20dp"
+            android:background="@color/grey"
+            app:layout_constraintBottom_toBottomOf="@id/tv_or"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toEndOf="@id/tv_or"
+            app:layout_constraintTop_toTopOf="@id/tv_or" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login_with_google"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/outline_btn_height"
+            android:layout_marginTop="@dimen/edt_gap"
+            android:background="@drawable/outline_button"
+            android:gravity="center"
+            android:text="@string/continue_with_google"
+            android:textColor="@color/textColor"
+            app:icon="@drawable/google_logo"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_or" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login_with_facebook"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/outline_btn_height"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/outline_button"
+            android:gravity="center"
+            android:text="@string/continue_with_facebook"
+            android:textColor="@color/textColor"
+            app:icon="@drawable/facebook_logo"
+            app:iconGravity="textStart"
+            app:iconTint="@null"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/btn_login_with_google" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

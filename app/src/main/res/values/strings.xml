@@ -1,6 +1,51 @@
 <resources>
-    <string name="app_name">nutrigoal</string>
+    <string name="app_name">NutriGoal</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="login_title">Welcome Back!</string>
+    <string name="login_desc">Login to access your personalized experience.</string>
+
+    <string name="register_title">Let\'s get you started!</string>
+    <string name="register_desc">Sign up to start your personalized journey.</string>
+
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+
+    <string name="login">Login</string>
+    <string name="already_have_an_account">Already have an account? </string>
+    <string name="don_t_have_an_account_yet">Don\'t have an account yet? </string>
+    <string name="register">Register</string>
+
+    <string name="no_data">No Data</string>
+
+    <string name="tv_home_greetings">Hello Universe!</string>
+    <string name="tv_home_desc">Your stories, an inspiration to others.</string>
+
+    <string name="login_success">Login Success</string>
+    <string name="register_success">Register Success</string>
+
+    <string name="loading">Loading</string>
+    <string name="log_out_desc">Logout of account</string>
+    <string name="logout">Logout</string>
+    <string name="select_language">Select Language</string>
+    <string name="profile">Profile </string>
+    <string name="back_btn_profile_desc">Return from profile page</string>
+    <string name="description">Description</string>
+
+    <string name="error_story_desc_empty">Please fill in the description first!</string>
+    <string name="error_story_image_empty">Please select a picture first!</string>
+    <string name="error_wrong_input">Your email or password is wrong. Try Again!</string>
+    <string name="error_something_wrong">Something wrong. Try Again!</string>
+    <string name="error_wrong_email_format">Invalid email format</string>
+    <string name="error_min_length_field">%s cannot be less than %d characters</string>
+    <string name="error_empty_field">%s must not be empty</string>
+    <string name="error_occurs">Error Occurs</string>
+    <string name="error_expired_session">Your session expired, please login again!</string>
+    <string name="app_logo_desc">display the app logo</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="continue_with_facebook">Continue with Facebook</string>
+    <string name="or">OR</string>
 </resources>
