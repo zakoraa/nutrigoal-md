@@ -8,22 +8,22 @@ import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.SettingBoxContentItemBinding
 
 class SettingBoxContentItemAdapter(private val items: List<SettingBoxContentItem>) :
-    RecyclerView.Adapter<SettingBoxContentItemAdapter.ProfileViewHolder>() {
+    RecyclerView.Adapter<SettingBoxContentItemAdapter.SettingsBoxContentItemViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingsBoxContentItemViewHolder {
         val binding =
             SettingBoxContentItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ProfileViewHolder(binding)
+        return SettingsBoxContentItemViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: SettingsBoxContentItemViewHolder, position: Int) {
         val item = items[position]
         holder.bind(item)
     }
 
     override fun getItemCount(): Int = items.size
 
-    inner class ProfileViewHolder(private val binding: SettingBoxContentItemBinding) :
+    inner class SettingsBoxContentItemViewHolder(private val binding: SettingBoxContentItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: SettingBoxContentItem) {
             with(binding) {

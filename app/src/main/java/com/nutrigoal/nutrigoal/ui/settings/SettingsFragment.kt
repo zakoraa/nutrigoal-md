@@ -8,12 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.FragmentSettingsBinding
+import com.nutrigoal.nutrigoal.ui.common.BoxSection
+import com.nutrigoal.nutrigoal.ui.common.BoxSectionAdapter
 
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
-    private lateinit var boxSectionAdapter: BoxSectionAdapter
-    private lateinit var items: MutableList<SettingBoxContentItem>
+    private lateinit var boxSectionAdapter: BoxSectionAdapter<SettingBoxContentItem>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -22,12 +23,12 @@ class SettingsFragment : Fragment() {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        setupView()
+        setUpView()
 
         return root
     }
 
-    private fun setupView() {
+    private fun setUpView() {
         with(binding) {
             val sections = listOf(
                 BoxSection(
