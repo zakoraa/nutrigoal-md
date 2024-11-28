@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
+import com.nutrigoal.nutrigoal.utils.AnimationUtil
 
 
 class LoginActivity : AppCompatActivity() {
@@ -51,21 +52,23 @@ class LoginActivity : AppCompatActivity() {
             val email = edEmail.text.toString()
             val password = edPassword.text.toString()
 
-            if (email.isEmpty()) {
-                showToast(getString(R.string.error_empty_field, getString(R.string.email)))
-            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                showToast(getString(R.string.error_wrong_email_format))
-            } else if (password.isEmpty()) {
-                showToast(getString(R.string.error_empty_field, getString(R.string.password)))
-            } else if (password.length < 8) {
-                showToast(
-                    getString(
-                        R.string.error_min_length_field, getString(R.string.password), 8
-                    )
-                )
-            } else {
-
-            }
+//            if (email.isEmpty()) {
+//                showToast(getString(R.string.error_empty_field, getString(R.string.email)))
+//            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//                showToast(getString(R.string.error_wrong_email_format))
+//            } else if (password.isEmpty()) {
+//                showToast(getString(R.string.error_empty_field, getString(R.string.password)))
+//            } else if (password.length < 8) {
+//                showToast(
+//                    getString(
+//                        R.string.error_min_length_field, getString(R.string.password), 8
+//                    )
+//                )
+//            } else {
+//
+//            }
+            val intent = Intent(this@LoginActivity, com.nutrigoal.nutrigoal.ui.survey.Survey1Activity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -85,55 +88,29 @@ class LoginActivity : AppCompatActivity() {
                 duration = 2000
             }.start()
 
-            val appLogo =
-                ObjectAnimator.ofFloat(ivAppLogo, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val title =
-                ObjectAnimator.ofFloat(tvTitle, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val desc =
-                ObjectAnimator.ofFloat(tvDesc, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val edtEmail =
-                ObjectAnimator.ofFloat(edEmail, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val edtPass =
-                ObjectAnimator.ofFloat(edPassword, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val btnLogin =
-                ObjectAnimator.ofFloat(btnLogin, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val llBellowBtn =
-                ObjectAnimator.ofFloat(llBellowBtn, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val dividerLeft =
-                ObjectAnimator.ofFloat(dividerLeft, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val dividerRight =
-                ObjectAnimator.ofFloat(dividerRight, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val tvOr = ObjectAnimator.ofFloat(tvOr, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val btnLoginWithGoogle =
-                ObjectAnimator.ofFloat(btnLoginWithGoogle, View.TRANSLATION_Y, 100f, 0f)
-                    .setDuration(1000)
-            val btnLoginWithFacebook =
-                ObjectAnimator.ofFloat(btnLoginWithFacebook, View.TRANSLATION_Y, 100f, 0f)
-                    .setDuration(1000)
+            val animators = listOf(
+                AnimationUtil.createTranslationAnimator(ivAppLogo),
+                AnimationUtil.createTranslationAnimator(tvTitle),
+                AnimationUtil.createTranslationAnimator(tvDesc),
+                AnimationUtil.createTranslationAnimator(edEmail),
+                AnimationUtil.createTranslationAnimator(edPassword),
+                AnimationUtil.createTranslationAnimator(btnLogin),
+                AnimationUtil.createTranslationAnimator(llBellowBtn),
+                AnimationUtil.createTranslationAnimator(dividerLeft),
+                AnimationUtil.createTranslationAnimator(dividerRight),
+                AnimationUtil.createTranslationAnimator(tvOr),
+                AnimationUtil.createTranslationAnimator(btnLoginWithGoogle),
+                AnimationUtil.createTranslationAnimator(btnLoginWithFacebook)
+            )
 
             val together = AnimatorSet().apply {
-                playTogether(
-                    appLogo,
-                    title,
-                    desc,
-                    edtEmail,
-                    edtPass,
-                    btnLogin,
-                    llBellowBtn,
-                    dividerRight,
-                    dividerLeft,
-                    tvOr,
-                    btnLoginWithGoogle,
-                    btnLoginWithFacebook
-                )
+                playTogether(animators)
             }
-
             AnimatorSet().apply {
                 playSequentially(together)
                 start()
             }
         }
-
     }
 
 }

@@ -6,9 +6,18 @@
     <dimen name="edt_icon_gap">8dp</dimen>
     <dimen name="edt_padding_horizontal">20dp</dimen>
 
-    <dimen name="btn_height">65dp</dimen>
+    <dimen name="rb_gap_vertical">10dp</dimen>
+    <dimen name="rb_gap_horizontal">30dp</dimen>
+
+    <dimen name="btn_height">68dp</dimen>
+    <dimen name="btn_radius">30dp</dimen>
     <dimen name="outline_btn_height">60dp</dimen>
+    <dimen name="survey_outline_btn_height">55dp</dimen>
+    <dimen name="survey_btn_height">63dp</dimen>
     <dimen name="bellow_auth_button_gap">15dp</dimen>
+
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="margin_bottom_to_edge">100dp</dimen>
 </resources>
 

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.survey.Survey3Activity">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/screen_horizontal_margin"
+            android:paddingBottom="@dimen/margin_bottom_to_edge">
+
+            <TextView
+                android:id="@+id/tv_survey_step"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/_3_of_3_steps"
+                android:textColor="@color/primary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/progress_line"
+                android:layout_width="0dp"
+                android:layout_height="2.5dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/primary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_survey_step"
+                app:layout_constraintWidth_percent="1" />
+
+            <TextView
+                android:id="@+id/tv_step3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/step_3"
+                android:textColor="@color/primary"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/progress_line" />
+
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/TextTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="70dp"
+                android:text="@string/survey3_title"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_step3" />
+
+            <TextView
+                android:id="@+id/tv_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/survey3_desc"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+            <TextView
+                android:id="@+id/tv_diet_goals"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/what_is_your_goal"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+
+            <RadioGroup
+                android:id="@+id/rg_goal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_diet_goals">
+
+                <RadioButton
+                    android:id="@+id/rb_diet_goals"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/rb_gap_horizontal"
+                    android:text="@string/diet_goals" />
+
+                <RadioButton
+                    android:id="@+id/rb_gaining_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gaining_weight" />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/tv_history_mag"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/rb_gap_vertical"
+                android:text="@string/is_there_a_history_of_mag_disease"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/rg_goal" />
+
+            <RadioGroup
+                android:id="@+id/rg_history_mag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_history_mag">
+
+                <RadioButton
+                    android:id="@+id/rb_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/rb_gap_horizontal"
+                    android:text="@string/yes" />
+
+                <RadioButton
+                    android:id="@+id/rb_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no" />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/tv_diet_category"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/rb_gap_vertical"
+                android:text="@string/select_diet_category"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/rg_history_mag" />
+
+            <RadioGroup
+                android:id="@+id/rg_diet_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_diet_category">
+
+                <RadioButton
+                    android:id="@+id/rb_vegan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/rb_gap_horizontal"
+                    android:text="@string/vegan" />
+
+                <RadioButton
+                    android:id="@+id/rb_keto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/keto" />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/tv_favorite_processed_food"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/rb_gap_vertical"
+                android:text="@string/what_is_your_favorite_processed_food"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/rg_diet_category" />
+
+            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+                android:id="@+id/ed_favorite_processed_food"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/edt_height"
+                android:layout_marginTop="@dimen/rb_gap_vertical"
+                android:hint="@string/favorite_processed_food_hint"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_favorite_processed_food" />
+
+            <TextView
+                android:id="@+id/tv_favorite_instant_food"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/edt_gap"
+                android:text="@string/what_is_your_favorite_processed_food"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/ed_favorite_processed_food" />
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_favorite_instant_food">
+
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/outline_button"
+                    android:hint="@null"
+                    android:inputType="none"
+                    android:labelFor="@string/choose_instant_food"
+                    android:text="@string/choose_instant_food" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_back"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/survey_outline_btn_height"
+        android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/outline_button"
+        android:text="@string/back"
+        android:textColor="@color/primary"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.44" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_next"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/survey_btn_height"
+        android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
+        android:gravity="center"
+        android:text="@string/next"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/btn_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn_back"
+        app:layout_constraintWidth_percent="0.44" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -48,4 +48,44 @@
     <string name="continue_with_google">Continue with Google</string>
     <string name="continue_with_facebook">Continue with Facebook</string>
     <string name="or">OR</string>
+    <string name="_1_of_3_steps">1 of 3 steps</string>
+    <string name="survey1_decoration_desc">display survey1 decoration</string>
+    <string name="step_1">Step 1</string>
+    <string name="survey1_title">Discover Your Healthy Eating Habits!</string>
+    <string name="survey1_desc">Take a moment to share your dietary information. Together, we’ll create a personalized plan to support your health goals!</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="_2_of_3_steps">2 of 3 steps</string>
+    <string name="step_2">Step 2</string>
+    <string name="survey2_title">Personal Details</string>
+    <string name="survey2_desc">Provide your personal details to help us tailor the experience just for you. Your information brings us one step closer to achieving your goals together!</string>
+    <string name="_3_of_3_steps">3 of 3 steps</string>
+    <string name="step_3">Step 3</string>
+    <string name="survey3_title">Personalized Diet</string>
+    <string name="survey3_desc">Answer a few questions about your dietary habits and preferences. Together, we’ll create a diet plan that fits your goals and lifestyle perfectly!</string>
+    <string name="body_weight">Body weight</string>
+    <string name="height">Height</string>
+    <string name="age">Age</string>
+    <string name="select_gender">Select Gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="what_is_your_goal">What is your goal?</string>
+    <string name="diet_goals">Diet goals</string>
+    <string name="gaining_weight">Gaining weight</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="vegan">Vegan</string>
+    <string name="keto">Keto</string>
+    <string name="select_diet_category">Select diet category</string>
+    <string name="is_there_a_history_of_mag_disease">Is there a history of mag disease?</string>
+    <string name="what_is_your_favorite_processed_food">What is your favorite processed food?</string>
+    <string name="favorite_processed_food_hint">E.g : Nasi goreng</string>
+    <string name="choose_instant_food">Choose instant food</string>
+
+    <string-array name="instant_foods">
+        <item>Fried Noodles</item>
+        <item>Burger</item>
+        <item>Pizza</item>
+        <item>French Fries</item>
+    </string-array>
 </resources>

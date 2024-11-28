@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.ActivityRegisterBinding
+import com.nutrigoal.nutrigoal.utils.AnimationUtil
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
@@ -84,50 +85,24 @@ class RegisterActivity : AppCompatActivity() {
                 duration = 2000
             }.start()
 
-            val appLogo =
-                ObjectAnimator.ofFloat(ivAppLogo, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val title =
-                ObjectAnimator.ofFloat(tvTitle, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val desc =
-                ObjectAnimator.ofFloat(tvDesc, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val edtUsername = ObjectAnimator.ofFloat(edUsername, View.TRANSLATION_Y, 100f, 0f)
-                .setDuration(1000)
-            val edtEmail = ObjectAnimator.ofFloat(edEmail, View.TRANSLATION_Y, 100f, 0f)
-                .setDuration(1000)
-            val edtPass = ObjectAnimator.ofFloat(edPassword, View.TRANSLATION_Y, 100f, 0f)
-                .setDuration(1000)
-            val btnLogin =
-                ObjectAnimator.ofFloat(btnRegister, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val llBellowBtn =
-                ObjectAnimator.ofFloat(llBellowBtn, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val dividerLeft =
-                ObjectAnimator.ofFloat(dividerLeft, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val dividerRight =
-                ObjectAnimator.ofFloat(dividerRight, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val tvOr = ObjectAnimator.ofFloat(tvOr, View.TRANSLATION_Y, 100f, 0f).setDuration(1000)
-            val btnLoginWithGoogle =
-                ObjectAnimator.ofFloat(btnLoginWithGoogle, View.TRANSLATION_Y, 100f, 0f)
-                    .setDuration(1000)
-            val btnLoginWithFacebook =
-                ObjectAnimator.ofFloat(btnLoginWithFacebook, View.TRANSLATION_Y, 100f, 0f)
-                    .setDuration(1000)
+            val animators = listOf(
+                AnimationUtil.createTranslationAnimator(ivAppLogo),
+                AnimationUtil.createTranslationAnimator(tvTitle),
+                AnimationUtil.createTranslationAnimator(tvDesc),
+                AnimationUtil.createTranslationAnimator(edUsername),
+                AnimationUtil.createTranslationAnimator(edEmail),
+                AnimationUtil.createTranslationAnimator(edPassword),
+                AnimationUtil.createTranslationAnimator(btnRegister),
+                AnimationUtil.createTranslationAnimator(llBellowBtn),
+                AnimationUtil.createTranslationAnimator(dividerLeft),
+                AnimationUtil.createTranslationAnimator(dividerRight),
+                AnimationUtil.createTranslationAnimator(tvOr),
+                AnimationUtil.createTranslationAnimator(btnLoginWithGoogle),
+                AnimationUtil.createTranslationAnimator(btnLoginWithFacebook)
+            )
 
             val together = AnimatorSet().apply {
-                playTogether(
-                    edtUsername,
-                    appLogo,
-                    title,
-                    desc,
-                    edtEmail,
-                    edtPass,
-                    btnLogin,
-                    llBellowBtn,
-                    dividerRight,
-                    dividerLeft,
-                    tvOr,
-                    btnLoginWithGoogle,
-                    btnLoginWithFacebook
-                )
+                playTogether(animators)
             }
 
             AnimatorSet().apply {
@@ -136,4 +111,5 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
     }
+
 }
