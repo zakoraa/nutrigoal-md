@@ -49,8 +49,13 @@ class BoxSectionAdapter<T>(private val sections: List<BoxSection<T>>) :
                         else -> throw IllegalArgumentException("Unsupported item type in BoxSection")
                     }
                 }
-                recyclerView.layoutManager = LinearLayoutManager(root.context)
                 recyclerView.adapter = adapter
+                recyclerView.setHasFixedSize(true)
+                recyclerView.layoutManager = object : LinearLayoutManager(root.context) {
+                    override fun canScrollVertically(): Boolean {
+                        return false
+                    }
+                }
             }
 
         }

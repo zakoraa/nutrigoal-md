@@ -68,6 +68,7 @@
     <string name="body_weight">Body weight</string>
     <string name="height">Height</string>
     <string name="age">Age</string>
+    <string name="gender">Gender</string>
     <string name="select_gender">Select Gender</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
@@ -104,4 +105,6 @@
     <string name="content_and_display">Content &amp; Display</string>
     <string name="go_to_the_profile_page">Go to the profile page</string>
     <string name="update_password">Update Password</string>
+    <string name="iv_back_from_profile_desc">Back from profile page</string>
+    <string name="iv_photo_profile_desc">Display photo profile</string>
 </resources>

@@ -59,8 +59,9 @@ class SettingsFragment : Fragment() {
                 ),
             )
             boxSectionAdapter = BoxSectionAdapter(sections)
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = boxSectionAdapter
+            recyclerView.setHasFixedSize(true)
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
         }
     }
 }

@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Nutrigoal"
         tools:targetApi="31">
         <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.survey.Survey3Activity"
             android:exported="false" />
         <activity
