@@ -29,24 +29,28 @@
         <item name="android:textStyle">bold</item>
         <item name="fontFamily">@font/poppinsbold</item>
     </style>
-
     <style name="TextHeading1" parent="TextTitle">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="fontFamily">@font/poppinsmedium</item>
     </style>
 
+    <style name="TextHeading2">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/poppinsregular</item>
+    </style>
+
     <style name="TextLabel" parent="TextHeading1">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="TextPlaceholder">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/grey</item>
         <item name="fontFamily">@font/poppinsregular</item>
     </style>
 
     <style name="TextOnButton">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/onPrimary</item>
         <item name="fontFamily">@font/poppinsmedium</item>
     </style>
@@ -57,4 +61,5 @@
         <item name="android:height">40dp</item>
         <item name="android:color">@color/primary</item>
     </style>
+
 </resources>

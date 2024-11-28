@@ -90,11 +90,18 @@
         <item>Pizza</item>
         <item>French Fries</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="today">Today</string>
+    <string name="notification">Notification</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="authentication">Authentication</string>
     <string name="check_icon_desc">display daily check reminder</string>
     <string name="daily_check_in_title">Daily Diet Check-In Reminder!</string>
     <string name="eat_reminder_title">It\'s Time to Eat and Stay Hydrated!</string>
     <string name="no_eat_reminder_title">No Eating or Drinking</string>
+    <string name="account">Account</string>
+    <string name="content_and_display">Content &amp; Display</string>
+    <string name="go_to_the_profile_page">Go to the profile page</string>
+    <string name="update_password">Update Password</string>
 </resources>
