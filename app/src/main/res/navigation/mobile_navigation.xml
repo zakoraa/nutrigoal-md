@@ -3,23 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
-
-    <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.nutrigoal.nutrigoal.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+    app:startDestination="@+id/navigation_notifications">
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.nutrigoal.nutrigoal.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
+        android:label="@string/dashboard"
         tools:layout="@layout/fragment_dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_plan_diet"
+        android:name="com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment"
+        android:label="fragment_plan_diet"
+        tools:layout="@layout/fragment_plan_diet" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.nutrigoal.nutrigoal.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.nutrigoal.nutrigoal.ui.settings.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" />
+
 </navigation>

@@ -50,4 +50,11 @@
         <item name="android:textColor">@color/onPrimary</item>
         <item name="fontFamily">@font/poppinsmedium</item>
     </style>
+
+    <style name="BottomNavActiveIndicatorStyle" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:shape">oval</item>
+        <item name="android:width">40dp</item>
+        <item name="android:height">40dp</item>
+        <item name="android:color">@color/primary</item>
+    </style>
 </resources>

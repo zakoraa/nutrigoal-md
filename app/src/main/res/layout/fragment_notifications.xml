@@ -4,19 +4,171 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/greyBackground"
     tools:context=".ui.notifications.NotificationsFragment">
 
     <TextView
-        android:id="@+id/text_notifications"
+        android:id="@+id/tv_notification_title"
+        style="@style/TextTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/background"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="10dp"
+        android:text="@string/notifications"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_notification_title">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_background"
+            android:padding="15dp">
+
+            <TextView
+                android:id="@+id/tv_heading"
+                style="@style/TextHeading1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/today"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/iv_daily_check_in"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginTop="20dp"
+                android:contentDescription="@string/check_icon_desc"
+                android:src="@drawable/ic_check"
+                app:layout_constraintStart_toStartOf="@+id/tv_heading"
+                app:layout_constraintTop_toBottomOf="@+id/tv_heading" />
+
+            <TextView
+                android:id="@+id/tv_daily_check_in_title"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
+                android:text="@string/daily_check_in_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/iv_daily_check_in"
+                app:layout_constraintTop_toTopOf="@id/iv_daily_check_in" />
+
+            <TextView
+                android:id="@+id/tv_daily_check_in_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="11 November 2024, 10 AM"
+                app:layout_constraintEnd_toEndOf="@id/tv_daily_check_in_title"
+                app:layout_constraintStart_toStartOf="@id/tv_daily_check_in_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_daily_check_in_title" />
+
+            <View
+                android:id="@+id/daily_check_in_divider"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/lightGrey"
+                app:layout_constraintEnd_toEndOf="@id/tv_daily_check_in_title"
+                app:layout_constraintStart_toStartOf="@id/tv_daily_check_in_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_daily_check_in_time" />
+
+            <ImageView
+                android:id="@+id/iv_eat_reminder"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginTop="20dp"
+                android:contentDescription="@string/check_icon_desc"
+                android:src="@drawable/ic_food"
+                app:layout_constraintStart_toStartOf="@+id/tv_heading"
+                app:layout_constraintTop_toBottomOf="@+id/daily_check_in_divider" />
+
+            <TextView
+                android:id="@+id/tv_eat_reminder_title"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/eat_reminder_title"
+                app:layout_constraintEnd_toEndOf="@id/tv_daily_check_in_title"
+                app:layout_constraintStart_toEndOf="@id/iv_eat_reminder"
+                app:layout_constraintTop_toTopOf="@id/iv_eat_reminder" />
+
+            <TextView
+                android:id="@+id/tv_eat_reminder_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="11 November 2024, 10 AM"
+                app:layout_constraintEnd_toEndOf="@id/tv_eat_reminder_title"
+                app:layout_constraintStart_toStartOf="@id/tv_eat_reminder_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_eat_reminder_title" />
+
+            <View
+                android:id="@+id/eat_reminder_divider"
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/lightGrey"
+                app:layout_constraintEnd_toEndOf="@id/tv_eat_reminder_title"
+                app:layout_constraintStart_toStartOf="@id/tv_eat_reminder_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_eat_reminder_time" />
+
+            <ImageView
+                android:id="@+id/iv_no_eat_reminder"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginTop="20dp"
+                android:contentDescription="@string/check_icon_desc"
+                android:src="@drawable/ic_dont_eat_drink"
+                app:layout_constraintStart_toStartOf="@+id/tv_heading"
+                app:layout_constraintTop_toBottomOf="@+id/eat_reminder_divider" />
+
+            <TextView
+                android:id="@+id/tv_no_eat_reminder_title"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="@string/no_eat_reminder_title"
+                app:layout_constraintEnd_toEndOf="@id/tv_daily_check_in_title"
+                app:layout_constraintStart_toEndOf="@id/iv_no_eat_reminder"
+                app:layout_constraintTop_toTopOf="@id/iv_no_eat_reminder" />
+
+            <TextView
+                android:id="@+id/tv_no_eat_reminder_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="11 November 2024, 10 AM"
+                app:layout_constraintEnd_toEndOf="@id/tv_no_eat_reminder_title"
+                app:layout_constraintStart_toStartOf="@id/tv_no_eat_reminder_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_no_eat_reminder_title" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/lightGrey"
+                app:layout_constraintEnd_toEndOf="@id/tv_no_eat_reminder_title"
+                app:layout_constraintStart_toStartOf="@id/tv_no_eat_reminder_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_no_eat_reminder_time" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
