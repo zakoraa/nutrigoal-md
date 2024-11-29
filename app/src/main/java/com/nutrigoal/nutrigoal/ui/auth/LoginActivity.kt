@@ -5,16 +5,28 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialResponse
+import androidx.lifecycle.lifecycleScope
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.google.firebase.auth.FirebaseUser
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
+import com.nutrigoal.nutrigoal.ui.MainActivity
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
+import com.nutrigoal.nutrigoal.utils.ToastUtil
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,12 +36,59 @@ class LoginActivity : AppCompatActivity() {
         initView()
         initAction()
         playAnimation()
-
-        binding.btnLoginWithGoogle.setOnClickListener {}
     }
 
     private fun initView() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+        lifecycleScope.launch {
+            viewModel.credentialState.collect { result ->
+                handleCredentialState(result)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.loginWithGoogleState.collect { result ->
+                handleLoginWithGoogleState(result)
+            }
+        }
+    }
+
+    private fun handleCredentialState(result: ResultState<GetCredentialResponse>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                showLoading(false)
+                handleLogin(result.data)
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, result.error)
+            }
+
+            is ResultState.Initial -> {}
+        }
+    }
+
+    private fun handleLoginWithGoogleState(result: ResultState<FirebaseUser?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.login_success))
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, result.error)
+            }
+
+            is ResultState.Initial -> {}
+
+        }
     }
 
     private fun initAction() {
@@ -46,6 +105,41 @@ class LoginActivity : AppCompatActivity() {
                 login()
             }
 
+            btnLoginWithGoogle.setOnClickListener {
+                viewModel.getCredentialResponse(this@LoginActivity)
+            }
+
+        }
+    }
+
+    private fun handleLogin(result: GetCredentialResponse) {
+        when (val credential = result.credential) {
+            is CustomCredential -> {
+                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    try {
+                        val googleIdTokenCredential =
+                            GoogleIdTokenCredential.createFrom(credential.data)
+                        viewModel.loginWithGoogle(googleIdTokenCredential.idToken)
+                    } catch (e: GoogleIdTokenParsingException) {
+                        ToastUtil.showToast(
+                            this@LoginActivity,
+                            getString(R.string.error_login)
+                        )
+                    }
+                } else {
+                    ToastUtil.showToast(
+                        this@LoginActivity,
+                        getString(R.string.error_login)
+                    )
+                }
+            }
+
+            else -> {
+                ToastUtil.showToast(
+                    this@LoginActivity,
+                    getString(R.string.error_login)
+                )
+            }
         }
     }
 
@@ -79,12 +173,20 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showLoading(isLoading: Boolean) {
         with(binding) {
-
+            if (isLoading) {
+                btnLogin.visibility = View.INVISIBLE
+                btnLoginWithGoogle.isClickable = false
+                btnLoginWithFacebook.isClickable = false
+                shimmerBtnLogin.visibility = View.VISIBLE
+                shimmerBtnLogin.startShimmer()
+            } else {
+                btnLogin.visibility = View.VISIBLE
+                btnLoginWithGoogle.isClickable = true
+                btnLoginWithFacebook.isClickable = true
+                shimmerBtnLogin.visibility = View.INVISIBLE
+                shimmerBtnLogin.stopShimmer()
+            }
         }
-    }
-
-    private fun showToast(message: String?) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun playAnimation() {

@@ -75,7 +75,7 @@
             app:layout_constraintTop_toBottomOf="@id/ed_email"
             app:passwordToggleEnabled="true" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login"
             style="@style/TextOnButton"
             android:layout_width="0dp"
@@ -86,6 +86,19 @@
             app:layout_constraintStart_toStartOf="@id/tv_title"
             app:layout_constraintTop_toBottomOf="@id/ed_password" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_btn_login"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginTop="@dimen/edt_gap"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/ed_password"
+            app:shimmer_duration="3000">
+
+            <include layout="@layout/shimmer_button" />
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
         <LinearLayout
             android:id="@+id/ll_bellow_btn"
