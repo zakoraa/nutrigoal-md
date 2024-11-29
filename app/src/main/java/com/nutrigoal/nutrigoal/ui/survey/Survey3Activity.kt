@@ -32,16 +32,16 @@ class Survey3Activity : AppCompatActivity() {
         setUpAction()
     }
 
-    private fun setUpView(){
+    private fun setUpView() {
         val instantFoods = resources.getStringArray(R.array.instant_foods)
 
         val arrayAdapter = ArrayAdapter(this, R.layout.instant_food_dropdown_item, instantFoods)
         binding.autoCompleteTextView.setAdapter(arrayAdapter)
     }
 
-    private fun setUpAction(){
-        with(binding){
-            btnBack.setOnClickListener{
+    private fun setUpAction() {
+        with(binding) {
+            btnBack.setOnClickListener {
                 finish()
             }
 
@@ -54,26 +54,23 @@ class Survey3Activity : AppCompatActivity() {
 
     private fun playAnimation() {
         with(binding) {
+            val durationDefault = 1000L
 
             val animators = listOf(
-                AnimationUtil.createTranslationAnimator(progressLine),
-                AnimationUtil.createTranslationAnimator(tvSurveyStep),
-                AnimationUtil.createTranslationAnimator(tvTitle),
-                AnimationUtil.createTranslationAnimator(tvDesc),
                 AnimationUtil.createTranslationAnimator(tvStep3),
-                AnimationUtil.createTranslationAnimator(tvDietGoals),
-                AnimationUtil.createTranslationAnimator(tvDietCategory),
-                AnimationUtil.createTranslationAnimator(tvFavoriteInstantFood),
-                AnimationUtil.createTranslationAnimator(tvFavoriteProcessedFood),
-                AnimationUtil.createTranslationAnimator(tvHistoryMag),
-                AnimationUtil.createTranslationAnimator(edFavoriteProcessedFood),
-                AnimationUtil.createTranslationAnimator(rgHistoryMag),
-                AnimationUtil.createTranslationAnimator(rgGoal),
-                AnimationUtil.createTranslationAnimator(rgDietCategory),
-                AnimationUtil.createTranslationAnimator(autoCompleteTextView),
-                AnimationUtil.createTranslationAnimator(btnBack),
-                AnimationUtil.createTranslationAnimator(btnNext),
-            )
+                AnimationUtil.createTranslationAnimator(tvTitle, durationDefault + 100),
+                AnimationUtil.createTranslationAnimator(tvDesc, durationDefault + 150),
+                AnimationUtil.createTranslationAnimator(tvDietGoals, durationDefault + 200),
+                AnimationUtil.createTranslationAnimator(rgGoal, durationDefault + 250),
+                AnimationUtil.createTranslationAnimator(tvHistoryMag, durationDefault + 300),
+                AnimationUtil.createTranslationAnimator(rgHistoryMag, durationDefault + 350),
+                AnimationUtil.createTranslationAnimator(tvDietCategory, durationDefault + 400),
+                AnimationUtil.createTranslationAnimator(rgDietCategory, durationDefault + 450),
+                AnimationUtil.createTranslationAnimator(tvFavoriteProcessedFood, durationDefault + 500),
+                AnimationUtil.createTranslationAnimator(edFavoriteProcessedFood, durationDefault + 550),
+                AnimationUtil.createTranslationAnimator(tvFavoriteInstantFood, durationDefault + 600),
+                AnimationUtil.createTranslationAnimator(autoCompleteTextView, durationDefault + 650),
+                )
 
             val together = AnimatorSet().apply {
                 playTogether(animators)

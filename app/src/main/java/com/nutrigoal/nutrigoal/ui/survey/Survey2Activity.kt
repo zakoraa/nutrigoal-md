@@ -29,14 +29,17 @@ class Survey2Activity : AppCompatActivity() {
         setUpAction()
     }
 
-    private fun setUpAction(){
-        with(binding){
-            btnBack.setOnClickListener{
+    private fun setUpAction() {
+        with(binding) {
+            btnBack.setOnClickListener {
                 finish()
             }
 
             btnNext.setOnClickListener {
-                val intent = Intent(this@Survey2Activity, com.nutrigoal.nutrigoal.ui.survey.Survey3Activity::class.java)
+                val intent = Intent(
+                    this@Survey2Activity,
+                    com.nutrigoal.nutrigoal.ui.survey.Survey3Activity::class.java
+                )
                 startActivity(intent)
             }
         }
@@ -44,22 +47,17 @@ class Survey2Activity : AppCompatActivity() {
 
     private fun playAnimation() {
         with(binding) {
+            val durationDefault = 1000L
 
             val animators = listOf(
-                AnimationUtil.createTranslationAnimator(progressBaseLine),
-                AnimationUtil.createTranslationAnimator(progressLine),
-                AnimationUtil.createTranslationAnimator(tvSurveyStep),
-                AnimationUtil.createTranslationAnimator(tvTitle),
-                AnimationUtil.createTranslationAnimator(tvDesc),
                 AnimationUtil.createTranslationAnimator(tvStep2),
-                AnimationUtil.createTranslationAnimator(tvGenderTitle),
-                AnimationUtil.createTranslationAnimator(edHeight),
-                AnimationUtil.createTranslationAnimator(edAge),
-                AnimationUtil.createTranslationAnimator(edBodyWeight),
-                AnimationUtil.createTranslationAnimator(edBodyWeight),
-                AnimationUtil.createTranslationAnimator(groupRadio),
-                AnimationUtil.createTranslationAnimator(btnBack),
-                AnimationUtil.createTranslationAnimator(btnNext),
+                AnimationUtil.createTranslationAnimator(tvTitle, durationDefault + 100),
+                AnimationUtil.createTranslationAnimator(tvDesc, durationDefault + 200),
+                AnimationUtil.createTranslationAnimator(edBodyWeight, durationDefault + 300),
+                AnimationUtil.createTranslationAnimator(edHeight, durationDefault + 400),
+                AnimationUtil.createTranslationAnimator(edAge, durationDefault + 500),
+                AnimationUtil.createTranslationAnimator(tvGenderTitle, durationDefault + 600),
+                AnimationUtil.createTranslationAnimator(groupRadio, durationDefault + 700),
             )
 
             val together = AnimatorSet().apply {

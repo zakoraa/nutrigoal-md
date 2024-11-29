@@ -29,9 +29,9 @@ class Survey1Activity : AppCompatActivity() {
         setUpAction()
     }
 
-    private fun setUpAction(){
-        with(binding){
-            btnBack.setOnClickListener{
+    private fun setUpAction() {
+        with(binding) {
+            btnBack.setOnClickListener {
                 finish()
             }
 
@@ -44,17 +44,13 @@ class Survey1Activity : AppCompatActivity() {
 
     private fun playAnimation() {
         with(binding) {
+            val durationDefault = 1000L
 
             val animators = listOf(
-                AnimationUtil.createTranslationAnimator(tvSurveyStep),
-                AnimationUtil.createTranslationAnimator(progressBaseLine),
-                AnimationUtil.createTranslationAnimator(progressLine),
-                AnimationUtil.createTranslationAnimator(tvTitle),
-                AnimationUtil.createTranslationAnimator(tvDesc),
-                AnimationUtil.createTranslationAnimator(tvStep1),
                 AnimationUtil.createTranslationAnimator(ivSurvey1Decoration),
-                AnimationUtil.createTranslationAnimator(btnBack),
-                AnimationUtil.createTranslationAnimator(btnNext),
+                AnimationUtil.createTranslationAnimator(tvStep1, durationDefault + 1300),
+                AnimationUtil.createTranslationAnimator(tvTitle, durationDefault + 1600),
+                AnimationUtil.createTranslationAnimator(tvDesc, durationDefault + 1900),
             )
 
             val together = AnimatorSet().apply {

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
@@ -28,6 +29,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun initView() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
     }
 
     private fun initAction() {
@@ -67,7 +69,10 @@ class LoginActivity : AppCompatActivity() {
 //            } else {
 //
 //            }
-            val intent = Intent(this@LoginActivity, com.nutrigoal.nutrigoal.ui.survey.Survey1Activity::class.java)
+            val intent = Intent(
+                this@LoginActivity,
+                com.nutrigoal.nutrigoal.ui.survey.Survey1Activity::class.java
+            )
             startActivity(intent)
         }
     }
@@ -84,9 +89,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun playAnimation() {
         with(binding) {
-            ObjectAnimator.ofFloat(decoration, View.TRANSLATION_X, 100f, 0f).apply {
+            AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(decoration, View.TRANSLATION_X, 100f, 0f),
+                    ObjectAnimator.ofFloat(decoration, View.ALPHA, 0f, 1f)
+                )
                 duration = 2000
-            }.start()
+                start()
+            }
 
             val animators = listOf(
                 AnimationUtil.createTranslationAnimator(ivAppLogo),
