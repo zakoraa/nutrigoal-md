@@ -75,9 +75,6 @@
     <string name="select_gender">Select Gender</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
-    <string name="what_is_your_goal">What is your goal?</string>
-    <string name="diet_goals">Diet goals</string>
-    <string name="gaining_weight">Gaining weight</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="vegan">Vegan</string>
@@ -85,8 +82,7 @@
     <string name="select_diet_category">Select diet category</string>
     <string name="is_there_a_history_of_mag_disease">Is there a history of mag disease?</string>
     <string name="what_is_your_favorite_processed_food">What is your favorite processed food?</string>
-    <string name="favorite_processed_food_hint">E.g : Nasi goreng</string>
-    <string name="choose_instant_food">Choose instant food</string>
+    <string name="choose_processed_food">Choose processed food</string>
 
     <string-array name="instant_foods">
         <item>Fried Noodles</item>

@@ -1,19 +1,85 @@
 package com.nutrigoal.nutrigoal.utils
 
+import android.content.Context
+import android.view.View
+import android.widget.TextView
+import com.nutrigoal.nutrigoal.R
 
-object InputValidator {
-//    fun List<Pair<TextFieldView, String>>.areAllInputsValid(): String? {
-//        for ((inputField, fieldName) in this) {
-//            if (inputField.text.isNullOrEmpty()) {
-//                return fieldName
-//            }
-//        }
-//        return null
-//    }
+class InputValidator(private val context: Context) {
 
-    private fun isEmailValid(email: String): Boolean =
-        email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    fun validateInput(input: String): String? {
+        return when {
+            input.isEmpty() -> emptyInputMessage(input)
 
-    private fun isPasswordValid(password: String): Boolean =
-        password.isNotEmpty() && password.length >= 8
+            else -> null
+        }
+    }
+
+    fun validateEmail(email: String): String? {
+        return when {
+            email.isEmpty() -> emptyInputMessage(context.getString(R.string.email))
+
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                context.getString(R.string.error_wrong_email_format)
+
+            else -> null
+        }
+    }
+
+    fun validatePassword(password: String): String? {
+        val lengthLimit = 6
+        return when {
+            password.isEmpty() -> emptyInputMessage(context.getString(R.string.password))
+
+            password.length < lengthLimit -> inputLengthLimitMessage(
+                context.getString(R.string.password),
+                lengthLimit
+            )
+
+            else -> null
+        }
+    }
+
+    fun validateUsername(username: String): String? {
+        val lengthLimit = 3
+        return when {
+            username.isEmpty() -> emptyInputMessage(context.getString(R.string.username))
+
+            username.length < lengthLimit -> inputLengthLimitMessage(
+                context.getString(R.string.username),
+                lengthLimit
+            )
+
+            else -> null
+        }
+    }
+
+    private fun emptyInputMessage(input: String): String {
+        return String.format(context.getString(R.string.error_empty_field), input)
+    }
+
+    private fun showErrorInput(textView: TextView, errorMessage: String) {
+        textView.text = errorMessage
+        textView.visibility = View.VISIBLE
+    }
+
+    private fun hideErrorInput(textView: TextView) {
+        textView.visibility = View.GONE
+    }
+
+
+    fun checkValidation(tvError: TextView, errorMessage: String?) {
+        if (errorMessage != null) {
+            showErrorInput(
+                tvError,
+                errorMessage
+            )
+        } else {
+            hideErrorInput(tvError)
+        }
+    }
+
+    private fun inputLengthLimitMessage(input: String, length: Int): String {
+        return String.format(context.getString(R.string.error_min_length_field), input, length)
+    }
 }

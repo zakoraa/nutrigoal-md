@@ -5,6 +5,8 @@
     <dimen name="edt_gap">20dp</dimen>
     <dimen name="edt_icon_gap">8dp</dimen>
     <dimen name="edt_padding_horizontal">20dp</dimen>
+    <dimen name="edt_error_text_margin_top">3dp</dimen>
+    <dimen name="edt_error_text_margin_start">25dp</dimen>
 
     <dimen name="rb_gap_vertical">10dp</dimen>
     <dimen name="rb_gap_horizontal">30dp</dimen>

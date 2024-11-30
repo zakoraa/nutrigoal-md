@@ -9,13 +9,6 @@ import kotlinx.coroutines.flow.onStart
 fun <T> Flow<T>.asResultState(): Flow<ResultState<T>> {
     return this
         .map<T, ResultState<T>> { ResultState.Success(it) }
-        .onStart { emit(ResultState.Initial) }
-        .catch { emit(ResultState.Error(it.message ?: "Unknown error")) }
-}
-
-fun <T> Flow<T>.asResultFromLoadingState(): Flow<ResultState<T>> {
-    return this
-        .map<T, ResultState<T>> { ResultState.Success(it) }
         .onStart { emit(ResultState.Loading) }
         .catch { emit(ResultState.Error(it.message ?: "Unknown error")) }
 }

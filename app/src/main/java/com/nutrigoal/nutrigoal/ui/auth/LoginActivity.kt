@@ -19,6 +19,7 @@ import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
 import com.nutrigoal.nutrigoal.ui.MainActivity
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
+import com.nutrigoal.nutrigoal.utils.InputValidator
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -27,6 +28,8 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: AuthViewModel by viewModels()
+    private val inputValidator: InputValidator by lazy { InputValidator(this@LoginActivity) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +52,33 @@ class LoginActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             viewModel.loginWithGoogleState.collect { result ->
-                handleLoginWithGoogleState(result)
+                handleLoginState(result)
             }
+        }
+
+        lifecycleScope.launch {
+            viewModel.loginWithEmailAndPasswordState.collect { result ->
+                handleLoginState(result)
+            }
+        }
+    }
+
+    private fun initAction() {
+        with(binding) {
+
+            tvDirectToRegister.setOnClickListener {
+                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+                startActivity(intent)
+            }
+
+            btnLogin.setOnClickListener {
+                handleLoginWithEmailAndPassword()
+            }
+
+            btnLoginWithGoogle.setOnClickListener {
+                viewModel.getCredentialResponse(this@LoginActivity)
+            }
+
         }
     }
 
@@ -59,19 +87,19 @@ class LoginActivity : AppCompatActivity() {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 showLoading(false)
-                handleLogin(result.data)
+                handleLoginWithGoogle(result.data)
             }
 
             is ResultState.Error -> {
                 showLoading(false)
-                ToastUtil.showToast(this, result.error)
+                ToastUtil.showToast(this, getString(R.string.error_login))
             }
 
             is ResultState.Initial -> {}
         }
     }
 
-    private fun handleLoginWithGoogleState(result: ResultState<FirebaseUser?>) {
+    private fun handleLoginState(result: ResultState<FirebaseUser?>) {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
@@ -83,7 +111,7 @@ class LoginActivity : AppCompatActivity() {
 
             is ResultState.Error -> {
                 showLoading(false)
-                ToastUtil.showToast(this, result.error)
+                ToastUtil.showToast(this, getString(R.string.error_login))
             }
 
             is ResultState.Initial -> {}
@@ -91,28 +119,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun initAction() {
-        with(binding) {
-            edEmail.setInputName(getString(R.string.email))
-            edPassword.setInputName(getString(R.string.password))
-
-            tvDirectToRegister.setOnClickListener {
-                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
-                startActivity(intent)
-            }
-
-            btnLogin.setOnClickListener {
-                login()
-            }
-
-            btnLoginWithGoogle.setOnClickListener {
-                viewModel.getCredentialResponse(this@LoginActivity)
-            }
-
-        }
-    }
-
-    private fun handleLogin(result: GetCredentialResponse) {
+    private fun handleLoginWithGoogle(result: GetCredentialResponse) {
         when (val credential = result.credential) {
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
@@ -143,31 +150,20 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun login() {
+    private fun handleLoginWithEmailAndPassword() {
         with(binding) {
-            val email = edEmail.text.toString()
-            val password = edPassword.text.toString()
+            val email = edEmail.text.toString().trim()
+            val password = edPassword.text.toString().trim()
 
-//            if (email.isEmpty()) {
-//                showToast(getString(R.string.error_empty_field, getString(R.string.email)))
-//            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-//                showToast(getString(R.string.error_wrong_email_format))
-//            } else if (password.isEmpty()) {
-//                showToast(getString(R.string.error_empty_field, getString(R.string.password)))
-//            } else if (password.length < 8) {
-//                showToast(
-//                    getString(
-//                        R.string.error_min_length_field, getString(R.string.password), 8
-//                    )
-//                )
-//            } else {
-//
-//            }
-            val intent = Intent(
-                this@LoginActivity,
-                com.nutrigoal.nutrigoal.ui.survey.Survey1Activity::class.java
-            )
-            startActivity(intent)
+            val emailError = inputValidator.validateEmail(email)
+            val passwordError = inputValidator.validatePassword(password)
+
+            inputValidator.checkValidation(tvErrorEmail, emailError)
+            inputValidator.checkValidation(tvErrorPassword, passwordError)
+
+            if (emailError == null && passwordError == null) {
+                viewModel.loginWithEmailAndPassword(email, password)
+            }
         }
     }
 

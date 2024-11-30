@@ -97,6 +97,18 @@
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/tv_desc" />
 
+            <TextView
+                android:id="@+id/tv_error_body_weight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/edt_error_text_margin_start"
+                android:layout_marginTop="@dimen/edt_error_text_margin_top"
+                android:textColor="@color/error"
+                app:layout_constraintStart_toStartOf="@id/progress_base_line"
+                app:layout_constraintTop_toBottomOf="@id/ed_body_weight"
+                android:visibility="gone"
+                tools:text="Wrong input" />
+
             <com.nutrigoal.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_height"
                 android:layout_width="0dp"
@@ -107,7 +119,19 @@
                 android:inputType="number"
                 app:layout_constraintEnd_toEndOf="@id/progress_base_line"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
-                app:layout_constraintTop_toBottomOf="@id/ed_body_weight" />
+                app:layout_constraintTop_toBottomOf="@id/tv_error_body_weight" />
+
+            <TextView
+                android:id="@+id/tv_error_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/edt_error_text_margin_start"
+                android:layout_marginTop="@dimen/edt_error_text_margin_top"
+                android:textColor="@color/error"
+                app:layout_constraintStart_toStartOf="@id/progress_base_line"
+                app:layout_constraintTop_toBottomOf="@id/ed_height"
+                android:visibility="gone"
+                tools:text="Wrong input" />
 
             <com.nutrigoal.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_age"
@@ -118,7 +142,19 @@
                 android:inputType="number"
                 app:layout_constraintEnd_toEndOf="@id/progress_base_line"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
-                app:layout_constraintTop_toBottomOf="@id/ed_height" />
+                app:layout_constraintTop_toBottomOf="@id/tv_error_height" />
+
+            <TextView
+                android:id="@+id/tv_error_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/edt_error_text_margin_start"
+                android:layout_marginTop="@dimen/edt_error_text_margin_top"
+                android:textColor="@color/error"
+                app:layout_constraintStart_toStartOf="@id/progress_base_line"
+                app:layout_constraintTop_toBottomOf="@id/ed_age"
+                android:visibility="gone"
+                tools:text="Wrong input" />
 
             <TextView
                 android:id="@+id/tv_gender_title"
@@ -129,7 +165,7 @@
                 android:text="@string/select_gender"
                 app:layout_constraintEnd_toEndOf="@id/progress_base_line"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
-                app:layout_constraintTop_toBottomOf="@id/ed_age" />
+                app:layout_constraintTop_toBottomOf="@id/tv_error_age" />
 
             <RadioGroup
                 android:id="@+id/group_radio"

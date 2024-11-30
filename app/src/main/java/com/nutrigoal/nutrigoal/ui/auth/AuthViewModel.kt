@@ -23,6 +23,13 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
         MutableStateFlow<ResultState<GetCredentialResponse>>(ResultState.Initial)
     val credentialState: StateFlow<ResultState<GetCredentialResponse>> get() = _credentialState
 
+    private val _loginWithEmailAndPasswordState =
+        MutableStateFlow<ResultState<FirebaseUser?>>(ResultState.Initial)
+    val loginWithEmailAndPasswordState: StateFlow<ResultState<FirebaseUser?>> get() = _loginWithEmailAndPasswordState
+    private val _registerWithEmailAndPasswordState =
+        MutableStateFlow<ResultState<FirebaseUser?>>(ResultState.Initial)
+    val registerWithEmailAndPasswordState: StateFlow<ResultState<FirebaseUser?>> get() = _registerWithEmailAndPasswordState
+
     fun getCredentialResponse(context: Context) {
         viewModelScope.launch {
             authRepository.getCredentialResponse(context)
@@ -40,4 +47,23 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
                 }
         }
     }
+
+    fun loginWithEmailAndPassword(email: String, password: String) {
+        viewModelScope.launch {
+            authRepository.loginWithEmailAndPassword(email, password)
+                .collect { result ->
+                    _loginWithEmailAndPasswordState.value = result
+                }
+        }
+    }
+
+    fun registerWithEmailAndPassword(username: String, email: String, password: String) {
+        viewModelScope.launch {
+            authRepository.registerWithEmailAndPassword(username, email, password)
+                .collect { result ->
+                    _registerWithEmailAndPasswordState.value = result
+                }
+        }
+    }
+
 }

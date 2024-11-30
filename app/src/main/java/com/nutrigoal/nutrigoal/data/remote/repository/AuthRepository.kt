@@ -8,6 +8,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.utils.asResultState
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +42,41 @@ class AuthRepository(private val auth: FirebaseAuth) {
         return flow {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             val result = auth.signInWithCredential(credential).await()
+            val user = result.user
+            if (user !== null) {
+                emit(user)
+            } else {
+                emit(null)
+            }
+        }.asResultState()
+    }
+
+    fun registerWithEmailAndPassword(
+        username: String,
+        email: String,
+        password: String
+    ): Flow<ResultState<FirebaseUser?>> {
+        return flow {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = result.user
+            if (user !== null) {
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(username)
+                    .build()
+                user.updateProfile(profileUpdates).await()
+                emit(user)
+            } else {
+                emit(null)
+            }
+        }.asResultState()
+    }
+
+    fun loginWithEmailAndPassword(
+        email: String,
+        password: String
+    ): Flow<ResultState<FirebaseUser?>> {
+        return flow {
+            val result = auth.signInWithEmailAndPassword(email, password).await()
             val user = result.user
             if (user !== null) {
                 emit(user)

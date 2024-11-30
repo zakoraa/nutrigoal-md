@@ -49,6 +49,12 @@
         <item name="fontFamily">@font/poppinsregular</item>
     </style>
 
+    <style name="TextErrorInput">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/grey</item>
+        <item name="fontFamily">@font/poppinsregular</item>
+    </style>
+
     <style name="TextOnButton">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/onPrimary</item>
