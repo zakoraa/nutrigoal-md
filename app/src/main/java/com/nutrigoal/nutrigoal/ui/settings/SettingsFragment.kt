@@ -1,20 +1,31 @@
 package com.nutrigoal.nutrigoal.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.databinding.FragmentSettingsBinding
+import com.nutrigoal.nutrigoal.ui.MainActivity
+import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.common.BoxSection
 import com.nutrigoal.nutrigoal.ui.common.BoxSectionAdapter
+import com.nutrigoal.nutrigoal.utils.ToastUtil
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
     private lateinit var boxSectionAdapter: BoxSectionAdapter<SettingBoxContentItem>
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,6 +40,33 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setUpView() {
+        setUpSettingSections()
+
+        lifecycleScope.launch {
+            viewModel.logoutState.collect { result ->
+                handleLogout(result)
+            }
+        }
+    }
+
+    private fun handleLogout(result: ResultState<Unit>) {
+        when (result) {
+            is ResultState.Loading -> {}
+            is ResultState.Success -> {
+                ToastUtil.showToast(requireContext(), getString(R.string.logout_success))
+                startActivity(Intent(requireActivity(), MainActivity::class.java))
+                requireActivity().finish()
+            }
+
+            is ResultState.Error -> {
+                ToastUtil.showToast(requireContext(), getString(R.string.error_logout))
+            }
+
+            is ResultState.Initial -> {}
+        }
+    }
+
+    private fun setUpSettingSections() {
         with(binding) {
             val sections = listOf(
                 BoxSection(
@@ -58,7 +96,7 @@ class SettingsFragment : Fragment() {
                     )
                 ),
             )
-            boxSectionAdapter = BoxSectionAdapter(sections)
+            boxSectionAdapter = BoxSectionAdapter(sections, viewModel)
             recyclerView.adapter = boxSectionAdapter
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(requireContext())

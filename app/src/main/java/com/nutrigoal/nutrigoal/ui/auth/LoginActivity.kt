@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.lifecycleScope
@@ -36,14 +35,12 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initView()
-        initAction()
+        setUpView()
+        setUpAction()
         playAnimation()
     }
 
-    private fun initView() {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
+    private fun setUpView() {
         lifecycleScope.launch {
             viewModel.credentialState.collect { result ->
                 handleCredentialState(result)
@@ -63,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun initAction() {
+    private fun setUpAction() {
         with(binding) {
 
             tvDirectToRegister.setOnClickListener {

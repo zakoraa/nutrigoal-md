@@ -10,12 +10,14 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
+import com.nutrigoal.nutrigoal.data.local.entity.User
 import com.nutrigoal.nutrigoal.utils.asResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class AuthRepository(private val auth: FirebaseAuth) {
+class AuthRepository(private val auth: FirebaseAuth, private val authPreference: AuthPreference) {
 
     fun getCredentialResponse(
         context: Context,
@@ -44,6 +46,12 @@ class AuthRepository(private val auth: FirebaseAuth) {
             val result = auth.signInWithCredential(credential).await()
             val user = result.user
             if (user !== null) {
+                authPreference.saveSession(
+                    User(
+                        id = user.uid,
+                        isLogin = true
+                    )
+                )
                 emit(user)
             } else {
                 emit(null)
@@ -79,10 +87,28 @@ class AuthRepository(private val auth: FirebaseAuth) {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val user = result.user
             if (user !== null) {
+                authPreference.saveSession(
+                    User(
+                        id = user.uid,
+                        isLogin = true
+                    )
+                )
                 emit(user)
             } else {
                 emit(null)
             }
+        }.asResultState()
+    }
+
+    fun logout(): Flow<ResultState<Unit>> {
+        return flow {
+            emit(authPreference.logout())
+        }.asResultState()
+    }
+
+    fun getSession(): Flow<ResultState<User>> {
+        return flow {
+            emit(authPreference.getUserSession())
         }.asResultState()
     }
 
