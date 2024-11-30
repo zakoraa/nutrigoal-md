@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.local.entity.User
 import com.nutrigoal.nutrigoal.data.remote.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
+
+    private val _userSessionState =
+        MutableStateFlow<ResultState<User>>(ResultState.Loading)
+    val userSessionState: StateFlow<ResultState<User>> get() = _userSessionState
+    private val _logoutState =
+        MutableStateFlow<ResultState<Unit>>(ResultState.Initial)
+    val logoutState: StateFlow<ResultState<Unit>> get() = _logoutState
 
     private val _loginWithGoogleState =
         MutableStateFlow<ResultState<FirebaseUser?>>(ResultState.Initial)
@@ -62,6 +70,24 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
             authRepository.registerWithEmailAndPassword(username, email, password)
                 .collect { result ->
                     _registerWithEmailAndPasswordState.value = result
+                }
+        }
+    }
+
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout().collect { result ->
+                _logoutState.value = result
+            }
+        }
+    }
+
+    fun getSession() {
+        viewModelScope.launch {
+            authRepository.getSession()
+                .collect { result ->
+                    _userSessionState.value = result
                 }
         }
     }

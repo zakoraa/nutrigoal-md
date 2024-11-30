@@ -34,12 +34,12 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initView()
-        initAction()
+        setUpView()
+        setUpAction()
         playAnimation()
     }
 
-    private fun initView() {
+    private fun setUpView() {
         lifecycleScope.launch {
             viewModel.credentialState.collect { result ->
                 handleCredentialState(result)
@@ -59,7 +59,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun initAction() {
+    private fun setUpAction() {
         with(binding) {
             edUsername.setInputName(getString(R.string.username))
             edEmail.setInputName(getString(R.string.email))
@@ -108,7 +108,7 @@ class RegisterActivity : AppCompatActivity() {
 
             is ResultState.Error -> {
                 showLoading(false)
-                ToastUtil.showToast(this, getString(R.string.error_register))
+                ToastUtil.showToast(this, getString(R.string.error_login))
             }
 
             is ResultState.Initial -> {}
@@ -121,8 +121,7 @@ class RegisterActivity : AppCompatActivity() {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 showLoading(false)
-                ToastUtil.showToast(this, getString(R.string.login_success))
-                startActivity(Intent(this, LoginActivity::class.java))
+                ToastUtil.showToast(this, getString(R.string.register_success))
                 finish()
             }
 

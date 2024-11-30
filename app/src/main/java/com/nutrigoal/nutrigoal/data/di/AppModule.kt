@@ -2,7 +2,11 @@ package com.nutrigoal.nutrigoal.data.di
 
 import android.app.Application
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.google.firebase.auth.FirebaseAuth
+import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
+import com.nutrigoal.nutrigoal.data.local.database.dataStore
 import com.nutrigoal.nutrigoal.data.remote.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
@@ -24,5 +28,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(auth: FirebaseAuth): AuthRepository = AuthRepository(auth)
+    fun provideAuthRepository(auth: FirebaseAuth, authPreference: AuthPreference): AuthRepository =
+        AuthRepository(auth, authPreference)
+
+    @Provides
+    @Singleton
+    fun provideDataStore(context: Context): DataStore<Preferences> = context.dataStore
+
+    @Provides
+    @Singleton
+    fun provideAuthPreference(dataStore: DataStore<Preferences>): AuthPreference =
+        AuthPreference.getInstance(dataStore)
 }

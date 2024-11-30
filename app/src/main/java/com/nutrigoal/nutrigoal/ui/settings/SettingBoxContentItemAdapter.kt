@@ -8,10 +8,14 @@ import androidx.core.content.ContextCompat.getString
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.SettingBoxContentItemBinding
-import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
+import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.profile.ProfileActivity
+import com.nutrigoal.nutrigoal.utils.AlertDialogUtil
 
-class SettingBoxContentItemAdapter(private val items: List<SettingBoxContentItem>) :
+class SettingBoxContentItemAdapter(
+    private val items: List<SettingBoxContentItem>,
+    private val viewModel: AuthViewModel
+) :
     RecyclerView.Adapter<SettingBoxContentItemAdapter.SettingsBoxContentItemViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -57,11 +61,11 @@ class SettingBoxContentItemAdapter(private val items: List<SettingBoxContentItem
 
                         getString(context, R.string.logout) -> {
                             itemView.setOnClickListener {
-                                val intent = Intent(context, LoginActivity::class.java).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                }
-                                context.startActivity(intent)
+                                AlertDialogUtil.showDialog(
+                                    context,
+                                    context.getString(R.string.confirm_logout_message),
+                                    onAccept = { viewModel.logout() }
+                                )
                             }
                         }
                     }

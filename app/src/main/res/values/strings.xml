@@ -3,9 +3,11 @@
 
     <string name="login_success">Login is successful</string>
     <string name="register_success">Register successful</string>
+    <string name="logout_success">Logout is successful</string>
 
     <string name="error_login">Login failed. Please try again.</string>
     <string name="error_register">Register failed. Please try again.</string>
+    <string name="error_logout">Logout failed. Please try again.</string>
     <string name="error_cancel_login_provider">Cancelled by User</string>
     <string name="error_email_already_registered">Register failed. Email already registered.</string>
     <string name="error_wrong_input">Your email or password is wrong. Try Again!</string>
@@ -106,4 +108,5 @@
     <string name="update_password">Update Password</string>
     <string name="iv_back_from_profile_desc">Back from profile page</string>
     <string name="iv_photo_profile_desc">Display photo profile</string>
+    <string name="confirm_logout_message">Are you sure you want to logout?</string>
 </resources>
