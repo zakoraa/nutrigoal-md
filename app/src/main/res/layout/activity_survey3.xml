@@ -77,49 +77,15 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
             <TextView
-                android:id="@+id/tv_diet_goals"
-                style="@style/TextLabel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="@string/what_is_your_goal"
-                app:layout_constraintEnd_toEndOf="@id/progress_line"
-                app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/tv_desc" />
-
-            <RadioGroup
-                android:id="@+id/rg_goal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="@id/progress_line"
-                app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/tv_diet_goals">
-
-                <RadioButton
-                    android:id="@+id/rb_diet_goals"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/rb_gap_horizontal"
-                    android:text="@string/diet_goals" />
-
-                <RadioButton
-                    android:id="@+id/rb_gaining_weight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/gaining_weight" />
-            </RadioGroup>
-
-            <TextView
                 android:id="@+id/tv_history_mag"
                 style="@style/TextLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/rb_gap_vertical"
+                android:layout_marginTop="30dp"
                 android:text="@string/is_there_a_history_of_mag_disease"
                 app:layout_constraintEnd_toEndOf="@id/progress_line"
                 app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/rg_goal" />
+                app:layout_constraintTop_toBottomOf="@id/tv_desc" />
 
             <RadioGroup
                 android:id="@+id/rg_history_mag"
@@ -183,33 +149,11 @@
                 style="@style/TextLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/rb_gap_vertical"
-                android:text="@string/what_is_your_favorite_processed_food"
-                app:layout_constraintEnd_toEndOf="@id/progress_line"
-                app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/rg_diet_category" />
-
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
-                android:id="@+id/ed_favorite_processed_food"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/edt_height"
-                android:layout_marginTop="@dimen/rb_gap_vertical"
-                android:hint="@string/favorite_processed_food_hint"
-                app:layout_constraintEnd_toEndOf="@id/progress_line"
-                app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/tv_favorite_processed_food" />
-
-            <TextView
-                android:id="@+id/tv_favorite_instant_food"
-                style="@style/TextLabel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/edt_gap"
                 android:text="@string/what_is_your_favorite_processed_food"
                 app:layout_constraintEnd_toEndOf="@id/progress_line"
                 app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/ed_favorite_processed_food" />
-
+                app:layout_constraintTop_toBottomOf="@id/rg_diet_category" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -218,7 +162,7 @@
                 android:paddingBottom="@dimen/margin_bottom_to_edge"
                 app:layout_constraintEnd_toEndOf="@id/progress_line"
                 app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/tv_favorite_instant_food">
+                app:layout_constraintTop_toBottomOf="@id/tv_favorite_processed_food">
 
                 <AutoCompleteTextView
                     android:id="@+id/auto_complete_text_view"
@@ -228,8 +172,8 @@
                     android:background="@drawable/outline_button"
                     android:hint="@null"
                     android:inputType="none"
-                    android:labelFor="@string/choose_instant_food"
-                    android:text="@string/choose_instant_food" />
+                    android:labelFor="@string/choose_processed_food"
+                    android:text="@string/choose_processed_food" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

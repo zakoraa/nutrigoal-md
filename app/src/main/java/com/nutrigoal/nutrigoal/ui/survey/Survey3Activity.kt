@@ -60,17 +60,19 @@ class Survey3Activity : AppCompatActivity() {
                 AnimationUtil.createTranslationAnimator(tvStep3),
                 AnimationUtil.createTranslationAnimator(tvTitle, durationDefault + 100),
                 AnimationUtil.createTranslationAnimator(tvDesc, durationDefault + 150),
-                AnimationUtil.createTranslationAnimator(tvDietGoals, durationDefault + 200),
-                AnimationUtil.createTranslationAnimator(rgGoal, durationDefault + 250),
-                AnimationUtil.createTranslationAnimator(tvHistoryMag, durationDefault + 300),
-                AnimationUtil.createTranslationAnimator(rgHistoryMag, durationDefault + 350),
-                AnimationUtil.createTranslationAnimator(tvDietCategory, durationDefault + 400),
-                AnimationUtil.createTranslationAnimator(rgDietCategory, durationDefault + 450),
-                AnimationUtil.createTranslationAnimator(tvFavoriteProcessedFood, durationDefault + 500),
-                AnimationUtil.createTranslationAnimator(edFavoriteProcessedFood, durationDefault + 550),
-                AnimationUtil.createTranslationAnimator(tvFavoriteInstantFood, durationDefault + 600),
-                AnimationUtil.createTranslationAnimator(autoCompleteTextView, durationDefault + 650),
-                )
+                AnimationUtil.createTranslationAnimator(tvHistoryMag, durationDefault + 200),
+                AnimationUtil.createTranslationAnimator(rgHistoryMag, durationDefault + 250),
+                AnimationUtil.createTranslationAnimator(tvDietCategory, durationDefault + 300),
+                AnimationUtil.createTranslationAnimator(rgDietCategory, durationDefault + 350),
+                AnimationUtil.createTranslationAnimator(
+                    tvFavoriteProcessedFood,
+                    durationDefault + 400
+                ),
+                AnimationUtil.createTranslationAnimator(
+                    autoCompleteTextView,
+                    durationDefault + 450
+                ),
+            )
 
             val together = AnimatorSet().apply {
                 playTogether(animators)

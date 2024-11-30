@@ -5,16 +5,31 @@ import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialResponse
+import androidx.lifecycle.lifecycleScope
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.google.firebase.auth.FirebaseUser
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
+import com.nutrigoal.nutrigoal.ui.MainActivity
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
+import com.nutrigoal.nutrigoal.utils.InputValidator
+import com.nutrigoal.nutrigoal.utils.ToastUtil
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private val viewModel: AuthViewModel by viewModels()
+    private val inputValidator: InputValidator by lazy { InputValidator(this@LoginActivity) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,18 +39,32 @@ class LoginActivity : AppCompatActivity() {
         initView()
         initAction()
         playAnimation()
-
-        binding.btnLoginWithGoogle.setOnClickListener {}
     }
 
     private fun initView() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+        lifecycleScope.launch {
+            viewModel.credentialState.collect { result ->
+                handleCredentialState(result)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.loginWithGoogleState.collect { result ->
+                handleLoginState(result)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.loginWithEmailAndPasswordState.collect { result ->
+                handleLoginState(result)
+            }
+        }
     }
 
     private fun initAction() {
         with(binding) {
-            edEmail.setInputName(getString(R.string.email))
-            edPassword.setInputName(getString(R.string.password))
 
             tvDirectToRegister.setOnClickListener {
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
@@ -43,48 +72,117 @@ class LoginActivity : AppCompatActivity() {
             }
 
             btnLogin.setOnClickListener {
-                login()
+                handleLoginWithEmailAndPassword()
+            }
+
+            btnLoginWithGoogle.setOnClickListener {
+                viewModel.getCredentialResponse(this@LoginActivity)
             }
 
         }
     }
 
-    private fun login() {
-        with(binding) {
-            val email = edEmail.text.toString()
-            val password = edPassword.text.toString()
+    private fun handleCredentialState(result: ResultState<GetCredentialResponse>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                showLoading(false)
+                handleLoginWithGoogle(result.data)
+            }
 
-//            if (email.isEmpty()) {
-//                showToast(getString(R.string.error_empty_field, getString(R.string.email)))
-//            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-//                showToast(getString(R.string.error_wrong_email_format))
-//            } else if (password.isEmpty()) {
-//                showToast(getString(R.string.error_empty_field, getString(R.string.password)))
-//            } else if (password.length < 8) {
-//                showToast(
-//                    getString(
-//                        R.string.error_min_length_field, getString(R.string.password), 8
-//                    )
-//                )
-//            } else {
-//
-//            }
-            val intent = Intent(
-                this@LoginActivity,
-                com.nutrigoal.nutrigoal.ui.survey.Survey1Activity::class.java
-            )
-            startActivity(intent)
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.error_login))
+            }
+
+            is ResultState.Initial -> {}
+        }
+    }
+
+    private fun handleLoginState(result: ResultState<FirebaseUser?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.login_success))
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.error_login))
+            }
+
+            is ResultState.Initial -> {}
+
+        }
+    }
+
+    private fun handleLoginWithGoogle(result: GetCredentialResponse) {
+        when (val credential = result.credential) {
+            is CustomCredential -> {
+                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    try {
+                        val googleIdTokenCredential =
+                            GoogleIdTokenCredential.createFrom(credential.data)
+                        viewModel.loginWithGoogle(googleIdTokenCredential.idToken)
+                    } catch (e: GoogleIdTokenParsingException) {
+                        ToastUtil.showToast(
+                            this@LoginActivity,
+                            getString(R.string.error_login)
+                        )
+                    }
+                } else {
+                    ToastUtil.showToast(
+                        this@LoginActivity,
+                        getString(R.string.error_login)
+                    )
+                }
+            }
+
+            else -> {
+                ToastUtil.showToast(
+                    this@LoginActivity,
+                    getString(R.string.error_login)
+                )
+            }
+        }
+    }
+
+    private fun handleLoginWithEmailAndPassword() {
+        with(binding) {
+            val email = edEmail.text.toString().trim()
+            val password = edPassword.text.toString().trim()
+
+            val emailError = inputValidator.validateEmail(email)
+            val passwordError = inputValidator.validatePassword(password)
+
+            inputValidator.checkValidation(tvErrorEmail, emailError)
+            inputValidator.checkValidation(tvErrorPassword, passwordError)
+
+            if (emailError == null && passwordError == null) {
+                viewModel.loginWithEmailAndPassword(email, password)
+            }
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
         with(binding) {
-
+            if (isLoading) {
+                btnLogin.visibility = View.INVISIBLE
+                btnLoginWithGoogle.isClickable = false
+                btnLoginWithFacebook.isClickable = false
+                shimmerBtnLogin.visibility = View.VISIBLE
+                shimmerBtnLogin.startShimmer()
+            } else {
+                btnLogin.visibility = View.VISIBLE
+                btnLoginWithGoogle.isClickable = true
+                btnLoginWithFacebook.isClickable = true
+                shimmerBtnLogin.visibility = View.INVISIBLE
+                shimmerBtnLogin.stopShimmer()
+            }
         }
-    }
-
-    private fun showToast(message: String?) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun playAnimation() {

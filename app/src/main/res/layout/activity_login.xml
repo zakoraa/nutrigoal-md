@@ -61,6 +61,19 @@
             app:layout_constraintStart_toStartOf="@id/tv_title"
             app:layout_constraintTop_toBottomOf="@id/tv_desc" />
 
+        <TextView
+            android:id="@+id/tv_error_email"
+            style="@style/TextErrorInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/edt_error_text_margin_start"
+            android:layout_marginTop="@dimen/edt_error_text_margin_top"
+            android:textColor="@color/error"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/ed_email"
+            app:layout_constraintTop_toBottomOf="@id/ed_email"
+            tools:text="Wrong input" />
+
         <com.nutrigoal.nutrigoal.ui.common.TextFieldView
             android:id="@+id/ed_password"
             android:layout_width="0dp"
@@ -72,10 +85,23 @@
             android:inputType="textPassword"
             app:layout_constraintEnd_toEndOf="@id/tv_title"
             app:layout_constraintStart_toStartOf="@id/tv_title"
-            app:layout_constraintTop_toBottomOf="@id/ed_email"
+            app:layout_constraintTop_toBottomOf="@id/tv_error_email"
             app:passwordToggleEnabled="true" />
 
-        <Button
+        <TextView
+            android:id="@+id/tv_error_password"
+            style="@style/TextErrorInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/edt_error_text_margin_start"
+            android:layout_marginTop="@dimen/edt_error_text_margin_top"
+            android:textColor="@color/error"
+            app:layout_constraintStart_toStartOf="@id/ed_email"
+            app:layout_constraintTop_toBottomOf="@id/ed_password"
+            android:visibility="gone"
+            tools:text="Wrong input" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login"
             style="@style/TextOnButton"
             android:layout_width="0dp"
@@ -84,8 +110,21 @@
             android:text="@string/login"
             app:layout_constraintEnd_toEndOf="@id/tv_title"
             app:layout_constraintStart_toStartOf="@id/tv_title"
-            app:layout_constraintTop_toBottomOf="@id/ed_password" />
+            app:layout_constraintTop_toBottomOf="@id/tv_error_password" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_btn_login"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginTop="@dimen/edt_gap"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/tv_title"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/ed_password"
+            app:shimmer_duration="3000">
+
+            <include layout="@layout/shimmer_button" />
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
         <LinearLayout
             android:id="@+id/ll_bellow_btn"

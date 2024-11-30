@@ -1,6 +1,21 @@
 <resources>
     <string name="app_name">NutriGoal</string>
 
+    <string name="login_success">Login is successful</string>
+    <string name="register_success">Register successful</string>
+
+    <string name="error_login">Login failed. Please try again.</string>
+    <string name="error_register">Register failed. Please try again.</string>
+    <string name="error_cancel_login_provider">Cancelled by User</string>
+    <string name="error_email_already_registered">Register failed. Email already registered.</string>
+    <string name="error_wrong_input">Your email or password is wrong. Try Again!</string>
+    <string name="error_something_wrong">Something wrong. Try Again!</string>
+    <string name="error_wrong_email_format">Invalid email format</string>
+    <string name="error_min_length_field">%s cannot be less than %d characters</string>
+    <string name="error_empty_field">%s must not be empty</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="error_expired_session">Your session expired, please login again!</string>
+
     <string name="dashboard">Dashboard</string>
     <string name="plan_diet">Plan Diet</string>
     <string name="notifications">Notifications</string>
@@ -26,9 +41,6 @@
     <string name="tv_home_greetings">Hello Universe!</string>
     <string name="tv_home_desc">Your stories, an inspiration to others.</string>
 
-    <string name="login_success">Login Success</string>
-    <string name="register_success">Register Success</string>
-
     <string name="loading">Loading</string>
     <string name="log_out_desc">Logout of account</string>
     <string name="logout">Logout</string>
@@ -37,15 +49,6 @@
     <string name="back_btn_profile_desc">Return from profile page</string>
     <string name="description">Description</string>
 
-    <string name="error_story_desc_empty">Please fill in the description first!</string>
-    <string name="error_story_image_empty">Please select a picture first!</string>
-    <string name="error_wrong_input">Your email or password is wrong. Try Again!</string>
-    <string name="error_something_wrong">Something wrong. Try Again!</string>
-    <string name="error_wrong_email_format">Invalid email format</string>
-    <string name="error_min_length_field">%s cannot be less than %d characters</string>
-    <string name="error_empty_field">%s must not be empty</string>
-    <string name="error_occurs">Error Occurs</string>
-    <string name="error_expired_session">Your session expired, please login again!</string>
     <string name="app_logo_desc">display the app logo</string>
     <string name="continue_with_google">Continue with Google</string>
     <string name="continue_with_facebook">Continue with Facebook</string>
@@ -72,9 +75,6 @@
     <string name="select_gender">Select Gender</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
-    <string name="what_is_your_goal">What is your goal?</string>
-    <string name="diet_goals">Diet goals</string>
-    <string name="gaining_weight">Gaining weight</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="vegan">Vegan</string>
@@ -82,8 +82,7 @@
     <string name="select_diet_category">Select diet category</string>
     <string name="is_there_a_history_of_mag_disease">Is there a history of mag disease?</string>
     <string name="what_is_your_favorite_processed_food">What is your favorite processed food?</string>
-    <string name="favorite_processed_food_hint">E.g : Nasi goreng</string>
-    <string name="choose_instant_food">Choose instant food</string>
+    <string name="choose_processed_food">Choose processed food</string>
 
     <string-array name="instant_foods">
         <item>Fried Noodles</item>
