@@ -2,6 +2,7 @@ package com.nutrigoal.nutrigoal.ui.common
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.databinding.BoxSectionItemBinding
@@ -10,8 +11,14 @@ import com.nutrigoal.nutrigoal.ui.notifications.NotificationBoxContentItem
 import com.nutrigoal.nutrigoal.ui.notifications.NotificationBoxContentItemAdapter
 import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItem
 import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItemAdapter
+import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 
-class BoxSectionAdapter<T>(private val sections: List<BoxSection<T>>, private val viewModel: AuthViewModel) :
+class BoxSectionAdapter<T>(
+    private val sections: List<BoxSection<T>>,
+    private val viewModel: AuthViewModel,
+    private val settingsViewModel: SettingsViewModel,
+    private val lifecycleOwner: LifecycleOwner
+) :
     RecyclerView.Adapter<BoxSectionAdapter<T>.BoxSectionViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoxSectionViewHolder {
@@ -39,7 +46,12 @@ class BoxSectionAdapter<T>(private val sections: List<BoxSection<T>>, private va
                     else -> when {
                         items.isNotEmpty() && items[0] is SettingBoxContentItem -> {
                             @Suppress("UNCHECKED_CAST")
-                            (SettingBoxContentItemAdapter(items as List<SettingBoxContentItem>, viewModel))
+                            (SettingBoxContentItemAdapter(
+                                items as List<SettingBoxContentItem>,
+                                viewModel,
+                                settingsViewModel,
+                                lifecycleOwner,
+                            ))
                         }
 
                         items.isNotEmpty() && items[0] is NotificationBoxContentItem -> {

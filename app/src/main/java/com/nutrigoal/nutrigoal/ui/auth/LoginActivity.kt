@@ -15,6 +15,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingExcept
 import com.google.firebase.auth.FirebaseUser
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
 import com.nutrigoal.nutrigoal.ui.MainActivity
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
@@ -28,7 +29,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: AuthViewModel by viewModels()
     private val inputValidator: InputValidator by lazy { InputValidator(this@LoginActivity) }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +56,12 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.loginWithEmailAndPasswordState.collect { result ->
                 handleLoginState(result)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.currentUserState.collect { result ->
+                handleGetUser(result)
             }
         }
     }
@@ -102,6 +108,7 @@ class LoginActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 showLoading(false)
                 ToastUtil.showToast(this, getString(R.string.login_success))
+                viewModel.getCurrentUser()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
@@ -161,6 +168,23 @@ class LoginActivity : AppCompatActivity() {
             if (emailError == null && passwordError == null) {
                 viewModel.loginWithEmailAndPassword(email, password)
             }
+        }
+    }
+
+    private fun handleGetUser(result: ResultState<UserEntity?>){
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                viewModel.setCurrentUser(result.data)
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.error_get_user))
+            }
+
+            is ResultState.Initial -> {}
+
         }
     }
 

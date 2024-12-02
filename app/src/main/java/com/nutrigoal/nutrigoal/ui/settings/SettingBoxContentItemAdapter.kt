@@ -4,7 +4,9 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import androidx.core.content.ContextCompat.getString
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.SettingBoxContentItemBinding
@@ -14,7 +16,9 @@ import com.nutrigoal.nutrigoal.utils.AlertDialogUtil
 
 class SettingBoxContentItemAdapter(
     private val items: List<SettingBoxContentItem>,
-    private val viewModel: AuthViewModel
+    private val viewModel: AuthViewModel,
+    private val settingsViewModel: SettingsViewModel,
+    private val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<SettingBoxContentItemAdapter.SettingsBoxContentItemViewHolder>() {
 
@@ -39,23 +43,39 @@ class SettingBoxContentItemAdapter(
         fun bind(item: SettingBoxContentItem) {
             with(binding) {
                 tvTitle.text = item.title
-                toggleButton.isChecked = item.isToggleButton
+                toggleButton.isChecked = false
                 endIcon.setImageResource(item.endIconResId)
+                val context = itemView.context
 
                 if (item.isToggleButton) {
                     toggleButton.visibility = View.VISIBLE
                     endIcon.visibility = View.GONE
+                    when (item.title) {
+                        getString(context, R.string.dark_mode) -> {
+                            settingsViewModel.getThemeSettings()
+                                .observe(lifecycleOwner) { isDarkModeActive: Boolean ->
+                                    toggleButton.isChecked = isDarkModeActive
+                                }
+
+                            toggleButton.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+                                settingsViewModel.saveThemeSetting(isChecked)
+                            }
+
+                        }
+                    }
                 } else {
                     toggleButton.visibility = View.GONE
                     endIcon.visibility = View.VISIBLE
-
-                    val context = itemView.context
 
                     when (item.title) {
                         getString(context, R.string.profile) -> {
                             itemView.setOnClickListener {
                                 val intent = Intent(context, ProfileActivity::class.java)
+                                viewModel.currentUser.observe(lifecycleOwner) { user ->
+                                    intent.putExtra(EXTRA_USER, user)
+                                }
                                 context.startActivity(intent)
+
                             }
                         }
 
@@ -68,13 +88,16 @@ class SettingBoxContentItemAdapter(
                                 )
                             }
                         }
+
                     }
-
-
                 }
             }
 
         }
+    }
+
+    companion object {
+        const val EXTRA_USER = "extra_user"
     }
 }
 

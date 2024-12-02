@@ -86,4 +86,5 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.shimmer)
     implementation(platform(libs.firebase.bom))
+    implementation(libs.androidx.core.splashscreen)
 }

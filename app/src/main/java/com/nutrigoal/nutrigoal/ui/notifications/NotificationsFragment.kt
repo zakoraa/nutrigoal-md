@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import com.nutrigoal.nutrigoal.databinding.FragmentNotificationsBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.common.BoxSection
 import com.nutrigoal.nutrigoal.ui.common.BoxSectionAdapter
+import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,6 +23,7 @@ class NotificationsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var boxSectionAdapter: BoxSectionAdapter<NotificationBoxContentItem>
     private val viewModel: AuthViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,7 +68,8 @@ class NotificationsFragment : Fragment() {
                 ),
             )
 
-            boxSectionAdapter = BoxSectionAdapter(sections, viewModel)
+            boxSectionAdapter =
+                BoxSectionAdapter(sections, viewModel, settingsViewModel, viewLifecycleOwner)
             recyclerView.adapter = boxSectionAdapter
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(requireContext())

@@ -10,6 +10,8 @@
     <color name="onPrimary">#FFFFFFFF</color>
 
     <color name="background">#FFFFFFFF</color>
+    <color name="onBackground">#FF000000</color>
+    <color name="bottom_nav_stroke_color">#00FFFFFF</color>
     <color name="greyBackground">#F3F3F3</color>
     <color name="error">#FF4545</color>
 
