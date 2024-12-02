@@ -65,7 +65,7 @@ class NotificationsFragment : Fragment() {
                 ),
             )
 
-            boxSectionAdapter = BoxSectionAdapter(sections, viewModel)
+            boxSectionAdapter = BoxSectionAdapter(sections, viewModel, viewLifecycleOwner)
             recyclerView.adapter = boxSectionAdapter
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(requireContext())

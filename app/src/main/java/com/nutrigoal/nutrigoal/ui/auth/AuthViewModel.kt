@@ -1,12 +1,16 @@
 package com.nutrigoal.nutrigoal.ui.auth
 
 import android.content.Context
+import android.util.Log
 import androidx.credentials.GetCredentialResponse
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.entity.User
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.data.remote.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +41,25 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
     private val _registerWithEmailAndPasswordState =
         MutableStateFlow<ResultState<FirebaseUser?>>(ResultState.Initial)
     val registerWithEmailAndPasswordState: StateFlow<ResultState<FirebaseUser?>> get() = _registerWithEmailAndPasswordState
+
+    private val _currentUserState =
+        MutableStateFlow<ResultState<UserEntity?>>(ResultState.Initial)
+    val currentUserState: StateFlow<ResultState<UserEntity?>> get() = _currentUserState
+    private val _currentUser = MutableLiveData<UserEntity?>(null)
+    val currentUser: LiveData<UserEntity?> get() = _currentUser
+
+    fun setCurrentUser(user: UserEntity?) {
+        _currentUser.value = user
+        Log.d("FLORAAA", "setCurrentUser: ${currentUser.value.toString()}")
+    }
+
+    fun getCurrentUser() {
+        viewModelScope.launch {
+            authRepository.getCurrentUser().collect { result ->
+                _currentUserState.value = result
+            }
+        }
+    }
 
     fun getCredentialResponse(context: Context) {
         viewModelScope.launch {
@@ -73,7 +96,6 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
                 }
         }
     }
-
 
     fun logout() {
         viewModelScope.launch {

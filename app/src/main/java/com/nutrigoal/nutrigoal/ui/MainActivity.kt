@@ -2,11 +2,11 @@ package com.nutrigoal.nutrigoal.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +16,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.entity.User
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityMainBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
@@ -27,7 +28,6 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: AuthViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         viewModel.getSession()
 
@@ -58,18 +57,51 @@ class MainActivity : AppCompatActivity() {
                 handleGetUserSession(result)
             }
         }
+
+        lifecycleScope.launch {
+            viewModel.currentUserState.collect { result ->
+                handleGetUser(result)
+            }
+        }
+    }
+
+    private fun handleGetUser(result: ResultState<UserEntity?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                viewModel.setCurrentUser(result.data)
+                viewModel.currentUser.observe(this@MainActivity) { user ->
+                    if (user != null) {
+                        Log.d("FLORAAA", "KELASSSS: ${user.toString()}")
+                    } else {
+                        Log.d("FLORAAA", "User is null")
+                    }
+                }
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.error_get_user))
+            }
+
+            is ResultState.Initial -> {}
+
+        }
     }
 
     private fun handleGetUserSession(result: ResultState<User>) {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
-                showLoading(false)
                 if (!result.data.isLogin) {
                     val intent = Intent(this, LoginActivity::class.java)
                     startActivity(intent)
                     finish()
+                } else {
+                    Log.d("FLORAAAAA", "handleGetUserSession: (dijalanskan)")
+                    viewModel.getCurrentUser()
                 }
+                showLoading(false)
             }
 
             is ResultState.Error -> {

@@ -1,16 +1,25 @@
 package com.nutrigoal.nutrigoal.ui.profile
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityProfileBinding
+import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
+import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItemAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,34 +36,51 @@ class ProfileActivity : AppCompatActivity() {
         setUpAction()
     }
 
+    private fun setUpView() {
+        val user = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(
+                SettingBoxContentItemAdapter.EXTRA_USER,
+                UserEntity::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(SettingBoxContentItemAdapter.EXTRA_USER)
+        }
+
+        if (user != null) {
+            updateProfileData(user)
+        }
+
+    }
+
+    private fun updateProfileData(user: UserEntity) {
+         Glide.with(this)
+            .load(user.photoProfile)
+            .placeholder(R.drawable.photo_profile)
+            .into(binding.ivPhotoProfile)
+
+        val profileItems = listOf(
+            ProfileItem(getString(R.string.username), user.username),
+            ProfileItem(getString(R.string.email), user.email),
+            ProfileItem(getString(R.string.age), user.age.toString()),
+            ProfileItem(getString(R.string.gender), user.gender.toString()),
+            ProfileItem(getString(R.string.body_weight), "${user.bodyWeight} Kg"),
+            ProfileItem(getString(R.string.height), "${user.height} Cm")
+        )
+
+        val adapter = ProfileItemAdapter(profileItems)
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this).apply {
+            isSmoothScrollbarEnabled = true
+        }
+    }
+
     private fun setUpAction() {
         with(binding) {
             ivBack.setOnClickListener {
                 finish()
             }
-        }
-    }
-
-    private fun setUpView() {
-        val profileItems = listOf(
-            ProfileItem(getString(R.string.username), "John Doe"),
-            ProfileItem(getString(R.string.email), "johndoe@gmail.com"),
-            ProfileItem(getString(R.string.age), "17"),
-            ProfileItem(getString(R.string.gender), "Male"),
-            ProfileItem(getString(R.string.body_weight), "70 Kg"),
-            ProfileItem(getString(R.string.height), "170 Cm")
-        )
-
-        val adapter = ProfileItemAdapter(profileItems)
-        with(binding) {
-            recyclerView.adapter = adapter
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = object : LinearLayoutManager(this@ProfileActivity) {
-                override fun canScrollVertically(): Boolean {
-                    return false
-                }
-            }
-
         }
     }
 }

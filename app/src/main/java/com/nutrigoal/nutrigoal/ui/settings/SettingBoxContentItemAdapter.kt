@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getString
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.SettingBoxContentItemBinding
@@ -14,7 +15,8 @@ import com.nutrigoal.nutrigoal.utils.AlertDialogUtil
 
 class SettingBoxContentItemAdapter(
     private val items: List<SettingBoxContentItem>,
-    private val viewModel: AuthViewModel
+    private val viewModel: AuthViewModel,
+    private val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<SettingBoxContentItemAdapter.SettingsBoxContentItemViewHolder>() {
 
@@ -55,7 +57,11 @@ class SettingBoxContentItemAdapter(
                         getString(context, R.string.profile) -> {
                             itemView.setOnClickListener {
                                 val intent = Intent(context, ProfileActivity::class.java)
+                                viewModel.currentUser.observe(lifecycleOwner) { user ->
+                                    intent.putExtra(EXTRA_USER, user)
+                                }
                                 context.startActivity(intent)
+
                             }
                         }
 
@@ -75,6 +81,10 @@ class SettingBoxContentItemAdapter(
             }
 
         }
+    }
+
+    companion object {
+        const val EXTRA_USER = "extra_user"
     }
 }
 
