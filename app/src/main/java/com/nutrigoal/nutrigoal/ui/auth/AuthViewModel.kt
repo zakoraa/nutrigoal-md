@@ -1,7 +1,6 @@
 package com.nutrigoal.nutrigoal.ui.auth
 
 import android.content.Context
-import android.util.Log
 import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -50,7 +49,6 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
 
     fun setCurrentUser(user: UserEntity?) {
         _currentUser.value = user
-        Log.d("FLORAAA", "setCurrentUser: ${currentUser.value.toString()}")
     }
 
     fun getCurrentUser() {

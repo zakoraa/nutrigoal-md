@@ -11,10 +11,12 @@ import com.nutrigoal.nutrigoal.ui.notifications.NotificationBoxContentItem
 import com.nutrigoal.nutrigoal.ui.notifications.NotificationBoxContentItemAdapter
 import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItem
 import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItemAdapter
+import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 
 class BoxSectionAdapter<T>(
     private val sections: List<BoxSection<T>>,
     private val viewModel: AuthViewModel,
+    private val settingsViewModel: SettingsViewModel,
     private val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<BoxSectionAdapter<T>.BoxSectionViewHolder>() {
@@ -47,7 +49,8 @@ class BoxSectionAdapter<T>(
                             (SettingBoxContentItemAdapter(
                                 items as List<SettingBoxContentItem>,
                                 viewModel,
-                                lifecycleOwner
+                                settingsViewModel,
+                                lifecycleOwner,
                             ))
                         }
 

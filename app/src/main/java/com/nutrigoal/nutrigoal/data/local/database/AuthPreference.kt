@@ -10,24 +10,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.nutrigoal.nutrigoal.data.local.entity.User
 import kotlinx.coroutines.flow.first
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
+val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
 
 class AuthPreference private constructor(private val dataStore: DataStore<Preferences>) {
-
-    companion object {
-        @Volatile
-        private var INSTANCE: AuthPreference? = null
-        private val USER_ID = stringPreferencesKey("id")
-        private val IS_LOGIN_KEY = booleanPreferencesKey("isLogin")
-
-        fun getInstance(dataStore: DataStore<Preferences>): AuthPreference {
-            return INSTANCE ?: synchronized(this) {
-                val instance = AuthPreference(dataStore)
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
 
     suspend fun getUserSession(): User {
         val preferences = dataStore.data.first()
@@ -47,6 +32,21 @@ class AuthPreference private constructor(private val dataStore: DataStore<Prefer
     suspend fun logout() {
         dataStore.edit { preferences ->
             preferences.clear()
+        }
+    }
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AuthPreference? = null
+        private val USER_ID = stringPreferencesKey("id")
+        private val IS_LOGIN_KEY = booleanPreferencesKey("isLogin")
+
+        fun getInstance(dataStore: DataStore<Preferences>): AuthPreference {
+            return INSTANCE ?: synchronized(this) {
+                val instance = AuthPreference(dataStore)
+                INSTANCE = instance
+                instance
+            }
         }
     }
 }

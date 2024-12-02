@@ -26,6 +26,7 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var boxSectionAdapter: BoxSectionAdapter<SettingBoxContentItem>
     private val viewModel: AuthViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -96,7 +97,8 @@ class SettingsFragment : Fragment() {
                     )
                 ),
             )
-            boxSectionAdapter = BoxSectionAdapter(sections, viewModel, viewLifecycleOwner)
+            boxSectionAdapter =
+                BoxSectionAdapter(sections, viewModel, settingsViewModel, viewLifecycleOwner)
             recyclerView.adapter = boxSectionAdapter
             recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager = LinearLayoutManager(requireContext())

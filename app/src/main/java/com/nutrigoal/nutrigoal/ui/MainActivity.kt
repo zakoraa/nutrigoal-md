@@ -7,6 +7,7 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,7 @@ import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityMainBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
+import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -28,6 +30,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: AuthViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
-
+        getAppThemes()
         viewModel.getSession()
 
         lifecycleScope.launch {
@@ -63,6 +66,17 @@ class MainActivity : AppCompatActivity() {
                 handleGetUser(result)
             }
         }
+    }
+
+    private fun getAppThemes() {
+        settingsViewModel.getThemeSettings()
+            .observe(this@MainActivity) { isDarkModeActive: Boolean ->
+                if (isDarkModeActive) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+            }
     }
 
     private fun handleGetUser(result: ResultState<UserEntity?>) {
