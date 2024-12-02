@@ -102,7 +102,9 @@
     <string name="check_icon_desc">display daily check reminder</string>
     <string name="daily_check_in_title">Daily Diet Check-In Reminder!</string>
     <string name="eat_reminder_title">It\'s Time to Eat and Stay Hydrated!</string>
+    <string name="eat_reminder_message">Remember to take care of yourself! Enjoy a nutritious meal and drink plenty of water to stay energized and healthy.</string>
     <string name="no_eat_reminder_title">No Eating or Drinking</string>
+    <string name="open_app">Open App</string>
     <string name="account">Account</string>
     <string name="content_and_display">Content &amp; Display</string>
     <string name="go_to_the_profile_page">Go to the profile page</string>

@@ -2,7 +2,6 @@ package com.nutrigoal.nutrigoal.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
@@ -84,13 +83,6 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 viewModel.setCurrentUser(result.data)
-                viewModel.currentUser.observe(this@MainActivity) { user ->
-                    if (user != null) {
-                        Log.d("FLORAAA", "KELASSSS: ${user.toString()}")
-                    } else {
-                        Log.d("FLORAAA", "User is null")
-                    }
-                }
             }
 
             is ResultState.Error -> {
@@ -112,7 +104,6 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 } else {
-                    Log.d("FLORAAAAA", "handleGetUserSession: (dijalanskan)")
                     viewModel.getCurrentUser()
                 }
                 showLoading(false)
