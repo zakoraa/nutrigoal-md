@@ -1,6 +1,5 @@
 package com.nutrigoal.nutrigoal.ui.dashboard
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -69,15 +68,15 @@ class DashboardFragment : Fragment() {
             xAxis.valueFormatter = IndexAxisValueFormatter(xValues)
             xAxis.labelCount = 7
             xAxis.granularity = 1f
-            xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.primary)
+            xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
 
             val yAxis = chartBodyWeightProgress.axisLeft
             yAxis.axisMinimum = 55f
             yAxis.axisMaximum = 70f
             yAxis.axisLineWidth = 2f
-            yAxis.axisLineColor = ContextCompat.getColor(requireContext(), R.color.primary)
+            yAxis.axisLineColor = ContextCompat.getColor(requireContext(), R.color.textColor)
             yAxis.labelCount = 5
-            yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.primary)
+            yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
 
             val entries: MutableList<BarEntry> = ArrayList()
             entries.add(BarEntry(0f, 60f))
@@ -123,8 +122,16 @@ class DashboardFragment : Fragment() {
         )
         val dataSet = LineDataSet(entries, "Calories")
         dataSet.color = ContextCompat.getColor(requireContext(), R.color.primary)
-        dataSet.valueTextColor = Color.BLACK
+        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
         dataSet.valueTextSize = 10f
+
+        val xAxis = lineChart.xAxis
+        xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+
+        val yAxis = lineChart.axisLeft
+        yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+
+        lineChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
 
         lineChart.data = LineData(dataSet)
         setupChartDefaults(lineChart)
@@ -142,8 +149,16 @@ class DashboardFragment : Fragment() {
         )
         val dataSet = BarDataSet(entries, "Protein")
         dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
-        dataSet.valueTextColor = Color.BLACK
+        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
         dataSet.valueTextSize = 10f
+
+        val xAxis = barChart.xAxis
+        xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+
+        val yAxis = barChart.axisLeft
+        yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+
+        barChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
 
         barChart.data = BarData(dataSet)
         setupChartDefaults(barChart)
@@ -159,11 +174,11 @@ class DashboardFragment : Fragment() {
         )
         val dataSet = PieDataSet(entries, "Fat")
         dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
-        dataSet.valueTextColor = Color.BLACK
+        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
         dataSet.valueTextSize = 10f
 
         pieChart.data = PieData(dataSet)
-        pieChart.description = Description().apply { text = "Fat Distribution" }
+        pieChart.description = Description().apply { text = "" }
         pieChart.setUsePercentValues(true)
         pieChart.animateY(1000)
     }
@@ -180,12 +195,21 @@ class DashboardFragment : Fragment() {
         )
         val dataSet = BarDataSet(entries, "Carbohydrates")
         dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
-        dataSet.valueTextColor = Color.BLACK
+        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
         dataSet.valueTextSize = 10f
+
+        val xAxis = horizontalBarChart.xAxis
+        xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+
+        val yAxis = horizontalBarChart.axisLeft
+        yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+
+        horizontalBarChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
 
         horizontalBarChart.data = BarData(dataSet)
         setupChartDefaults(horizontalBarChart)
     }
+
 
     private fun setupChartDefaults(chart: Chart<*>) {
         chart.description = Description().apply { text = "" }
