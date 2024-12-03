@@ -101,7 +101,12 @@ class SettingsFragment : Fragment() {
                 BoxSectionAdapter(sections, viewModel, settingsViewModel, viewLifecycleOwner)
             recyclerView.adapter = boxSectionAdapter
             recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.setLayoutManager(object : LinearLayoutManager(requireContext()) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            })
+
         }
     }
 }

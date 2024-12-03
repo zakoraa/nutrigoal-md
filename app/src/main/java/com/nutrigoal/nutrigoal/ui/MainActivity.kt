@@ -37,12 +37,13 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView
 
         val navController =
-            findNavController(com.nutrigoal.nutrigoal.R.id.nav_host_fragment_activity_main)
+            findNavController(R.id.nav_host_fragment_activity_main)
 
         navView.setupWithNavController(navController)
 
@@ -139,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                 NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
                     if (scrollY > oldScrollY) {
                         bottomNavCard.animate()
-                            .translationY(bottomNavCard.height.toFloat()).setInterpolator(
+                            .translationY(bottomNavCard.height.toFloat() + 70).setInterpolator(
                                 DecelerateInterpolator()
                             ).start()
                     } else if (scrollY < oldScrollY) {

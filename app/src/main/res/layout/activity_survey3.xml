@@ -155,27 +155,26 @@
                 app:layout_constraintStart_toStartOf="@id/progress_line"
                 app:layout_constraintTop_toBottomOf="@id/rg_diet_category" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/search_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingBottom="@dimen/margin_bottom_to_edge"
-                app:layout_constraintEnd_toEndOf="@id/progress_line"
-                app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/tv_favorite_processed_food">
+                android:layout_marginVertical="10dp"
+                android:hint="@string/search_your_favorite_food"
+                android:queryHint="@string/Apple"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_favorite_processed_food" />
 
-                <AutoCompleteTextView
-                    android:id="@+id/auto_complete_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/outline_button"
-                    android:hint="@null"
-                    android:inputType="none"
-                    android:labelFor="@string/choose_processed_food"
-                    android:text="@string/choose_processed_food" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/search_view" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
