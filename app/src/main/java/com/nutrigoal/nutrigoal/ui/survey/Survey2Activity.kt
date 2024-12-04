@@ -38,7 +38,7 @@ class Survey2Activity : AppCompatActivity() {
             btnNext.setOnClickListener {
                 val intent = Intent(
                     this@Survey2Activity,
-                    com.nutrigoal.nutrigoal.ui.survey.Survey3Activity::class.java
+                    Survey3Activity::class.java
                 )
                 startActivity(intent)
             }

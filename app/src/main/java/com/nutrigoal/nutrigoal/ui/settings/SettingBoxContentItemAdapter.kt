@@ -1,18 +1,23 @@
 package com.nutrigoal.nutrigoal.ui.settings
 
 import android.content.Intent
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.SettingBoxContentItemBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.profile.ProfileActivity
 import com.nutrigoal.nutrigoal.utils.AlertDialogUtil
+import com.nutrigoal.nutrigoal.utils.DailyReminderService
+import kotlinx.coroutines.launch
 
 class SettingBoxContentItemAdapter(
     private val items: List<SettingBoxContentItem>,
@@ -31,6 +36,7 @@ class SettingBoxContentItemAdapter(
         return SettingsBoxContentItemViewHolder(binding)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: SettingsBoxContentItemViewHolder, position: Int) {
         val item = items[position]
         holder.bind(item)
@@ -40,6 +46,7 @@ class SettingBoxContentItemAdapter(
 
     inner class SettingsBoxContentItemViewHolder(private val binding: SettingBoxContentItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @RequiresApi(Build.VERSION_CODES.O)
         fun bind(item: SettingBoxContentItem) {
             with(binding) {
                 tvTitle.text = item.title
@@ -61,6 +68,30 @@ class SettingBoxContentItemAdapter(
                                 settingsViewModel.saveThemeSetting(isChecked)
                             }
 
+                        }
+
+                        getString(context, R.string.notification) -> {
+                            settingsViewModel.getDailyReminderSetting()
+                                .observe(lifecycleOwner) { isEnabled ->
+                                    toggleButton.isChecked = isEnabled
+                                }
+
+                            toggleButton.setOnCheckedChangeListener { _, isChecked ->
+                                if (isChecked) {
+                                    val intent = Intent(context, DailyReminderService::class.java)
+                                    context.startForegroundService(intent)
+                                } else {
+                                    toggleButton.isChecked = false
+                                    val intent = Intent(context, DailyReminderService::class.java)
+                                    context.stopService(intent)
+                                    lifecycleOwner.lifecycleScope.launch {
+                                        settingsViewModel.saveDailyReminderSetting(false)
+                                    }
+                                }
+                                lifecycleOwner.lifecycleScope.launch {
+                                    settingsViewModel.saveDailyReminderSetting(isChecked)
+                                }
+                            }
                         }
                     }
                 } else {
@@ -92,9 +123,9 @@ class SettingBoxContentItemAdapter(
                     }
                 }
             }
-
         }
     }
+
 
     companion object {
         const val EXTRA_USER = "extra_user"

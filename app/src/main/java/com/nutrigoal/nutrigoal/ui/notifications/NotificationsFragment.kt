@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.FragmentNotificationsBinding
@@ -30,8 +29,6 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this)[NotificationsViewModel::class.java]
 
         _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -72,7 +69,11 @@ class NotificationsFragment : Fragment() {
                 BoxSectionAdapter(sections, viewModel, settingsViewModel, viewLifecycleOwner)
             recyclerView.adapter = boxSectionAdapter
             recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.setLayoutManager(object : LinearLayoutManager(requireContext()) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            })
         }
     }
 }

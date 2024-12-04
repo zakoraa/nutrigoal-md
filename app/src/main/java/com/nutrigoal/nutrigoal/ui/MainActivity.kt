@@ -1,11 +1,14 @@
 package com.nutrigoal.nutrigoal.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import android.widget.ArrayAdapter
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -19,6 +22,7 @@ import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.entity.User
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityMainBinding
+import com.nutrigoal.nutrigoal.databinding.PopUpCheckInBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
@@ -38,12 +42,13 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView
 
         val navController =
-            findNavController(com.nutrigoal.nutrigoal.R.id.nav_host_fragment_activity_main)
+            findNavController(R.id.nav_host_fragment_activity_main)
 
         navView.setupWithNavController(navController)
 
@@ -66,6 +71,54 @@ class MainActivity : AppCompatActivity() {
                 handleGetUser(result)
             }
         }
+
+        showMealTimePopup()
+    }
+
+    private fun showMealTimePopup() {
+        val bindingPopup = PopUpCheckInBinding.inflate(LayoutInflater.from(this))
+        val breakfastTimes = resources.getStringArray(R.array.breakfast_times)
+        val launchTimes = resources.getStringArray(R.array.launch_times)
+        val dinnerTimes = resources.getStringArray(R.array.dinner_times)
+
+        val breakfastAdapter = ArrayAdapter(this, R.layout.dropdown_item, breakfastTimes)
+        val launchAdapter = ArrayAdapter(this, R.layout.dropdown_item, launchTimes)
+        val dinnerAdapter = ArrayAdapter(this, R.layout.dropdown_item, dinnerTimes)
+
+        with(bindingPopup) {
+            dropdownBreakfastTime.setText(breakfastTimes[0])
+            dropdownLunchTime.setText(launchTimes[0])
+            dropdownDinnerTime.setText(dinnerTimes[0])
+
+            dropdownBreakfastTime.setAdapter(breakfastAdapter)
+            dropdownLunchTime.setAdapter(launchAdapter)
+            dropdownDinnerTime.setAdapter(dinnerAdapter)
+
+            val alertDialog = AlertDialog.Builder(this@MainActivity)
+                .setView(root)
+                .setCancelable(false)
+                .setPositiveButton("Check-in") { dialog, _ ->
+                    val breakfastTime = dropdownBreakfastTime.text.toString()
+                    val lunchTime = dropdownLunchTime.text.toString()
+                    val dinnerTime = dropdownDinnerTime.text.toString()
+
+                    saveMealTimes(breakfastTime, lunchTime, dinnerTime)
+                    dialog.dismiss()
+                }
+                .create()
+
+            alertDialog.show()
+        }
+    }
+
+    private fun saveMealTimes(breakfastTime: String, lunchTime: String, dinnerTime: String) {
+        val sharedPreferences = getSharedPreferences("MealTimes", Context.MODE_PRIVATE)
+        sharedPreferences.edit().apply {
+            putString("Breakfast", breakfastTime)
+            putString("Lunch", lunchTime)
+            putString("Dinner", dinnerTime)
+            apply()
+        }
     }
 
     private fun getAppThemes() {
@@ -84,13 +137,6 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 viewModel.setCurrentUser(result.data)
-                viewModel.currentUser.observe(this@MainActivity) { user ->
-                    if (user != null) {
-                        Log.d("FLORAAA", "KELASSSS: ${user.toString()}")
-                    } else {
-                        Log.d("FLORAAA", "User is null")
-                    }
-                }
             }
 
             is ResultState.Error -> {
@@ -112,7 +158,6 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 } else {
-                    Log.d("FLORAAAAA", "handleGetUserSession: (dijalanskan)")
                     viewModel.getCurrentUser()
                 }
                 showLoading(false)
@@ -141,14 +186,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
     private fun bottomNavScrollAnimation() {
         with(binding) {
             nestedScrollView.setOnScrollChangeListener(
                 NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
                     if (scrollY > oldScrollY) {
                         bottomNavCard.animate()
-                            .translationY(bottomNavCard.height.toFloat()).setInterpolator(
+                            .translationY(bottomNavCard.height.toFloat() + 70).setInterpolator(
                                 DecelerateInterpolator()
                             ).start()
                     } else if (scrollY < oldScrollY) {
