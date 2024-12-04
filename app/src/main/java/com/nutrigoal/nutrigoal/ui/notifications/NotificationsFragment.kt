@@ -21,6 +21,10 @@ import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @AndroidEntryPoint
 class NotificationsFragment : Fragment() {
@@ -90,29 +94,82 @@ class NotificationsFragment : Fragment() {
     private fun setUpAdapter(result: List<NotificationLocalEntity>) {
         with(binding) {
             if (result.isNotEmpty()) {
-                val sections = listOf(
-                    BoxSection(
-                        getString(R.string.today),
-                        result.map { entity ->
-                            val imageResId = when (entity.notificationType) {
-                                NotificationType.CHECK_IN -> R.drawable.ic_check
-                                NotificationType.TIME_TO_EAT -> R.drawable.ic_food
-                            }
+                val currentDate = Calendar.getInstance().time
 
-                            NotificationBoxContentItem(
-                                id = entity.id,
-                                imageResId = imageResId,
-                                title = entity.title,
-                                time = entity.time,
-                                isConfirmed = entity.isConfirmed,
-                                notificationType = entity.notificationType
+                val dateFormat = SimpleDateFormat("dd MMMM yyyy, hh:mm a", Locale.ENGLISH)
+
+                val todayList = mutableListOf<NotificationBoxContentItem>()
+                val yesterdayList = mutableListOf<NotificationBoxContentItem>()
+                val oldestList = mutableListOf<NotificationBoxContentItem>()
+
+                result.forEach { entity ->
+                    val entityDate = dateFormat.parse(entity.time) ?: return@forEach
+                    val entityCalendar = Calendar.getInstance().apply { time = entityDate }
+
+                    when {
+                        isToday(entityCalendar, currentDate) -> {
+                            val imageResId = getNotificationImage(entity.notificationType)
+                            todayList.add(
+                                NotificationBoxContentItem(
+                                    id = entity.id,
+                                    imageResId = imageResId,
+                                    title = entity.title,
+                                    time = entity.time,
+                                    isConfirmed = entity.isConfirmed,
+                                    notificationType = entity.notificationType
+                                )
                             )
                         }
-                    )
-                )
 
-                boxSectionAdapter =
-                    BoxSectionAdapter(sections, viewModel, settingsViewModel, notificationsViewModel, viewLifecycleOwner)
+                        isYesterday(entityCalendar, currentDate) -> {
+                            val imageResId = getNotificationImage(entity.notificationType)
+                            yesterdayList.add(
+                                NotificationBoxContentItem(
+                                    id = entity.id,
+                                    imageResId = imageResId,
+                                    title = entity.title,
+                                    time = entity.time,
+                                    isConfirmed = entity.isConfirmed,
+                                    notificationType = entity.notificationType
+                                )
+                            )
+                        }
+
+                        else -> {
+                            val imageResId = getNotificationImage(entity.notificationType)
+                            oldestList.add(
+                                NotificationBoxContentItem(
+                                    id = entity.id,
+                                    imageResId = imageResId,
+                                    title = entity.title,
+                                    time = entity.time,
+                                    isConfirmed = entity.isConfirmed,
+                                    notificationType = entity.notificationType
+                                )
+                            )
+                        }
+                    }
+                }
+
+                val sections = mutableListOf<BoxSection<NotificationBoxContentItem>>()
+
+                if (todayList.isNotEmpty()) {
+                    sections.add(BoxSection(getString(R.string.today), todayList))
+                }
+                if (yesterdayList.isNotEmpty()) {
+                    sections.add(BoxSection(getString(R.string.yesterday), yesterdayList))
+                }
+                if (oldestList.isNotEmpty()) {
+                    sections.add(BoxSection(getString(R.string.oldest), oldestList))
+                }
+
+                boxSectionAdapter = BoxSectionAdapter(
+                    sections,
+                    viewModel,
+                    settingsViewModel,
+                    notificationsViewModel,
+                    viewLifecycleOwner
+                )
                 recyclerView.adapter = boxSectionAdapter
                 recyclerView.setHasFixedSize(true)
                 recyclerView.layoutManager = object : LinearLayoutManager(requireContext()) {
@@ -123,8 +180,29 @@ class NotificationsFragment : Fragment() {
             } else {
                 tvNoActivity.visibility = View.VISIBLE
             }
-
         }
+    }
+
+    private fun getNotificationImage(notificationType: NotificationType): Int {
+        return when (notificationType) {
+            NotificationType.CHECK_IN -> R.drawable.ic_check
+            NotificationType.TIME_TO_EAT -> R.drawable.ic_food
+        }
+    }
+
+    private fun isToday(entityCalendar: Calendar, currentDate: Date): Boolean {
+        val calendar = Calendar.getInstance().apply { time = currentDate }
+        return entityCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
+                entityCalendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) &&
+                entityCalendar.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)
+    }
+
+    private fun isYesterday(entityCalendar: Calendar, currentDate: Date): Boolean {
+        val calendar = Calendar.getInstance().apply { time = currentDate }
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+        return entityCalendar.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
+                entityCalendar.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) &&
+                entityCalendar.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)
     }
 
 }
