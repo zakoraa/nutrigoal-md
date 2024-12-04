@@ -12,12 +12,25 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.local.database.NotificationDao
+import com.nutrigoal.nutrigoal.data.local.entity.NotificationLocalEntity
+import com.nutrigoal.nutrigoal.data.local.entity.NotificationType
 import com.nutrigoal.nutrigoal.ui.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DailyReminderService : Service() {
+
+    @Inject
+    lateinit var notificationDao: NotificationDao
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -57,11 +70,31 @@ class DailyReminderService : Service() {
 
                 if (countdown == "00:00:00") {
                     currentMealIndex = (currentMealIndex + 1) % times.size
+                    CoroutineScope(Dispatchers.IO).launch {
+                        insertNotificationToDatabase(mealTitle, mealTime)
+                    }
                 }
+
 
                 handler.postDelayed(this, 1000L)
             }
         }, 1000L)
+    }
+
+    private suspend fun insertNotificationToDatabase(title: String, time: String) {
+        val dateFormat = SimpleDateFormat("dd MMMM yyyy, hh:mm a", Locale.ENGLISH)
+        val currentTime = Calendar.getInstance(Locale.ENGLISH).time
+        val formattedTime = dateFormat.format(currentTime)
+
+        val notificationEntity = NotificationLocalEntity(
+            title = title,
+            notificationType = NotificationType.TIME_TO_EAT,
+            isConfirmed = false,
+            time = formattedTime
+        )
+        withContext(Dispatchers.IO) {
+            notificationDao.insert(notificationEntity)
+        }
     }
 
     private fun getMealTimes(): List<Pair<String, String>> {
@@ -93,9 +126,19 @@ class DailyReminderService : Service() {
 
         val diffMillis = targetCalendar.timeInMillis - currentTime.timeInMillis
 
-        val hours = (diffMillis / (1000 * 60 * 60)) % 24 + 24
-        val minutes = (diffMillis / (1000 * 60) % 60).toInt() + 60
-        val seconds = (diffMillis / 1000 % 60).toInt() + 60
+        var hours = (diffMillis / (1000 * 60 * 60)) % 24 + 23
+        var minutes = (diffMillis / (1000 * 60) % 60).toInt() + 60
+        var seconds = (diffMillis / 1000 % 60).toInt() + 60
+
+        if (hours.toInt() == 60) {
+            hours = 0
+        }
+        if (minutes == 60) {
+            minutes = 0
+        }
+        if (seconds == 60) {
+            seconds = 0
+        }
 
         return String.format(Locale.ENGLISH, "%02d:%02d:%02d", hours, minutes, seconds)
     }

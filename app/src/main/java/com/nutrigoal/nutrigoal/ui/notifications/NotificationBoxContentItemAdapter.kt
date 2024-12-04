@@ -1,11 +1,18 @@
 package com.nutrigoal.nutrigoal.ui.notifications
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.local.entity.NotificationType
 import com.nutrigoal.nutrigoal.databinding.NotificationBoxContentItemBinding
 
-class NotificationBoxContentItemAdapter(private val items: List<NotificationBoxContentItem>) :
+class NotificationBoxContentItemAdapter(
+    private val items: List<NotificationBoxContentItem>,
+    private val notificationsViewModel: NotificationsViewModel
+) :
     RecyclerView.Adapter<NotificationBoxContentItemAdapter.NotificationBoxContentItemViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -35,13 +42,52 @@ class NotificationBoxContentItemAdapter(private val items: List<NotificationBoxC
                 tvTitle.text = item.title
                 imageView.setImageResource(item.imageResId)
                 tvTime.text = item.time
+
+                val context = itemView.context
+
+                if (item.notificationType == NotificationType.TIME_TO_EAT) {
+                    btnDone.setOnClickListener {
+                        notificationsViewModel.updateNotificationAsConfirmed(item.id)
+                    }
+                } else {
+                    root.setOnClickListener {
+                        notificationsViewModel.updateNotificationAsConfirmed(item.id)
+                    }
+                }
+
+                if (!item.isConfirmed) {
+                    notifSign.visibility = View.VISIBLE
+                    if (item.notificationType == NotificationType.TIME_TO_EAT) {
+                        btnDone.visibility = View.VISIBLE
+                    }
+                    root.setBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.primary_30
+                        )
+                    )
+                } else {
+                    notifSign.visibility = View.GONE
+                    if (item.notificationType == NotificationType.TIME_TO_EAT) {
+                        btnDone.visibility = View.GONE
+                    }
+                    root.setBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.background
+                        )
+                    )
+                }
             }
         }
     }
 }
 
 data class NotificationBoxContentItem(
+    val id: Int,
     val imageResId: Int,
     val title: String,
-    val time: String
+    val time: String,
+    val notificationType: NotificationType,
+    val isConfirmed: Boolean
 )

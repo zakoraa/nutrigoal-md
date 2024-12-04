@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.nutrigoal.nutrigoal.data.ResultState
-import com.nutrigoal.nutrigoal.data.local.entity.User
+import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.data.remote.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,9 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
 
-    private val _userSessionState =
-        MutableStateFlow<ResultState<User>>(ResultState.Loading)
-    val userSessionState: StateFlow<ResultState<User>> get() = _userSessionState
+    private val _userLocalEntitySessionState =
+        MutableStateFlow<ResultState<UserLocalEntity>>(ResultState.Loading)
+    val userLocalEntitySessionState: StateFlow<ResultState<UserLocalEntity>> get() = _userLocalEntitySessionState
     private val _logoutState =
         MutableStateFlow<ResultState<Unit>>(ResultState.Initial)
     val logoutState: StateFlow<ResultState<Unit>> get() = _logoutState
@@ -107,7 +107,7 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
         viewModelScope.launch {
             authRepository.getSession()
                 .collect { result ->
-                    _userSessionState.value = result
+                    _userLocalEntitySessionState.value = result
                 }
         }
     }

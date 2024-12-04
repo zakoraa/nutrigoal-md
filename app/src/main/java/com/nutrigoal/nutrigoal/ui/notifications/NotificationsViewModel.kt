@@ -1,13 +1,43 @@
 package com.nutrigoal.nutrigoal.ui.notifications
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.local.entity.NotificationLocalEntity
+import com.nutrigoal.nutrigoal.data.local.repository.NotificationRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NotificationsViewModel : ViewModel() {
+@HiltViewModel
+class NotificationsViewModel @Inject constructor(
+    private val notificationRepository: NotificationRepository
+) : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
+    private val _notificationListState =
+        MutableStateFlow<ResultState<List<NotificationLocalEntity>>>(ResultState.Initial)
+    val notificationListState: StateFlow<ResultState<List<NotificationLocalEntity>>> get() = _notificationListState
+
+    fun getAllNotifications() {
+        viewModelScope.launch {
+            notificationRepository.getAllNotifications().collect { result ->
+                _notificationListState.value = result
+            }
+        }
     }
-    val text: LiveData<String> = _text
+
+    fun insertNotification(notificationLocalEntity: NotificationLocalEntity) {
+        viewModelScope.launch {
+            notificationRepository.insert(notificationLocalEntity)
+        }
+    }
+
+    fun updateNotificationAsConfirmed(id: Int?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            notificationRepository.updateIsConfirmed(id)
+        }
+    }
 }

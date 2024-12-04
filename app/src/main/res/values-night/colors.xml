@@ -3,6 +3,7 @@
 <!--    <color name="primary">#195BFF</color>-->
     <color name="primary">#1B99D3</color>
     <color name="primary_80">#49ADDC</color>
+    <color name="primary_30">#2F49ADDC</color>
     <color name="primaryContainer">#F2F8FF</color>
     <color name="primaryVariant">#7BD5FF</color>
     <color name="secondary">#43A591</color>

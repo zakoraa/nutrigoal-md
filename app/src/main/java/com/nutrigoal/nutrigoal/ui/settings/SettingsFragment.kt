@@ -16,6 +16,7 @@ import com.nutrigoal.nutrigoal.ui.MainActivity
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.common.BoxSection
 import com.nutrigoal.nutrigoal.ui.common.BoxSectionAdapter
+import com.nutrigoal.nutrigoal.ui.notifications.NotificationsViewModel
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -27,6 +28,7 @@ class SettingsFragment : Fragment() {
     private lateinit var boxSectionAdapter: BoxSectionAdapter<SettingBoxContentItem>
     private val viewModel: AuthViewModel by activityViewModels()
     private val settingsViewModel: SettingsViewModel by activityViewModels()
+    private val notificationsViewModel: NotificationsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,7 +100,13 @@ class SettingsFragment : Fragment() {
                 ),
             )
             boxSectionAdapter =
-                BoxSectionAdapter(sections, viewModel, settingsViewModel, viewLifecycleOwner)
+                BoxSectionAdapter(
+                    sections,
+                    viewModel,
+                    settingsViewModel,
+                    notificationsViewModel,
+                    viewLifecycleOwner
+                )
             recyclerView.adapter = boxSectionAdapter
             recyclerView.setHasFixedSize(true)
             recyclerView.setLayoutManager(object : LinearLayoutManager(requireContext()) {

@@ -13,7 +13,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
-import com.nutrigoal.nutrigoal.data.local.entity.User
+import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.Gender
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.utils.asResultState
@@ -70,7 +70,7 @@ class AuthRepository(private val auth: FirebaseAuth, private val authPreference:
             val user = result.user
             if (user !== null) {
                 authPreference.saveSession(
-                    User(
+                    UserLocalEntity(
                         id = user.uid,
                         isLogin = true
                     )
@@ -111,7 +111,7 @@ class AuthRepository(private val auth: FirebaseAuth, private val authPreference:
             val user = result.user
             if (user !== null) {
                 authPreference.saveSession(
-                    User(
+                    UserLocalEntity(
                         id = user.uid,
                         isLogin = true
                     )
@@ -129,7 +129,7 @@ class AuthRepository(private val auth: FirebaseAuth, private val authPreference:
         }.asResultState()
     }
 
-    fun getSession(): Flow<ResultState<User>> {
+    fun getSession(): Flow<ResultState<UserLocalEntity>> {
         return flow {
             emit(authPreference.getUserSession())
         }.asResultState()
