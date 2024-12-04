@@ -2,9 +2,12 @@ package com.nutrigoal.nutrigoal.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import android.widget.ArrayAdapter
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -18,6 +21,7 @@ import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.entity.User
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityMainBinding
+import com.nutrigoal.nutrigoal.databinding.PopUpCheckInBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
@@ -66,6 +70,47 @@ class MainActivity : AppCompatActivity() {
                 handleGetUser(result)
             }
         }
+
+        showMealTimePopup()
+    }
+
+    private fun showMealTimePopup() {
+        val bindingPopup = PopUpCheckInBinding.inflate(LayoutInflater.from(this))
+        val breakfastTimes = resources.getStringArray(R.array.breakfast_times)
+        val launchTimes = resources.getStringArray(R.array.launch_times)
+        val dinnerTimes = resources.getStringArray(R.array.dinner_times)
+
+        val breakfastAdapter = ArrayAdapter(this, R.layout.dropdown_item, breakfastTimes)
+        val launchAdapter = ArrayAdapter(this, R.layout.dropdown_item, launchTimes)
+        val dinnerAdapter = ArrayAdapter(this, R.layout.dropdown_item, dinnerTimes)
+
+        with(bindingPopup) {
+            dropdownBreakfastTime.setText(breakfastTimes[0])
+            dropdownLunchTime.setText(launchTimes[0])
+            dropdownDinnerTime.setText(dinnerTimes[0])
+
+            dropdownBreakfastTime.setAdapter(breakfastAdapter)
+            dropdownLunchTime.setAdapter(launchAdapter)
+            dropdownDinnerTime.setAdapter(dinnerAdapter)
+
+            val alertDialog = AlertDialog.Builder(this@MainActivity)
+                .setView(root)
+                .setCancelable(false)
+                .setPositiveButton("Check-in") { dialog, _ ->
+                    val breakfastTime = dropdownBreakfastTime.text.toString()
+                    val lunchTime = dropdownLunchTime.text.toString()
+                    val dinnerTime = dropdownDinnerTime.text.toString()
+
+                    saveMealTimes(breakfastTime, lunchTime, dinnerTime)
+                    dialog.dismiss()
+                }
+                .create()
+
+            alertDialog.show()
+        }
+    }
+
+    private fun saveMealTimes(breakfast: String, lunch: String, dinner: String) {
     }
 
     private fun getAppThemes() {
@@ -132,7 +177,6 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
 
     private fun bottomNavScrollAnimation() {
         with(binding) {

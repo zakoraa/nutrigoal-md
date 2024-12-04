@@ -3,6 +3,7 @@ package com.nutrigoal.nutrigoal.ui.survey
 import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -41,15 +42,7 @@ class Survey3Activity : AppCompatActivity() {
 
     private fun setUpView() {
         addMapItems()
-
-        adapter = FavoriteProcessedAdapter(items = favoriteProcessedList)
-        with(binding) {
-            searchView.onActionViewExpanded()
-            recyclerView.adapter = adapter
-            recyclerView.setHasFixedSize(true)
-            recyclerView.layoutManager =
-                GridLayoutManager(this@Survey3Activity, 3, GridLayoutManager.VERTICAL, false)
-        }
+        setUpAdapter()
 
     }
 
@@ -102,6 +95,23 @@ class Survey3Activity : AppCompatActivity() {
                 playSequentially(together)
                 start()
             }
+        }
+    }
+
+    private fun setUpAdapter() {
+        val instantFoods = resources.getStringArray(R.array.activity_levels)
+        val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_item, instantFoods)
+
+        with(binding) {
+            autoCompleteTextView.setAdapter(arrayAdapter)
+            autoCompleteTextView.setText(instantFoods[0])
+            adapter = FavoriteProcessedAdapter(items = favoriteProcessedList)
+
+            searchView.onActionViewExpanded()
+            recyclerView.adapter = adapter
+            recyclerView.setHasFixedSize(true)
+            recyclerView.layoutManager =
+                GridLayoutManager(this@Survey3Activity, 3, GridLayoutManager.VERTICAL, false)
         }
     }
 

@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
-import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -17,11 +16,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.FragmentDashboardBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
@@ -46,14 +41,11 @@ class DashboardFragment : Fragment() {
 
     private fun setUpView() {
         handleShowHeader()
-        handleBodyWeightProgressChart()
-        setupCaloriesChart()
-        setupProteinChart()
-        setupFatChart()
-        setupCarbohydratesChart()
+        setUpWeightProgressChart()
+        setUpNutrientsChart()
     }
 
-    private fun handleBodyWeightProgressChart() {
+    private fun setUpWeightProgressChart() {
         val xValues =
             mutableListOf("20 Dec", "21 Dec", "22 Dec", "23 Dec", "24 Dec", "25 Dec", "26 Dec")
 
@@ -110,111 +102,57 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun setupCaloriesChart() {
-        val lineChart = binding.chartCalories
+    private fun setUpNutrientsChart() {
+        val lineChart = binding.chartNutrients
 
-        val entries = listOf(
-            Entry(0f, 1800f),
-            Entry(1f, 2000f),
-            Entry(2f, 1900f),
-            Entry(3f, 2200f),
-            Entry(4f, 2100f)
-        )
-        val dataSet = LineDataSet(entries, "Calories")
-        dataSet.color = ContextCompat.getColor(requireContext(), R.color.primary)
-        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-        dataSet.valueTextSize = 10f
+        val dates = (1..10).map { it.toFloat() }
+        val dateLabels = (1..10).map { "Day $it" }
+
+        val caloriesEntries =
+            dates.mapIndexed { index, date -> Entry(date, (1800 + index * 10).toFloat()) }
+        val proteinEntries =
+            dates.mapIndexed { index, date -> Entry(date, (80 + index * 2).toFloat()) }
+        val fatEntries = dates.mapIndexed { index, date -> Entry(date, (30 + index).toFloat()) }
+        val carbohydratesEntries =
+            dates.mapIndexed { index, date -> Entry(date, (200 + index * 5).toFloat()) }
+
+        val caloriesDataSet = LineDataSet(caloriesEntries, "Calories").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.primary)
+            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+            lineWidth = 2f
+        }
+        val proteinDataSet = LineDataSet(proteinEntries, "Protein").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.secondary)
+            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+            lineWidth = 2f
+        }
+        val fatDataSet = LineDataSet(fatEntries, "Fat").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.error)
+            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+            lineWidth = 2f
+        }
+        val carbohydratesDataSet = LineDataSet(carbohydratesEntries, "Carbohydrates").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.tertiary)
+            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+            lineWidth = 2f
+        }
+
+        val lineData = LineData(caloriesDataSet, proteinDataSet, fatDataSet, carbohydratesDataSet)
+        lineChart.data = lineData
 
         val xAxis = lineChart.xAxis
         xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.valueFormatter = IndexAxisValueFormatter(dateLabels)
+        xAxis.granularity = 1f
+        xAxis.labelCount = 7
 
         val yAxis = lineChart.axisLeft
         yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        lineChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        lineChart.data = LineData(dataSet)
-        setupChartDefaults(lineChart)
-    }
-
-    private fun setupProteinChart() {
-        val barChart = binding.chartProtein
-
-        val entries = listOf(
-            BarEntry(0f, 80f),
-            BarEntry(1f, 100f),
-            BarEntry(2f, 90f),
-            BarEntry(3f, 120f),
-            BarEntry(4f, 110f)
-        )
-        val dataSet = BarDataSet(entries, "Protein")
-        dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
-        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-        dataSet.valueTextSize = 10f
-
-        val xAxis = barChart.xAxis
-        xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        val yAxis = barChart.axisLeft
-        yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        barChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        barChart.data = BarData(dataSet)
-        setupChartDefaults(barChart)
-    }
-
-    private fun setupFatChart() {
-        val pieChart = binding.chartFat
-
-        val entries = listOf(
-            PieEntry(30f, "Saturated"),
-            PieEntry(50f, "Unsaturated"),
-            PieEntry(20f, "Trans Fat")
-        )
-        val dataSet = PieDataSet(entries, "Fat")
-        dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
-        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-        dataSet.valueTextSize = 10f
-
-        pieChart.data = PieData(dataSet)
-        pieChart.description = Description().apply { text = "" }
-        pieChart.setUsePercentValues(true)
-        pieChart.animateY(1000)
-    }
-
-    private fun setupCarbohydratesChart() {
-        val horizontalBarChart = binding.chartCarbohydrates
-
-        val entries = listOf(
-            BarEntry(0f, 200f),
-            BarEntry(1f, 250f),
-            BarEntry(2f, 230f),
-            BarEntry(3f, 260f),
-            BarEntry(4f, 240f)
-        )
-        val dataSet = BarDataSet(entries, "Carbohydrates")
-        dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
-        dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-        dataSet.valueTextSize = 10f
-
-        val xAxis = horizontalBarChart.xAxis
-        xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        val yAxis = horizontalBarChart.axisLeft
-        yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        horizontalBarChart.axisRight.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-        horizontalBarChart.data = BarData(dataSet)
-        setupChartDefaults(horizontalBarChart)
-    }
-
-
-    private fun setupChartDefaults(chart: Chart<*>) {
-        chart.description = Description().apply { text = "" }
-        chart.animateY(1000)
-        chart.invalidate()
+        lineChart.axisRight.isEnabled = false
+        lineChart.description.text = ""
+        lineChart.animateX(1000)
+        lineChart.invalidate()
     }
 
 

@@ -145,6 +145,37 @@
             </RadioGroup>
 
             <TextView
+                android:id="@+id/tv_activity_level"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/edt_gap"
+                android:text="@string/select_your_activity_level"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/rg_diet_category" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/dropdown_activity_level"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@id/progress_line"
+                app:layout_constraintStart_toStartOf="@id/progress_line"
+                app:layout_constraintTop_toBottomOf="@id/tv_activity_level">
+
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/outline_button"
+                    android:hint="@null"
+                    android:inputType="none" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
                 android:id="@+id/tv_favorite_processed_food"
                 style="@style/TextLabel"
                 android:layout_width="0dp"
@@ -153,7 +184,7 @@
                 android:text="@string/what_is_your_favorite_processed_food"
                 app:layout_constraintEnd_toEndOf="@id/progress_line"
                 app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/rg_diet_category" />
+                app:layout_constraintTop_toBottomOf="@id/dropdown_activity_level" />
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"
