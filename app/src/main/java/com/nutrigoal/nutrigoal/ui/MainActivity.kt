@@ -19,7 +19,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
-import com.nutrigoal.nutrigoal.data.local.entity.User
+import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityMainBinding
 import com.nutrigoal.nutrigoal.databinding.PopUpCheckInBinding
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.getSession()
 
         lifecycleScope.launch {
-            viewModel.userSessionState.collect { result ->
+            viewModel.userLocalEntitySessionState.collect { result ->
                 handleGetUserSession(result)
             }
         }
@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleGetUserSession(result: ResultState<User>) {
+    private fun handleGetUserSession(result: ResultState<UserLocalEntity>) {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {

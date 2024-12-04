@@ -5,6 +5,7 @@
     <string name="register_success">Register successful</string>
     <string name="logout_success">Logout is successful</string>
 
+    <string name="error_get_notification">Get notification failed. Please try again.</string>
     <string name="error_get_user">Get user failed. Please try again.</string>
     <string name="error_login">Login failed. Please try again.</string>
     <string name="error_register">Register failed. Please try again.</string>
@@ -95,8 +96,8 @@
     <string name="authentication">Authentication</string>
     <string name="check_icon_desc">display daily check reminder</string>
     <string name="daily_check_in_title">Daily Diet Check-In Reminder!</string>
-    <string name="eat_reminder_title">It\'s Time to Eat and Stay Hydrated!</string>
-    <string name="eat_reminder_message">Remember to take care of yourself! Enjoy a nutritious meal and drink plenty of water to stay energized and healthy.</string>
+    <string name="check_in_reminder_title">Time to Check-In and Set Your Meal Times!</string>
+    <string name="check_in_reminder_message">Don\'t forget to check-in and set your meal times to stay on track for a healthy day!</string>
     <string name="no_eat_reminder_title">No Eating or Drinking</string>
     <string name="open_app">Open App</string>
     <string name="account">Account</string>
@@ -346,5 +347,7 @@
     <string name="select_time">Select Time</string>
     <string name="lunch_time">Lunch Time</string>
     <string name="dinner_time">Dinner Time</string>
+    <string name="done">Done</string>
+    <string name="no_activity">No Activity</string>
 
 </resources>

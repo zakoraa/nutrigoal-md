@@ -9,6 +9,7 @@ import com.nutrigoal.nutrigoal.databinding.BoxSectionItemBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.notifications.NotificationBoxContentItem
 import com.nutrigoal.nutrigoal.ui.notifications.NotificationBoxContentItemAdapter
+import com.nutrigoal.nutrigoal.ui.notifications.NotificationsViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItem
 import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItemAdapter
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
@@ -17,6 +18,7 @@ class BoxSectionAdapter<T>(
     private val sections: List<BoxSection<T>>,
     private val viewModel: AuthViewModel,
     private val settingsViewModel: SettingsViewModel,
+    private val notificationsViewModel: NotificationsViewModel,
     private val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<BoxSectionAdapter<T>.BoxSectionViewHolder>() {
@@ -56,7 +58,7 @@ class BoxSectionAdapter<T>(
 
                         items.isNotEmpty() && items[0] is NotificationBoxContentItem -> {
                             @Suppress("UNCHECKED_CAST")
-                            (NotificationBoxContentItemAdapter(items as List<NotificationBoxContentItem>))
+                            (NotificationBoxContentItemAdapter(items as List<NotificationBoxContentItem>, notificationsViewModel ))
                         }
 
                         else -> throw IllegalArgumentException("Unsupported item type in BoxSection")
