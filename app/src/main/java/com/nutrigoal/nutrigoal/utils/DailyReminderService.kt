@@ -71,17 +71,16 @@ class DailyReminderService : Service() {
                 if (countdown == "00:00:00") {
                     currentMealIndex = (currentMealIndex + 1) % times.size
                     CoroutineScope(Dispatchers.IO).launch {
-                        insertNotificationToDatabase(mealTitle, mealTime)
+                        insertNotificationToDatabase(mealTitle)
                     }
                 }
-
 
                 handler.postDelayed(this, 1000L)
             }
         }, 1000L)
     }
 
-    private suspend fun insertNotificationToDatabase(title: String, time: String) {
+    private suspend fun insertNotificationToDatabase(title: String) {
         val dateFormat = SimpleDateFormat("dd MMMM yyyy, hh:mm a", Locale.ENGLISH)
         val currentTime = Calendar.getInstance(Locale.ENGLISH).time
         val formattedTime = dateFormat.format(currentTime)
@@ -126,11 +125,11 @@ class DailyReminderService : Service() {
 
         val diffMillis = targetCalendar.timeInMillis - currentTime.timeInMillis
 
-        var hours = (diffMillis / (1000 * 60 * 60)) % 24 + 23
-        var minutes = (diffMillis / (1000 * 60) % 60).toInt() + 60
-        var seconds = (diffMillis / 1000 % 60).toInt() + 60
+        var hours = (diffMillis / (1000 * 60 * 60) % 24).toInt() + 23
+        var minutes = (diffMillis / (1000 * 60) % 60).toInt() + 59
+        var seconds = (diffMillis / 1000 % 60).toInt() + 59
 
-        if (hours.toInt() == 60) {
+        if (hours == 60) {
             hours = 0
         }
         if (minutes == 60) {
