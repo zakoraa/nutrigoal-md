@@ -1,5 +1,6 @@
 package com.nutrigoal.nutrigoal.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -110,7 +111,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveMealTimes(breakfast: String, lunch: String, dinner: String) {
+    private fun saveMealTimes(breakfastTime: String, lunchTime: String, dinnerTime: String) {
+        val sharedPreferences = getSharedPreferences("MealTimes", Context.MODE_PRIVATE)
+        sharedPreferences.edit().apply {
+            putString("Breakfast", breakfastTime)
+            putString("Lunch", lunchTime)
+            putString("Dinner", dinnerTime)
+            apply()
+        }
     }
 
     private fun getAppThemes() {
