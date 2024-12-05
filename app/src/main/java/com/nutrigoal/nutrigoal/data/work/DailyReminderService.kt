@@ -92,8 +92,8 @@ class DailyReminderService : Service() {
         val diffMillis = targetCalendar.timeInMillis - currentTime.timeInMillis
 
         var hours = (diffMillis / (1000 * 60 * 60)) % 24 + 23
-        var minutes = (diffMillis / (1000 * 60) % 60).toInt() + 60
-        var seconds = (diffMillis / 1000 % 60).toInt() + 60
+        var minutes = (diffMillis / (1000 * 60) % 60).toInt() + 59
+        var seconds = (diffMillis / 1000 % 60).toInt() + 59
 
         if (hours.toInt() == 60) {
             hours = 0
