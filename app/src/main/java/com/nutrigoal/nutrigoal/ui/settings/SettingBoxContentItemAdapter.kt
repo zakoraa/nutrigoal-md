@@ -89,7 +89,7 @@ class SettingBoxContentItemAdapter(
                             val currentTime = Calendar.getInstance()
 
                             val targetTime = Calendar.getInstance().apply {
-                                set(Calendar.HOUR_OF_DAY, 9)
+                                set(Calendar.HOUR_OF_DAY, 19)
                                 set(Calendar.MINUTE, 0)
                                 set(Calendar.SECOND, 0)
                                 set(Calendar.MILLISECOND, 0)

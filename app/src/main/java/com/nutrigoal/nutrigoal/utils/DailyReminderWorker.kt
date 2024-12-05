@@ -50,18 +50,18 @@ class DailyReminderWorker @AssistedInject constructor(
     }
 
     private fun getTargetTime(): Calendar {
-        return Calendar.getInstance()
+        val currentTime = Calendar.getInstance()
 
-//        return Calendar.getInstance().apply {
-//            set(Calendar.HOUR_OF_DAY, 9)
-//            set(Calendar.MINUTE, 0)
-//            set(Calendar.SECOND, 0)
-//            set(Calendar.MILLISECOND, 0)
-//
-//            if (currentTime.after(this)) {
-//                add(Calendar.DAY_OF_YEAR, 1)
-//            }
-//        }
+        return Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 19)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+
+            if (currentTime.after(this)) {
+                add(Calendar.DAY_OF_YEAR, 1)
+            }
+        }
     }
 
     private fun showNotification() {
