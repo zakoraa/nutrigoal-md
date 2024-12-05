@@ -1,4 +1,4 @@
-package com.nutrigoal.nutrigoal.utils
+package com.nutrigoal.nutrigoal.data.work
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -9,15 +9,17 @@ import com.nutrigoal.nutrigoal.data.local.entity.NotificationLocalEntity
 import com.nutrigoal.nutrigoal.data.local.entity.NotificationType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 @HiltWorker
-class InsertNotificationWorker @AssistedInject constructor(
+class InsertTimeToEatWorker @AssistedInject constructor(
+    @Assisted private val notificationDao: NotificationDao,
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val notificationDao: NotificationDao
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -33,7 +35,10 @@ class InsertNotificationWorker @AssistedInject constructor(
             isConfirmed = false,
             time = formattedTime
         )
-        notificationDao.insert(notificationEntity)
+
+        withContext(Dispatchers.IO) {
+            notificationDao.insert(notificationEntity)
+        }
 
         return Result.success()
     }

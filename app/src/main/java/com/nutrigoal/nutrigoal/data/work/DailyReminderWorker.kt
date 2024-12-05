@@ -1,4 +1,4 @@
-package com.nutrigoal.nutrigoal.utils
+package com.nutrigoal.nutrigoal.data.work
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -12,56 +12,20 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.local.entity.NotificationLocalEntity
-import com.nutrigoal.nutrigoal.data.local.entity.NotificationType
 import com.nutrigoal.nutrigoal.ui.MainActivity
-import com.nutrigoal.nutrigoal.ui.notifications.NotificationsViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.util.Calendar
 
 @HiltWorker
 class DailyReminderWorker @AssistedInject constructor(
     @Assisted private val context: Context,
-    @Assisted private val workerParams: WorkerParameters,
-    private val notificationsViewModel: NotificationsViewModel,
+    @Assisted workerParams: WorkerParameters,
 ) : Worker(context, workerParams) {
 
     override fun doWork(): Result {
-        saveNotificationToDatabase()
         showNotification()
 
         return Result.success()
-    }
-
-    private fun saveNotificationToDatabase() {
-        val targetTime = getTargetTime()
-        val formattedTime = DateFormatter.formatToString(targetTime.time)
-
-        val notification = NotificationLocalEntity(
-            id = System.currentTimeMillis().toInt(),
-            title = context.getString(R.string.check_in_reminder_title),
-            isConfirmed = false,
-            time = formattedTime,
-            notificationType = NotificationType.CHECK_IN
-        )
-
-        notificationsViewModel.insertNotification(notification)
-    }
-
-    private fun getTargetTime(): Calendar {
-        val currentTime = Calendar.getInstance()
-
-        return Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 19)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-
-            if (currentTime.after(this)) {
-                add(Calendar.DAY_OF_YEAR, 1)
-            }
-        }
     }
 
     private fun showNotification() {
@@ -114,8 +78,9 @@ class DailyReminderWorker @AssistedInject constructor(
     }
 
     companion object {
-        private const val NOTIFICATION_ID = 1001
+        private const val NOTIFICATION_ID = 1002
         private const val CHANNEL_ID = "daily_reminder_channel"
         private const val CHANNEL_NAME = "Daily Reminder"
     }
 }
+

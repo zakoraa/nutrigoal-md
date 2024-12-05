@@ -1,4 +1,4 @@
-package com.nutrigoal.nutrigoal.utils
+package com.nutrigoal.nutrigoal.data.work
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,23 +11,17 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.NotificationCompat
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.workDataOf
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.local.database.NotificationDao
 import com.nutrigoal.nutrigoal.ui.MainActivity
-import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class DailyReminderService : Service() {
-
-    @Inject
-    lateinit var notificationDao: NotificationDao
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -56,55 +50,32 @@ class DailyReminderService : Service() {
 
     private fun startCountdown() {
         val times = getMealTimes()
+        var currentMealIndex = 0
 
         handler.postDelayed(object : Runnable {
             override fun run() {
+                val (mealTitle, mealTime) = times[currentMealIndex]
+                val countdown = calculateCountdown(mealTime)
 
-                when (determineCurrentMeal()) {
-                    "Breakfast" -> {
-                        val (mealTitle, mealTime) = times[0]
-                        val countdown = calculateCountdown(mealTime)
-                        updateNotification(mealTitle, countdown)
+                updateNotification(mealTitle, countdown)
 
-                        if (countdown == "00:00:00") {
-                            insertNotificationToDatabase(mealTitle)
-                        }
-                    }
-
-                    "Lunch" -> {
-                        val (mealTitle, mealTime) = times[1]
-                        val countdown = calculateCountdown(mealTime)
-                        updateNotification(mealTitle, countdown)
-
-                        if (countdown == "00:00:00") {
-                            insertNotificationToDatabase(mealTitle)
-                        }
-                    }
-
-                    "Dinner" -> {
-                        val (mealTitle, mealTime) = times[2]
-                        val countdown = calculateCountdown(mealTime)
-                        updateNotification(mealTitle, countdown)
-
-                        if (countdown == "00:00:00") {
-                            insertNotificationToDatabase(mealTitle)
-                        }
-                    }
+                if (countdown == "00:00:00") {
+                    currentMealIndex = (currentMealIndex + 1) % times.size
+                    insertNotificationToDatabase(mealTitle)
                 }
+
 
                 handler.postDelayed(this, 1000L)
             }
         }, 1000L)
     }
 
-    private fun insertNotificationToDatabase(title: String) {
-        val inputData = Data.Builder()
-            .putString("mealTitle", title)
-            .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<InsertNotificationWorker>()
-            .setInputData(inputData)
-            .build()
+    private fun insertNotificationToDatabase(title: String) {
+        val workRequest: WorkRequest =
+            OneTimeWorkRequest.Builder(InsertTimeToEatWorker::class.java)
+                .setInputData(workDataOf("mealTitle" to title))
+                .build()
 
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
     }
@@ -147,17 +118,6 @@ class DailyReminderService : Service() {
             "Let's have a great Lunch at $lunchTime!" to lunchTime,
             "Dinner is waiting for you at $dinnerTime!" to dinnerTime
         )
-    }
-
-    private fun determineCurrentMeal(): String {
-        val currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
-        return when (currentTime) {
-            in 0..9 -> "Breakfast"
-            in 10..17 -> "Lunch"
-            in 18..23 -> "Dinner"
-            else -> "Unknown"
-        }
     }
 
     private fun getUserMealTime(meal: String, defaultTime: String): String {
