@@ -1,4 +1,4 @@
-package com.nutrigoal.nutrigoal.utils
+package com.nutrigoal.nutrigoal.data.work
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,26 +11,17 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.NotificationCompat
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.workDataOf
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.local.database.NotificationDao
-import com.nutrigoal.nutrigoal.data.local.entity.NotificationLocalEntity
-import com.nutrigoal.nutrigoal.data.local.entity.NotificationType
 import com.nutrigoal.nutrigoal.ui.MainActivity
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class DailyReminderService : Service() {
-
-    @Inject
-    lateinit var notificationDao: NotificationDao
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -70,9 +61,7 @@ class DailyReminderService : Service() {
 
                 if (countdown == "00:00:00") {
                     currentMealIndex = (currentMealIndex + 1) % times.size
-                    CoroutineScope(Dispatchers.IO).launch {
-                        insertNotificationToDatabase(mealTitle, mealTime)
-                    }
+                    insertNotificationToDatabase(mealTitle)
                 }
 
 
@@ -81,38 +70,14 @@ class DailyReminderService : Service() {
         }, 1000L)
     }
 
-    private suspend fun insertNotificationToDatabase(title: String, time: String) {
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy, hh:mm a", Locale.ENGLISH)
-        val currentTime = Calendar.getInstance(Locale.ENGLISH).time
-        val formattedTime = dateFormat.format(currentTime)
 
-        val notificationEntity = NotificationLocalEntity(
-            title = title,
-            notificationType = NotificationType.TIME_TO_EAT,
-            isConfirmed = false,
-            time = formattedTime
-        )
-        withContext(Dispatchers.IO) {
-            notificationDao.insert(notificationEntity)
-        }
-    }
+    private fun insertNotificationToDatabase(title: String) {
+        val workRequest: WorkRequest =
+            OneTimeWorkRequest.Builder(InsertTimeToEatWorker::class.java)
+                .setInputData(workDataOf("mealTitle" to title))
+                .build()
 
-    private fun getMealTimes(): List<Pair<String, String>> {
-        val breakfastTime = getUserMealTime("Breakfast", "09:00 AM")
-        val lunchTime = getUserMealTime("Lunch", "02:00 PM")
-        val dinnerTime = getUserMealTime("Dinner", "08:00 PM")
-
-        return listOf(
-            "Time to enjoy your Breakfast at $breakfastTime!" to breakfastTime,
-            "Let's have a great Lunch at $lunchTime!" to lunchTime,
-            "Dinner is waiting for you at $dinnerTime!" to dinnerTime
-        )
-    }
-
-    private fun getUserMealTime(meal: String, defaultTime: String): String {
-        val sharedPreferences =
-            applicationContext.getSharedPreferences("MealTimes", Context.MODE_PRIVATE)
-        return sharedPreferences.getString(meal, defaultTime) ?: defaultTime
+        WorkManager.getInstance(applicationContext).enqueue(workRequest)
     }
 
     private fun calculateCountdown(targetTime: String): String {
@@ -141,6 +106,24 @@ class DailyReminderService : Service() {
         }
 
         return String.format(Locale.ENGLISH, "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    private fun getMealTimes(): List<Pair<String, String>> {
+        val breakfastTime = getUserMealTime("Breakfast", "09:00 AM")
+        val lunchTime = getUserMealTime("Lunch", "02:00 PM")
+        val dinnerTime = getUserMealTime("Dinner", "08:00 PM")
+
+        return listOf(
+            "Time to enjoy your Breakfast at $breakfastTime!" to breakfastTime,
+            "Let's have a great Lunch at $lunchTime!" to lunchTime,
+            "Dinner is waiting for you at $dinnerTime!" to dinnerTime
+        )
+    }
+
+    private fun getUserMealTime(meal: String, defaultTime: String): String {
+        val sharedPreferences =
+            applicationContext.getSharedPreferences("MealTimes", Context.MODE_PRIVATE)
+        return sharedPreferences.getString(meal, defaultTime) ?: defaultTime
     }
 
     private fun updateNotification(title: String, countdown: String) {

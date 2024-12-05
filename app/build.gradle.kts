@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.firebase.auth)
     implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -92,4 +93,5 @@ dependencies {
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.room.runtime)
     implementation (libs.androidx.room.ktx)
+    implementation(libs.androidx.startup.runtime)
 }

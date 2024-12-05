@@ -2,6 +2,7 @@ package com.nutrigoal.nutrigoal.ui.settings
 
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,17 +15,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.work.DailyReminderService
+import com.nutrigoal.nutrigoal.data.work.DailyReminderWorker
+import com.nutrigoal.nutrigoal.data.work.InsertDailyCheckInNotificationWorker
 import com.nutrigoal.nutrigoal.databinding.SettingBoxContentItemBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.profile.ProfileActivity
 import com.nutrigoal.nutrigoal.utils.AlertDialogUtil
-import com.nutrigoal.nutrigoal.utils.DailyReminderService
-import com.nutrigoal.nutrigoal.utils.DailyReminderWorker
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -86,54 +87,80 @@ class SettingBoxContentItemAdapter(
                                     toggleButton.isChecked = isEnabled
                                 }
 
-                            val currentTime = Calendar.getInstance()
-
-                            val targetTime = Calendar.getInstance().apply {
-                                set(Calendar.HOUR_OF_DAY, 9)
-                                set(Calendar.MINUTE, 0)
-                                set(Calendar.SECOND, 0)
-                                set(Calendar.MILLISECOND, 0)
-
-                                if (currentTime.after(this)) {
-                                    add(Calendar.DAY_OF_YEAR, 1)
-                                }
-                            }
-
-                            val timeUntilTarget = targetTime.timeInMillis - currentTime.timeInMillis
-
-                            val constraints = Constraints.Builder()
-                                .setRequiredNetworkType(NetworkType.CONNECTED)
-                                .build()
-
-                            val periodicWorkRequest = PeriodicWorkRequest.Builder(
-                                DailyReminderWorker::class.java,
-                                1, TimeUnit.DAYS
-                            )
-                                .setInitialDelay(timeUntilTarget, TimeUnit.MILLISECONDS)
-                                .setConstraints(constraints)
-                                .build()
-
                             val workManager =
                                 WorkManager.getInstance(context)
+
+
+                            val currentTime = Calendar.getInstance()
+
                             toggleButton.setOnCheckedChangeListener { _, isChecked ->
                                 if (isChecked) {
                                     val intent = Intent(context, DailyReminderService::class.java)
                                     context.startForegroundService(intent)
 
+                                    val targetTime = Calendar.getInstance().apply {
+                                        set(Calendar.HOUR_OF_DAY, 6)
+                                        set(Calendar.MINUTE, 0)
+                                        set(Calendar.SECOND, 0)
+                                        set(Calendar.MILLISECOND, 0)
+
+                                        if (currentTime.after(this)) {
+                                            add(Calendar.DAY_OF_YEAR, 1)
+                                        }
+                                    }
+
+                                    val timeUntilTarget =
+                                        targetTime.timeInMillis - currentTime.timeInMillis
+
+                                    val constraints = Constraints.Builder()
+                                        .build()
+
+                                    val dailyReminderRequest = PeriodicWorkRequest.Builder(
+                                        DailyReminderWorker::class.java,
+                                        1, TimeUnit.DAYS
+                                    )
+                                        .setInitialDelay(timeUntilTarget, TimeUnit.MILLISECONDS)
+                                        .setConstraints(constraints)
+                                        .build()
+
+                                    val checkInNotificationRequest = PeriodicWorkRequest.Builder(
+                                        InsertDailyCheckInNotificationWorker::class.java,
+                                        1, TimeUnit.DAYS
+                                    )
+                                        .setInitialDelay(timeUntilTarget, TimeUnit.MILLISECONDS)
+                                        .setConstraints(constraints)
+                                        .build()
+
+
                                     workManager.enqueueUniquePeriodicWork(
-                                        "DailyReminderWork",
-                                        ExistingPeriodicWorkPolicy.KEEP,
-                                        periodicWorkRequest
+                                        "DailyReminderWorker",
+                                        ExistingPeriodicWorkPolicy.UPDATE,
+                                        dailyReminderRequest
                                     )
 
-                                    workManager.getWorkInfoByIdLiveData(periodicWorkRequest.id)
-                                        .observe(lifecycleOwner) { workInfo ->
+                                    workManager.enqueueUniquePeriodicWork(
+                                        "InsertDailyCheckInNotificationWorker",
+                                        ExistingPeriodicWorkPolicy.UPDATE,
+                                        checkInNotificationRequest
+                                    )
 
-                                            if (workInfo?.state == WorkInfo.State.SUCCEEDED) {
+                                    workManager.getWorkInfoByIdLiveData(checkInNotificationRequest.id)
+                                        .observe(lifecycleOwner) { workInfo ->
+                                            if (workInfo?.state == WorkInfo.State.RUNNING) {
+                                                workManager.enqueue(checkInNotificationRequest)
+                                            }
+                                        }
+
+                                    workManager.getWorkInfoByIdLiveData(dailyReminderRequest.id)
+                                        .observe(lifecycleOwner) { workInfo ->
+                                            Log.d("FLORAAAA", "APA: ${workInfo?.state} ")
+                                            if (workInfo?.state == WorkInfo.State.RUNNING) {
                                                 toggleButton.isChecked = true
+                                                Log.d("FLORAAAA", "DIAJALNAKN: ")
                                                 lifecycleOwner.lifecycleScope.launch {
                                                     settingsViewModel.saveDailyReminderSetting(true)
                                                 }
+
                                             }
 
                                             if (workInfo?.state == WorkInfo.State.FAILED) {
@@ -148,7 +175,7 @@ class SettingBoxContentItemAdapter(
                                     toggleButton.isChecked = false
                                     val intent = Intent(context, DailyReminderService::class.java)
                                     context.stopService(intent)
-                                    workManager.cancelWorkById(periodicWorkRequest.id)
+                                    workManager.cancelAllWork()
                                     toggleButton.isChecked = false
                                     lifecycleOwner.lifecycleScope.launch {
                                         settingsViewModel.saveDailyReminderSetting(false)
