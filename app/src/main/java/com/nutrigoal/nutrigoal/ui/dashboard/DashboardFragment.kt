@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.bumptech.glide.Glide
 import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
@@ -159,10 +158,6 @@ class DashboardFragment : Fragment() {
     private fun handleShowHeader() {
         with(binding) {
             viewModel.currentUser.observe(viewLifecycleOwner) {
-                Glide.with(requireContext())
-                    .load(it?.photoProfile)
-                    .placeholder(R.drawable.photo_profile)
-                    .into(binding.ivPhotoProfile)
                 tvGreetings.text =
                     getString(R.string.dashboard_greetings, it?.username)
             }

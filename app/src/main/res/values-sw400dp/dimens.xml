@@ -19,6 +19,6 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="margin_bottom_to_edge">100dp</dimen>
-    <dimen name="margin_top_to_edge">40dp</dimen>
+    <dimen name="margin_top_to_edge">50dp</dimen>
 </resources>
 

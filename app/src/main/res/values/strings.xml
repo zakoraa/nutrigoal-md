@@ -119,7 +119,8 @@
     </string-array>
 
     <string-array name="breakfast_times">
-        <item>04:05 AM</item>
+        <item>03:00 AM</item>
+        <item>04:00 AM</item>
         <item>05:00 AM</item>
         <item>06:00 AM</item>
         <item>07:00 AM</item>
@@ -332,9 +333,9 @@
     <string name="Pangolin">Pangolin</string>
     <string name="Armadillo">Armadillo</string>
 
-    <string name="dashboard_greetings_desc">Keep track of your diet and maintain a healthy eating pattern!</string>
-    <string name="dashboard_greetings">Hi %s!</string>
-    <string name="body_weight_progress_title">Your body weight progress (kg)</string>
+    <string name="dashboard_greetings_desc">Keep track of your diet!</string>
+    <string name="dashboard_greetings">Hi %s</string>
+    <string name="body_weight_progress_title">Body Weight Progress (kg)</string>
     <string name="current_weight">Current Weight</string>
     <string name="weight_gain">Weight Gain</string>
     <string name="daily_progress_title">Daily Nutrient Consumption</string>
@@ -351,5 +352,6 @@
     <string name="dinner_time">Dinner Time</string>
     <string name="done">Done</string>
     <string name="no_activity">No Activity</string>
+    <string name="iv_header_image_desc">Display header image</string>
 
 </resources>
