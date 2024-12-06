@@ -7,11 +7,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.github.mikephil.charting.components.Description
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -40,64 +37,29 @@ class DashboardFragment : Fragment() {
 
     private fun setUpView() {
         handleShowHeader()
-        setUpWeightProgressChart()
         setUpNutrientsChart()
+        setUpWeightProgressAdapter()
     }
 
-    private fun setUpWeightProgressChart() {
-        val xValues =
-            mutableListOf("20 Dec", "21 Dec", "22 Dec", "23 Dec", "24 Dec", "25 Dec", "26 Dec")
+    private fun setUpWeightProgressAdapter() {
+        val weightList = listOf(
+            WeightProgress(12, 1, "Day 1", 70f),
+            WeightProgress(12, 2, "Day 2", 71f),
+            WeightProgress(12, 3, "Day 3", 70f),
+            WeightProgress(12, 4, "Day 4", 75f),
+            WeightProgress(12, 5, "Day 5", 71f),
+            WeightProgress(12, 6, "Day 6", 71f),
+        )
 
+        val adapter = BodyWeightProgressAdapter(weightList)
         with(binding) {
-            chartBodyWeightProgress.axisRight.setDrawLabels(false)
-            val description = Description()
-            description.text = ""
-            chartBodyWeightProgress.description = description
-
-            val xAxis = chartBodyWeightProgress.xAxis
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.valueFormatter = IndexAxisValueFormatter(xValues)
-            xAxis.labelCount = 7
-            xAxis.granularity = 1f
-            xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-            val yAxis = chartBodyWeightProgress.axisLeft
-            yAxis.axisMinimum = 55f
-            yAxis.axisMaximum = 70f
-            yAxis.axisLineWidth = 2f
-            yAxis.axisLineColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            yAxis.labelCount = 5
-            yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-
-            val entries: MutableList<BarEntry> = ArrayList()
-            entries.add(BarEntry(0f, 60f))
-            entries.add(BarEntry(1f, 61f))
-            entries.add(BarEntry(2f, 63f))
-            entries.add(BarEntry(3f, 64f))
-            entries.add(BarEntry(4f, 63f))
-            entries.add(BarEntry(5f, 62f))
-            entries.add(BarEntry(6f, 61f))
-
-            val dataSet = BarDataSet(entries, "Body Weight")
-            dataSet.colors = listOf(
-                ContextCompat.getColor(requireContext(), R.color.error),
-                ContextCompat.getColor(requireContext(), R.color.primary_80),
-                ContextCompat.getColor(requireContext(), R.color.secondary),
-                ContextCompat.getColor(requireContext(), R.color.tertiary),
-                ContextCompat.getColor(requireContext(), R.color.onBackground),
-                ContextCompat.getColor(requireContext(), R.color.primaryVariant),
-                ContextCompat.getColor(requireContext(), R.color.primary)
-            )
-            dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            dataSet.valueTextSize = 12f
-            dataSet.setDrawValues(true)
-
-            val barData = BarData(dataSet)
-            chartBodyWeightProgress.data = barData
-
-            chartBodyWeightProgress.setFitBars(true)
-            chartBodyWeightProgress.animateY(1000)
-            chartBodyWeightProgress.invalidate()
+            rvWeightProgress.adapter = adapter
+            rvWeightProgress.setHasFixedSize(true)
+            rvWeightProgress.setLayoutManager(object : LinearLayoutManager(requireContext()) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            })
         }
     }
 

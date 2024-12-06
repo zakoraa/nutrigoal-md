@@ -6,6 +6,8 @@
     <color name="primaryContainer">#F2F8FF</color>
     <color name="primaryVariant">#7BD5FF</color>
     <color name="secondary">#43A591</color>
+    <color name="secondary_dark">#418583</color>
+    <color name="secondary_darker">#296F6D</color>
     <color name="tertiary">#FB8500</color>
 
     <color name="onPrimary">#FFFFFFFF</color>

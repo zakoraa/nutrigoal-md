@@ -353,5 +353,7 @@
     <string name="done">Done</string>
     <string name="no_activity">No Activity</string>
     <string name="iv_header_image_desc">Display header image</string>
+    <string name="calorie_needs">Calorie Needs</string>
+    <string name="meal_recommendation">Meal Recommendation</string>
 
 </resources>
