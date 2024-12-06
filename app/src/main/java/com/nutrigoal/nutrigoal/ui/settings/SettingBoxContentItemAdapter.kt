@@ -150,13 +150,6 @@ class SettingBoxContentItemAdapter(
 
                                     workManager.getWorkInfoByIdLiveData(dailyReminderRequest.id)
                                         .observe(lifecycleOwner) { workInfo ->
-                                            if (workInfo?.state == WorkInfo.State.RUNNING) {
-                                                toggleButton.isChecked = true
-                                                lifecycleOwner.lifecycleScope.launch {
-                                                    settingsViewModel.saveDailyReminderSetting(true)
-                                                }
-
-                                            }
                                             if (workInfo?.state == WorkInfo.State.FAILED) {
                                                 Toast.makeText(
                                                     context,

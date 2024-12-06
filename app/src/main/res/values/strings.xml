@@ -120,7 +120,7 @@
 
     <string-array name="breakfast_times">
         <item>03:00 AM</item>
-        <item>04:00 AM</item>
+        <item>04:20 AM</item>
         <item>05:00 AM</item>
         <item>06:00 AM</item>
         <item>07:00 AM</item>
@@ -335,7 +335,7 @@
 
     <string name="dashboard_greetings_desc">Keep track of your diet!</string>
     <string name="dashboard_greetings">Hi %s</string>
-    <string name="body_weight_progress_title">Body Weight Progress (kg)</string>
+    <string name="body_weight_progress_title">Body Weight Progress</string>
     <string name="current_weight">Current Weight</string>
     <string name="weight_gain">Weight Gain</string>
     <string name="daily_progress_title">Daily Nutrient Consumption</string>
@@ -355,5 +355,7 @@
     <string name="iv_header_image_desc">Display header image</string>
     <string name="calorie_needs">Calorie Needs</string>
     <string name="meal_recommendation">Meal Recommendation</string>
+    <string name="last_7_days">Last 7 Days</string>
+    <string name="current_bmi">Current BMI</string>
 
 </resources>

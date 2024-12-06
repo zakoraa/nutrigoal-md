@@ -17,7 +17,7 @@ import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
-import com.nutrigoal.nutrigoal.ui.MainActivity
+import com.nutrigoal.nutrigoal.ui.survey.Survey1Activity
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
 import com.nutrigoal.nutrigoal.utils.InputValidator
 import com.nutrigoal.nutrigoal.utils.ToastUtil
@@ -109,7 +109,7 @@ class LoginActivity : AppCompatActivity() {
                 showLoading(false)
                 ToastUtil.showToast(this, getString(R.string.login_success))
                 viewModel.getCurrentUser()
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, Survey1Activity::class.java))
                 finish()
             }
 

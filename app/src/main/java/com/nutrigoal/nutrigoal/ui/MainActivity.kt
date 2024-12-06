@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
@@ -106,8 +107,11 @@ class MainActivity : AppCompatActivity() {
                     dialog.dismiss()
                 }
                 .create()
-
             alertDialog.show()
+
+            alertDialog.window?.setBackgroundDrawable(
+                ResourcesCompat.getDrawable(resources, R.drawable.card_background, theme)
+            )
         }
     }
 

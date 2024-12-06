@@ -103,8 +103,8 @@ class Survey3Activity : AppCompatActivity() {
         val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_item, instantFoods)
 
         with(binding) {
-            autoCompleteTextView.setAdapter(arrayAdapter)
             autoCompleteTextView.setText(instantFoods[0])
+            autoCompleteTextView.setAdapter(arrayAdapter)
             adapter = FavoriteProcessedAdapter(items = favoriteProcessedList)
 
             searchView.onActionViewExpanded()

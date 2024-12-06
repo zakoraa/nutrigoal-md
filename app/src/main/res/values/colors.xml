@@ -6,13 +6,15 @@
     <color name="primaryContainer">#F2F8FF</color>
     <color name="primaryVariant">#7BD5FF</color>
     <color name="secondary">#43A591</color>
-    <color name="secondary_dark">#418583</color>
-    <color name="secondary_darker">#296F6D</color>
-    <color name="tertiary">#FB8500</color>
+    <color name="secondary_50">#6DBDAB</color>
+<!--    <color name="secondary_50">#B543A591</color>-->
+    <color name="tertiary">#FFB058</color>
 
     <color name="onPrimary">#FFFFFFFF</color>
 
     <color name="background">#FFFFFFFF</color>
+    <color name="yellow">#FFD558</color>
+    <color name="green">#00CC91</color>
     <color name="onBackground">#FF000000</color>
     <color name="bottom_nav_stroke_color">#00FFFFFF</color>
     <color name="greyBackground">#F3F3F3</color>

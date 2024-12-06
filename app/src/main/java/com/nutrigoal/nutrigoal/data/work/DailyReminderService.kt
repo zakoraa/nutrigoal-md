@@ -72,7 +72,6 @@ class DailyReminderService : Service() {
                     insertNotificationToDatabase(mealTitle)
                 }
 
-
                 handler.postDelayed(this, 1000L)
             }
         }, 1000L)
@@ -84,7 +83,6 @@ class DailyReminderService : Service() {
             OneTimeWorkRequest.Builder(InsertTimeToEatWorker::class.java)
                 .setInputData(workDataOf("mealTitle" to title))
                 .build()
-
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
     }
 
