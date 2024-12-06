@@ -35,6 +35,14 @@ class DailyReminderService : Service() {
         startCountdown()
     }
 
+    override fun onDestroy() {
+        stopSelf()
+        stopForeground(STOP_FOREGROUND_DETACH)
+        handler.removeCallbacksAndMessages(null)
+        super.onDestroy()
+    }
+
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
