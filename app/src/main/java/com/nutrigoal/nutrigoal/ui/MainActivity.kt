@@ -1,10 +1,10 @@
 package com.nutrigoal.nutrigoal.ui
 
-import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
@@ -21,12 +21,18 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
+import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
+import com.nutrigoal.nutrigoal.data.remote.entity.Gender
+import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
+import com.nutrigoal.nutrigoal.data.remote.response.SurveyResponse
 import com.nutrigoal.nutrigoal.databinding.ActivityMainBinding
 import com.nutrigoal.nutrigoal.databinding.PopUpCheckInBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
+import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
+import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -36,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: AuthViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
+    private val surveyViewModel: SurveyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +66,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpView() {
         getAppThemes()
-        viewModel.getSession()
+
+        getSurveyResult()
 
         lifecycleScope.launch {
             viewModel.userLocalEntitySessionState.collect { result ->
@@ -73,8 +81,76 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        showMealTimePopup()
+        lifecycleScope.launch {
+            surveyViewModel.surveyResponseState.collect { result ->
+                handleGetSurveyResult(result)
+            }
+        }
+
     }
+
+    private fun getSurveyResult() {
+        val userEntity = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(
+                EXTRA_SURVEY,
+                UserEntity::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_SURVEY)
+        }
+
+        if (userEntity !== null) {
+            var genderValue = 0
+            if (userEntity.gender == Gender.FEMALE) {
+                genderValue = 1
+            }
+            val surveyRequest = SurveyRequest(
+                age = userEntity.age ?: 0,
+                height = userEntity.height ?: 0f,
+                weight = userEntity.bodyWeight ?: 0f,
+                gender = genderValue,
+                activity_level = userEntity.activityLevel ?: 1,
+                diet_category = userEntity.dietCategory ?: DietCategory.VEGAN.toString(),
+                has_gastric_issue = userEntity.hasGastricIssue.toString(),
+                food_preference = userEntity.foodPreference ?: emptyList()
+            )
+            surveyViewModel.getSurveyResult(surveyRequest)
+        } else {
+            val surveyRequest = SurveyRequest(
+                age = 20,
+                height = 170f,
+                weight = 70f,
+                gender = 0,
+                activity_level = 1,
+                diet_category = "vegan",
+                has_gastric_issue = "true",
+                food_preference = listOf("Apple", "Banana", "Orange", "Mango", "Strawberry")
+            )
+            surveyViewModel.getSurveyResult(surveyRequest)
+            viewModel.getSession()
+        }
+    }
+
+    private fun handleGetSurveyResult(result: ResultState<SurveyResponse?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                Log.d("FLORAAAAAA", "handleGetSurveyResult: ${result.data}")
+                showLoading(false)
+                showMealTimePopup()
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.error_get_user))
+            }
+
+            is ResultState.Initial -> {}
+
+        }
+    }
+
 
     private fun showMealTimePopup() {
         val bindingPopup = PopUpCheckInBinding.inflate(LayoutInflater.from(this))
@@ -116,7 +192,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveMealTimes(breakfastTime: String, lunchTime: String, dinnerTime: String) {
-        val sharedPreferences = getSharedPreferences("MealTimes", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("MealTimes", MODE_PRIVATE)
         sharedPreferences.edit().apply {
             putString("Breakfast", breakfastTime)
             putString("Lunch", lunchTime)
@@ -178,15 +254,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        with(binding) {
-            if (isLoading) {
-                progressBar.visibility = View.VISIBLE
-                nestedScrollView.visibility = View.INVISIBLE
-            } else {
-                progressBar.visibility = View.GONE
-                nestedScrollView.visibility = View.VISIBLE
-            }
-        }
+//        with(binding) {
+//            if (isLoading) {
+//                progressBar.visibility = View.VISIBLE
+//            } else {
+//                progressBar.visibility = View.GONE
+//            }
+//        }
 
     }
 

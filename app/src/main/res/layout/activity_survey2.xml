@@ -104,9 +104,9 @@
                 android:layout_marginStart="@dimen/edt_error_text_margin_start"
                 android:layout_marginTop="@dimen/edt_error_text_margin_top"
                 android:textColor="@color/error"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/ed_body_weight"
-                android:visibility="gone"
                 tools:text="Wrong input" />
 
             <com.nutrigoal.nutrigoal.ui.common.TextFieldView
@@ -128,9 +128,9 @@
                 android:layout_marginStart="@dimen/edt_error_text_margin_start"
                 android:layout_marginTop="@dimen/edt_error_text_margin_top"
                 android:textColor="@color/error"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/ed_height"
-                android:visibility="gone"
                 tools:text="Wrong input" />
 
             <com.nutrigoal.nutrigoal.ui.common.TextFieldView
@@ -151,9 +151,9 @@
                 android:layout_marginStart="@dimen/edt_error_text_margin_start"
                 android:layout_marginTop="@dimen/edt_error_text_margin_top"
                 android:textColor="@color/error"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/ed_age"
-                android:visibility="gone"
                 tools:text="Wrong input" />
 
             <TextView
@@ -171,6 +171,7 @@
                 android:id="@+id/group_radio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:checkedButton="@id/rb_male"
                 android:orientation="horizontal"
                 android:paddingBottom="@dimen/margin_bottom_to_edge"
                 app:layout_constraintEnd_toEndOf="@id/progress_base_line"

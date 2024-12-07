@@ -2,7 +2,9 @@ package com.nutrigoal.nutrigoal.ui.survey
 
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,8 +13,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivitySurvey3Binding
 import com.nutrigoal.nutrigoal.ui.MainActivity
+import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
 
 
@@ -23,6 +28,7 @@ class Survey3Activity : AppCompatActivity() {
     private val animalMap: MutableMap<String, String> = mutableMapOf()
     private lateinit var favoriteProcessedList: List<String>
     private lateinit var adapter: FavoriteProcessedAdapter
+    private var userEntity: UserEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +49,6 @@ class Survey3Activity : AppCompatActivity() {
     private fun setUpView() {
         addMapItems()
         setUpAdapter()
-
     }
 
     private fun setUpAction() {
@@ -52,10 +57,8 @@ class Survey3Activity : AppCompatActivity() {
                 finish()
             }
 
-            btnNext.setOnClickListener {
-                val intent = Intent(this@Survey3Activity, MainActivity::class.java)
-                startActivity(intent)
-            }
+            handleForm()
+
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     return false
@@ -66,6 +69,60 @@ class Survey3Activity : AppCompatActivity() {
                     return true
                 }
             })
+        }
+    }
+
+    private fun handleForm() {
+        userEntity = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(
+                EXTRA_SURVEY,
+                UserEntity::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_SURVEY)
+        }
+
+        with(binding) {
+            btnNext.setOnClickListener {
+                val selectedActivityLevel = autoCompleteTextView.text.toString()
+
+                val instantFoods = resources.getStringArray(R.array.activity_levels)
+
+                userEntity?.activityLevel = when (selectedActivityLevel) {
+                    instantFoods[0] -> 1
+                    instantFoods[1] -> 2
+                    instantFoods[2] -> 3
+                    instantFoods[3] -> 4
+                    instantFoods[4] -> 5
+                    else -> null
+                }
+
+                val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId
+
+                userEntity?.dietCategory = when (selectedDietCategoryId) {
+                    R.id.rb_vegan -> DietCategory.VEGAN.toString()
+                    R.id.rb_keto -> DietCategory.KETO.toString()
+                    else -> null
+                }
+
+                val selectedHistoryMagId = rgHistoryMag.checkedRadioButtonId
+
+                userEntity?.hasGastricIssue = when (selectedHistoryMagId) {
+                    R.id.rb_yes -> true
+                    R.id.rb_no -> false
+                    else -> null
+                }
+
+                val selectedFoodPreferences = adapter.getCheckedItems()
+
+                userEntity?.foodPreference = selectedFoodPreferences
+
+                Log.d("FLORAAAAAA", "handleGetSurveyResult: ${userEntity}")
+                val intent = Intent(this@Survey3Activity, MainActivity::class.java)
+                intent.putExtra(EXTRA_SURVEY, userEntity)
+                startActivity(intent)
+            }
         }
     }
 

@@ -2,13 +2,18 @@ package com.nutrigoal.nutrigoal.ui.survey
 
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.remote.entity.Gender
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivitySurvey2Binding
+import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
 
 class Survey2Activity : AppCompatActivity() {
@@ -30,16 +35,46 @@ class Survey2Activity : AppCompatActivity() {
     }
 
     private fun setUpAction() {
+        handleForm()
+
         with(binding) {
             btnBack.setOnClickListener {
                 finish()
             }
+        }
+    }
+
+    private fun handleForm() {
+        val userEntity = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(
+                EXTRA_SURVEY,
+                UserEntity::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_SURVEY)
+        }
+
+        with(binding) {
 
             btnNext.setOnClickListener {
+                userEntity?.age = edAge.text?.trim().toString().toIntOrNull()
+                userEntity?.height = edHeight.text?.trim().toString().toFloatOrNull()
+                userEntity?.bodyWeight = edBodyWeight.text?.trim().toString().toFloatOrNull()
+                val selectedGenderId = groupRadio.checkedRadioButtonId
+
+                userEntity?.gender = when (selectedGenderId) {
+                    R.id.rb_male -> Gender.MALE
+                    R.id.rb_female -> Gender.FEMALE
+                    else -> null
+                }
+
+                Log.d("FLORAAAAAA", "handleGetSurveyResult: ${userEntity}")
                 val intent = Intent(
                     this@Survey2Activity,
                     Survey3Activity::class.java
                 )
+                intent.putExtra(EXTRA_SURVEY, userEntity)
                 startActivity(intent)
             }
         }

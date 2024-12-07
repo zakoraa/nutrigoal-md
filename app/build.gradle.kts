@@ -26,6 +26,11 @@ android {
             "WEB_CLIENT_ID",
             "\"526047333608-aibmtojeq8r985t7alvp4gd5ct6ctg74.apps.googleusercontent.com\""
         )
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"http://192.168.100.188:5000/\""
+        )
     }
 
     buildTypes {

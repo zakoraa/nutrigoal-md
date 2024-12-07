@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
+import com.nutrigoal.nutrigoal.BuildConfig
 import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
 import com.nutrigoal.nutrigoal.data.local.database.NotificationDao
 import com.nutrigoal.nutrigoal.data.local.database.NotificationLocalEntityRoomDatabase
@@ -14,10 +15,16 @@ import com.nutrigoal.nutrigoal.data.local.database.authDataStore
 import com.nutrigoal.nutrigoal.data.local.database.settingDataStore
 import com.nutrigoal.nutrigoal.data.local.repository.NotificationRepository
 import com.nutrigoal.nutrigoal.data.remote.repository.AuthRepository
+import com.nutrigoal.nutrigoal.data.remote.repository.SurveyRepository
+import com.nutrigoal.nutrigoal.data.remote.retrofit.SurveyService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Singleton
@@ -25,6 +32,30 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        } else {
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)
+        }
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+    }
+
 
     @Provides
     @Singleton
@@ -68,6 +99,17 @@ object AppModule {
     ): NotificationRepository {
         return NotificationRepository(notificationDao)
     }
+
+    @Provides
+    @Singleton
+    fun provideSurveyService(retrofit: Retrofit): SurveyService {
+        return retrofit.create(SurveyService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSurveyRepository(surveyService: SurveyService): SurveyRepository =
+        SurveyRepository(surveyService)
 
     @Provides
     @Singleton

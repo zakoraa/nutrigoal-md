@@ -35,11 +35,11 @@
         android:layout_marginHorizontal="10dp"
         android:background="@drawable/card_background"
         android:paddingHorizontal="10dp"
+        android:layout_marginTop="15dp"
         android:paddingVertical="5dp"
-        android:translationY="-50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view_header">
+        app:layout_constraintTop_toBottomOf="@id/tv_plan_diet">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
@@ -52,6 +52,18 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_loading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/card_date"
+        app:layout_constraintStart_toStartOf="@id/card_date"
+        app:layout_constraintTop_toBottomOf="@id/card_date"
+        app:shimmer_duration="3000">
+
+        <include layout="@layout/card_shimmer" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card_calorie_needs"
@@ -61,7 +73,6 @@
         android:background="@drawable/card_background"
         android:paddingHorizontal="10dp"
         android:paddingVertical="15dp"
-        android:translationY="-50dp"
         app:layout_constraintEnd_toEndOf="@id/card_date"
         app:layout_constraintStart_toStartOf="@id/card_date"
         app:layout_constraintTop_toBottomOf="@id/card_date">
@@ -85,7 +96,6 @@
         android:background="@drawable/card_background"
         android:paddingHorizontal="10dp"
         android:paddingVertical="15dp"
-        android:translationY="-50dp"
         app:layout_constraintEnd_toEndOf="@id/card_date"
         app:layout_constraintStart_toStartOf="@id/card_date"
         app:layout_constraintTop_toBottomOf="@id/card_calorie_needs">

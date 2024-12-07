@@ -344,7 +344,7 @@
     <string name="fat_title">Fat</string>
     <string name="carbohydrates_title">Carbohydrates</string>
     <string name="select_your_activity_level">Select your activity level</string>
-    <string name="nutrients_title">Nutrients</string>
+    <string name="nutrients_title">Nutrients Progress</string>
     <string name="daily_check_in">Daily Check-in</string>
     <string name="breakfast_time">Breakfast Time</string>
     <string name="select_time">Select Time</string>

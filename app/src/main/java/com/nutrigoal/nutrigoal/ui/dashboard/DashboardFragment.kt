@@ -8,15 +8,22 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.remote.response.SurveyResponse
 import com.nutrigoal.nutrigoal.databinding.FragmentDashboardBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
+import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
+import com.nutrigoal.nutrigoal.utils.ToastUtil
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
@@ -25,6 +32,7 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AuthViewModel by activityViewModels()
+    private val surveyViewModel: SurveyViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,9 +48,49 @@ class DashboardFragment : Fragment() {
 
     private fun setUpView() {
         handleShowHeader()
-        setUpNutrientsChart()
+        setUpNutrientsCharts()
         setUpWeightProgressAdapter()
         setBMILineWidths()
+
+        lifecycleScope.launch {
+            surveyViewModel.surveyResponseState.collect { result ->
+                handleGetSurveyResult(result)
+            }
+        }
+    }
+
+    private fun handleGetSurveyResult(result: ResultState<SurveyResponse?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                showLoading(false)
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(requireContext(), getString(R.string.error_get_user))
+            }
+
+            is ResultState.Initial -> {}
+
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        with(binding) {
+            if (isLoading) {
+                cardNutrients.visibility = View.GONE
+                cardBodyWeightProgress.visibility = View.GONE
+                cardBodyWeightInfo.visibility = View.GONE
+                shimmerLoading.visibility = View.VISIBLE
+            } else {
+                cardNutrients.visibility = View.VISIBLE
+                cardBodyWeightProgress.visibility = View.VISIBLE
+                cardBodyWeightInfo.visibility = View.VISIBLE
+                shimmerLoading.visibility = View.GONE
+            }
+        }
+
     }
 
     private fun setUpWeightProgressAdapter() {
@@ -72,8 +120,11 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun setUpNutrientsChart() {
-        val lineChart = binding.chartNutrients
+    private fun setUpNutrientsCharts() {
+        val caloriesChart = binding.chartCalories
+        val proteinChart = binding.chartProtein
+        val fatChart = binding.chartFat
+        val carbohydratesChart = binding.chartCarbohydrates
 
         val dates = (1..10).map { it.toFloat() }
         val dateLabels = (1..10).map { "Day $it" }
@@ -86,43 +137,46 @@ class DashboardFragment : Fragment() {
         val carbohydratesEntries =
             dates.mapIndexed { index, date -> Entry(date, (200 + index * 5).toFloat()) }
 
-        val caloriesDataSet = LineDataSet(caloriesEntries, "Calories").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.primary)
-            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
-        }
-        val proteinDataSet = LineDataSet(proteinEntries, "Protein").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.secondary)
-            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
-        }
-        val fatDataSet = LineDataSet(fatEntries, "Fat").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.error)
-            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
-        }
-        val carbohydratesDataSet = LineDataSet(carbohydratesEntries, "Carbohydrates").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.tertiary)
+        setupSingleChart(caloriesChart, caloriesEntries, dateLabels, "Calories", R.color.primary)
+        setupSingleChart(proteinChart, proteinEntries, dateLabels, "Protein", R.color.secondary)
+        setupSingleChart(fatChart, fatEntries, dateLabels, "Fat", R.color.error)
+        setupSingleChart(
+            carbohydratesChart,
+            carbohydratesEntries,
+            dateLabels,
+            "Carbohydrates",
+            R.color.tertiary
+        )
+    }
+
+    private fun setupSingleChart(
+        chart: LineChart,
+        entries: List<Entry>,
+        labels: List<String>,
+        label: String,
+        colorRes: Int
+    ) {
+        val dataSet = LineDataSet(entries, label).apply {
+            color = ContextCompat.getColor(requireContext(), colorRes)
             valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
             lineWidth = 2f
         }
 
-        val lineData = LineData(caloriesDataSet, proteinDataSet, fatDataSet, carbohydratesDataSet)
-        lineChart.data = lineData
+        chart.data = LineData(dataSet)
 
-        val xAxis = lineChart.xAxis
+        val xAxis = chart.xAxis
         xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
         xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.valueFormatter = IndexAxisValueFormatter(dateLabels)
+        xAxis.valueFormatter = IndexAxisValueFormatter(labels)
         xAxis.granularity = 1f
         xAxis.labelCount = 7
 
-        val yAxis = lineChart.axisLeft
+        val yAxis = chart.axisLeft
         yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-        lineChart.axisRight.isEnabled = false
-        lineChart.description.text = ""
-        lineChart.animateX(1000)
-        lineChart.invalidate()
+        chart.axisRight.isEnabled = false
+        chart.description.text = ""
+        chart.animateX(1000)
+        chart.invalidate()
     }
 
 

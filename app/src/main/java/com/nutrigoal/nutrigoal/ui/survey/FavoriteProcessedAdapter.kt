@@ -30,6 +30,10 @@ class FavoriteProcessedAdapter(
         }
     }
 
+    fun getCheckedItems(): List<String> {
+        return checkedItems.toList()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         val binding = FavoriteProcessedFoodItemBinding.inflate(
             LayoutInflater.from(parent.context),

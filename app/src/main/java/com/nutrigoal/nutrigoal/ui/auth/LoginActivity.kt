@@ -109,7 +109,16 @@ class LoginActivity : AppCompatActivity() {
                 showLoading(false)
                 ToastUtil.showToast(this, getString(R.string.login_success))
                 viewModel.getCurrentUser()
-                startActivity(Intent(this, Survey1Activity::class.java))
+                val userResult = result.data
+                val userEntity = UserEntity(
+                    username = userResult?.displayName,
+                    email = userResult?.email,
+                    photoProfile = userResult?.photoUrl.toString()
+                )
+                val intent = Intent(this, Survey1Activity::class.java)
+                intent.putExtra(EXTRA_SURVEY, userEntity)
+                startActivity(intent)
+
                 finish()
             }
 
@@ -171,7 +180,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleGetUser(result: ResultState<UserEntity?>){
+    private fun handleGetUser(result: ResultState<UserEntity?>) {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
@@ -240,6 +249,10 @@ class LoginActivity : AppCompatActivity() {
                 start()
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_SURVEY = "extra_survey"
     }
 
 }
