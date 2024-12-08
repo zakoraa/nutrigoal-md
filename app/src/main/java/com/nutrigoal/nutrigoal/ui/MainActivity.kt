@@ -38,7 +38,7 @@ import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
-import com.nutrigoal.nutrigoal.utils.DateFormatter
+import com.nutrigoal.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -192,11 +192,7 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 val it = result.data
-                val today = DateFormatter.getTodayDate()
-                val index = it?.perDay?.indexOfFirst { date ->
-                    val createdAtDate = DateFormatter.parseDate(date.createdAt)
-                    createdAtDate == today
-                } ?: -1
+                val index = getTodayDataFromPerDay(it)
                 if (index != -1) {
                     val perDay = it?.perDay?.get(index)
                     val surveyRequest = SurveyRequest(

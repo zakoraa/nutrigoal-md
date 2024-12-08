@@ -110,6 +110,7 @@
     <string name="iv_back_from_profile_desc">Back from profile page</string>
     <string name="iv_photo_profile_desc">Display photo profile</string>
     <string name="confirm_logout_message">Are you sure you want to logout?</string>
+    <string name="last_days">Last %s days</string>
 
     <string-array name="activity_levels">
         <item>Sedentary (little to no exercise)</item>

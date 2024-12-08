@@ -16,12 +16,12 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.databinding.FragmentDashboardBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
-import java.util.Calendar
-import java.util.Locale
+import com.nutrigoal.nutrigoal.utils.DateFormatter.parseDateToMonthAndDay
 
 
 class DashboardFragment : Fragment() {
@@ -45,10 +45,13 @@ class DashboardFragment : Fragment() {
 
     private fun setUpView() {
         setUpNutrientsCharts()
-        setUpWeightProgressAdapter()
 
         surveyViewModel.isLoading.observe(viewLifecycleOwner) {
             showLoading(it)
+        }
+
+        historyViewModel.historyResult.observe(viewLifecycleOwner) {
+            setUpWeightProgressAdapter(it)
         }
 
     }
@@ -71,20 +74,24 @@ class DashboardFragment : Fragment() {
 
     }
 
-    private fun setUpWeightProgressAdapter() {
-        val calendar = Calendar.getInstance(Locale.ENGLISH)
-        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-        val weightList = listOf(
-            WeightProgress(12, currentDay - 5, "Day 1", 70f),
-            WeightProgress(12, currentDay - 4, "Day 2", 71f),
-            WeightProgress(12, currentDay - 3, "Day 3", 70f),
-            WeightProgress(12, currentDay - 2, "Day 4", 75f),
-            WeightProgress(12, currentDay - 1, "Day 5", 71f),
-            WeightProgress(12, currentDay, "Day 6", 71f),
-        )
+    private fun setUpWeightProgressAdapter(historyResponse: HistoryResponse) {
+        val weightList = historyResponse.perDay?.mapIndexed { index, perDayItem ->
+            val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
+
+            WeightProgress(
+                month = month,
+                day = day,
+                title = "Day ${index + 1}",
+                bodyWeight = perDayItem.bodyWeight ?: 0f
+            )
+        } ?: emptyList()
 
         val adapter = BodyWeightProgressAdapter(weightList)
         with(binding) {
+            tvBodyWeightProgressRange.text =
+                if (weightList.size == 1) getString(R.string.today) else {
+                    getString(R.string.last_days, weightList.size.toString())
+                }
             rvWeightProgress.adapter = adapter
             rvWeightProgress.setHasFixedSize(true)
             rvWeightProgress.setLayoutManager(object : LinearLayoutManager(requireContext()) {

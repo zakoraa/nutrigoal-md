@@ -11,7 +11,23 @@ object DateFormatter {
         return dateFormat.format(time)
     }
 
-     fun parseDate(dateString: String?): String? {
+    fun parseDateToMonthAndDay(dateString: String?): Pair<Int, Int> {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val date = dateFormat.parse(dateString ?: "")
+
+        val calendar = java.util.Calendar.getInstance()
+        if (date != null) {
+            calendar.time = date
+        }
+
+        return Pair(
+            calendar.get(java.util.Calendar.MONTH) + 1,
+            calendar.get(java.util.Calendar.DAY_OF_MONTH)
+        )
+
+    }
+
+    fun parseDate(dateString: String?): String? {
         if (dateString == null) return null
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
         return try {
@@ -32,7 +48,7 @@ object DateFormatter {
         }
     }
 
-     fun getTodayDate(): String {
+    fun getTodayDate(): String {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH) + 1
