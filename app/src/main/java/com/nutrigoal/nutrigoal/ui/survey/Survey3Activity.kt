@@ -19,6 +19,7 @@ import com.nutrigoal.nutrigoal.databinding.ActivitySurvey3Binding
 import com.nutrigoal.nutrigoal.ui.MainActivity
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
+import com.nutrigoal.nutrigoal.utils.ToastUtil
 
 
 class Survey3Activity : AppCompatActivity() {
@@ -101,8 +102,23 @@ class Survey3Activity : AppCompatActivity() {
                 val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId
 
                 userEntity?.dietCategory = when (selectedDietCategoryId) {
-                    R.id.rb_vegan -> DietCategory.VEGAN.toString()
-                    R.id.rb_keto -> DietCategory.KETO.toString()
+                    R.id.rb_vegan -> {
+                        adapter.updateItems(
+                            favoriteProcessedList.filterNot { animalMap.containsKey(it) }
+                        )
+                        DietCategory.VEGAN.toString()
+                    }
+
+                    R.id.rb_keto -> {
+                        val allItems = mutableListOf<String>().apply {
+                            addAll(fruitMap.keys)
+                            addAll(vegetableMap.keys)
+                            addAll(animalMap.keys)
+                        }
+                        adapter.updateItems(allItems)
+                        DietCategory.KETO.toString()
+                    }
+
                     else -> null
                 }
 
@@ -119,9 +135,17 @@ class Survey3Activity : AppCompatActivity() {
                 userEntity?.foodPreference = selectedFoodPreferences
 
                 Log.d("FLORAAAAAA", "handleGetSurveyResult: ${userEntity}")
-                val intent = Intent(this@Survey3Activity, MainActivity::class.java)
-                intent.putExtra(EXTRA_SURVEY, userEntity)
-                startActivity(intent)
+                if (selectedFoodPreferences.isNotEmpty()) {
+                    val intent = Intent(this@Survey3Activity, MainActivity::class.java)
+                    intent.putExtra(EXTRA_SURVEY, userEntity)
+                    startActivity(intent)
+                } else {
+                    ToastUtil.showToast(
+                        this@Survey3Activity,
+                        getString(R.string.error_favorite_food)
+                    )
+                }
+
             }
         }
     }
@@ -166,7 +190,6 @@ class Survey3Activity : AppCompatActivity() {
 
             searchView.onActionViewExpanded()
             recyclerView.adapter = adapter
-            recyclerView.setHasFixedSize(true)
             recyclerView.layoutManager =
                 GridLayoutManager(this@Survey3Activity, 3, GridLayoutManager.VERTICAL, false)
         }

@@ -17,7 +17,7 @@ data class RecommendedFoodBasedOnCalories(
     val rfbocTotalFiberG: String? = null,
 
     @field:SerializedName("rfboc_weight_(kg)")
-    val rfbocWeightKg: Any? = null,
+    val rfbocWeightKg: Float? = null,
 
     @field:SerializedName("rfboc_gender")
     val rfbocGender: String? = null,
@@ -62,7 +62,7 @@ data class RecommendedFoodBasedOnCalories(
     val rfbocTotalFatG: String? = null,
 
     @field:SerializedName("rfboc_height_(cm)")
-    val rfbocHeightCm: Any? = null,
+    val rfbocHeightCm: Float? = null,
 
     @field:SerializedName("rfboc_diet_type")
     val rfbocDietType: String? = null,

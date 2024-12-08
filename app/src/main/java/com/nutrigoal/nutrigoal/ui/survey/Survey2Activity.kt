@@ -15,9 +15,11 @@ import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivitySurvey2Binding
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
+import com.nutrigoal.nutrigoal.utils.InputValidator
 
 class Survey2Activity : AppCompatActivity() {
     private lateinit var binding: ActivitySurvey2Binding
+    private val inputValidator: InputValidator by lazy { InputValidator(this@Survey2Activity) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +60,23 @@ class Survey2Activity : AppCompatActivity() {
         with(binding) {
 
             btnNext.setOnClickListener {
-                userEntity?.age = edAge.text?.trim().toString().toIntOrNull()
-                userEntity?.height = edHeight.text?.trim().toString().toFloatOrNull()
-                userEntity?.bodyWeight = edBodyWeight.text?.trim().toString().toFloatOrNull()
+                val age = edAge.text?.trim().toString()
+                val height = edHeight.text?.trim().toString()
+                val bodyWeight = edBodyWeight.text?.trim().toString()
+
+                userEntity?.age = age.toIntOrNull()
+                userEntity?.height = height.toFloatOrNull()
+                userEntity?.bodyWeight = bodyWeight.toFloatOrNull()
+
+                val ageError = inputValidator.validateInput(edAge, getString(R.string.age))
+                val heightError = inputValidator.validateInput(edHeight, getString(R.string.height))
+                val bodyWeightError =
+                    inputValidator.validateInput(edBodyWeight, getString(R.string.body_weight))
+
+                inputValidator.checkValidation(tvErrorAge, ageError)
+                inputValidator.checkValidation(tvErrorHeight, heightError)
+                inputValidator.checkValidation(tvErrorBodyWeight, bodyWeightError)
+
                 val selectedGenderId = groupRadio.checkedRadioButtonId
 
                 userEntity?.gender = when (selectedGenderId) {
@@ -70,12 +86,14 @@ class Survey2Activity : AppCompatActivity() {
                 }
 
                 Log.d("FLORAAAAAA", "handleGetSurveyResult: ${userEntity}")
-                val intent = Intent(
-                    this@Survey2Activity,
-                    Survey3Activity::class.java
-                )
-                intent.putExtra(EXTRA_SURVEY, userEntity)
-                startActivity(intent)
+                if (ageError == null && heightError == null && bodyWeightError == null) {
+                    val intent = Intent(
+                        this@Survey2Activity,
+                        Survey3Activity::class.java
+                    )
+                    intent.putExtra(EXTRA_SURVEY, userEntity)
+                    startActivity(intent)
+                }
             }
         }
     }

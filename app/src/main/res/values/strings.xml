@@ -5,6 +5,7 @@
     <string name="register_success">Register successful</string>
     <string name="logout_success">Logout is successful</string>
 
+    <string name="error_favorite_food">You must choose your favorite food</string>
     <string name="error_get_notification">Get notification failed. Please try again.</string>
     <string name="error_get_user">Get user failed. Please try again.</string>
     <string name="error_login">Login failed. Please try again.</string>

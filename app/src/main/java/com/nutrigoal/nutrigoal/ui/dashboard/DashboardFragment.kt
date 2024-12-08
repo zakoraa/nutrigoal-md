@@ -203,17 +203,26 @@ class DashboardFragment : Fragment() {
     private fun handleShowCurrentUserData() {
         with(binding) {
             viewModel.currentUser.observe(viewLifecycleOwner) {
-                tvCurrentWeight.text = it?.bodyWeight.toString()
                 tvGreetings.text =
                     getString(R.string.dashboard_greetings, it?.username)
-                setBMILineWidths(it?.bodyWeight ?: 0f, it?.height ?: 0f)
+            }
+            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
+                tvCurrentWeight.text = it?.recommendedFoodBasedOnCalories?.rfbocWeightKg.toString()
+                setBMILineWidths(
+                    it?.recommendedFoodBasedOnCalories?.rfbocWeightKg
+                        ?: 0f,
+                    it?.recommendedFoodBasedOnCalories?.rfbocHeightCm
+                        ?: 0f
+                )
             }
 
         }
     }
 
     private fun calculateBMI(weight: Float, height: Float): Float {
-        if (height <= 0){return 0f}
+        if (height <= 0) {
+            return 0f
+        }
         val heightInMeter = height / 100
         return weight / (heightInMeter * heightInMeter)
     }

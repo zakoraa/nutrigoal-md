@@ -107,9 +107,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (userEntity !== null) {
-            var genderValue = 0
+            var genderValue = 1
             if (userEntity.gender == Gender.FEMALE) {
-                genderValue = 1
+                genderValue = 2
             }
             val surveyRequest = SurveyRequest(
                 age = userEntity.age ?: 0,

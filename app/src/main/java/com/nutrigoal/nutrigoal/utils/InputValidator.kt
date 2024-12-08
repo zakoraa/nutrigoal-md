@@ -4,13 +4,13 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.ui.common.TextFieldView
 
 class InputValidator(private val context: Context) {
 
-    fun validateInput(input: String): String? {
+    fun validateInput(editText: TextFieldView, input: String): String? {
         return when {
-            input.isEmpty() -> emptyInputMessage(input)
-
+            editText.text.toString().trim().isEmpty() -> emptyInputMessage(input)
             else -> null
         }
     }

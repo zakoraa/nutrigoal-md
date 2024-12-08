@@ -70,7 +70,7 @@ class RecommendationFoodAdapter(
                 button.setBackgroundColor(ContextCompat.getColor(context, R.color.primary_80))
             } else {
                 button.text = context.getString(R.string.select)
-                button.setTextColor(ContextCompat.getColor(context, R.color.primary))
+                button.setTextColor(ContextCompat.getColor(context, R.color.primary_80))
                 button.setBackgroundResource(R.drawable.recommended_food_button)
             }
         }
