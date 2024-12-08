@@ -4,7 +4,6 @@ import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -85,6 +84,29 @@ class Survey3Activity : AppCompatActivity() {
         }
 
         with(binding) {
+            val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId
+
+            userEntity?.dietCategory = when (selectedDietCategoryId) {
+                R.id.rb_vegan -> {
+                    adapter.updateItems(
+                        favoriteProcessedList.filterNot { animalMap.containsKey(it) }
+                    )
+                    DietCategory.VEGAN.toString()
+                }
+
+                R.id.rb_keto -> {
+                    val allItems = mutableListOf<String>().apply {
+                        addAll(fruitMap.keys)
+                        addAll(vegetableMap.keys)
+                        addAll(animalMap.keys)
+                    }
+                    adapter.updateItems(allItems)
+                    DietCategory.KETO.toString()
+                }
+
+                else -> null
+            }
+
             btnNext.setOnClickListener {
                 val selectedActivityLevel = autoCompleteTextView.text.toString()
 
@@ -96,29 +118,6 @@ class Survey3Activity : AppCompatActivity() {
                     instantFoods[2] -> 3
                     instantFoods[3] -> 4
                     instantFoods[4] -> 5
-                    else -> null
-                }
-
-                val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId
-
-                userEntity?.dietCategory = when (selectedDietCategoryId) {
-                    R.id.rb_vegan -> {
-                        adapter.updateItems(
-                            favoriteProcessedList.filterNot { animalMap.containsKey(it) }
-                        )
-                        DietCategory.VEGAN.toString()
-                    }
-
-                    R.id.rb_keto -> {
-                        val allItems = mutableListOf<String>().apply {
-                            addAll(fruitMap.keys)
-                            addAll(vegetableMap.keys)
-                            addAll(animalMap.keys)
-                        }
-                        adapter.updateItems(allItems)
-                        DietCategory.KETO.toString()
-                    }
-
                     else -> null
                 }
 
@@ -134,7 +133,6 @@ class Survey3Activity : AppCompatActivity() {
 
                 userEntity?.foodPreference = selectedFoodPreferences
 
-                Log.d("FLORAAAAAA", "handleGetSurveyResult: ${userEntity}")
                 if (selectedFoodPreferences.isNotEmpty()) {
                     val intent = Intent(this@Survey3Activity, MainActivity::class.java)
                     intent.putExtra(EXTRA_SURVEY, userEntity)
@@ -372,7 +370,7 @@ class Survey3Activity : AppCompatActivity() {
         animalMap["Armadillo"] = getString(R.string.Armadillo)
 
         favoriteProcessedList =
-            fruitMap.values.toList() + vegetableMap.values.toList() + animalMap.values.toList()
+            fruitMap.values.toList() + vegetableMap.values.toList()
     }
 
 }

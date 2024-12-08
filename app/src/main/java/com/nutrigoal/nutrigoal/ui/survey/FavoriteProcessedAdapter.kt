@@ -18,6 +18,7 @@ class FavoriteProcessedAdapter(
         fun bind(item: String) {
             with(binding) {
                 checkBox.text = item
+                checkBox.setOnCheckedChangeListener(null)
                 checkBox.isChecked = checkedItems.contains(item)
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
@@ -31,8 +32,8 @@ class FavoriteProcessedAdapter(
     }
 
     fun updateItems(newItems: Collection<String>) {
-        this.items = emptyList()
         this.items = newItems.toList()
+        filteredItems = this.items
         notifyDataSetChanged()
     }
 
@@ -63,4 +64,5 @@ class FavoriteProcessedAdapter(
         }
         notifyDataSetChanged()
     }
+
 }
