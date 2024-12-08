@@ -21,7 +21,7 @@ class HistoryViewModel @Inject constructor(
 
     val historyResponse = HistoryResponse()
 
-    private val _isLoading = MutableLiveData<Boolean>()
+    private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _historyResult = MutableLiveData<HistoryResponse>()
@@ -52,29 +52,35 @@ class HistoryViewModel @Inject constructor(
         _isLoading.value = true
         viewModelScope.launch {
             val userId = historyResponse.userId ?: return@launch
-            Log.d("FLORAAAAA", "userId: ${userId}")
+            Log.d("HistoryViewModel", "userId: ${userId}")
 
             val isAlreadyAdded = historyRepository.isHistoryAlreadyAdded(userId)
 
-            isAlreadyAdded.collect {
-                when (it) {
-                    is ResultState.Loading -> {}
+            isAlreadyAdded.collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                    }
+
                     is ResultState.Success -> {
-                        Log.d("FLORAAAAA", "BENER NGAAKK??: ${it.data}")
-                        if (!it.data) {
-                            historyRepository.addHistory(historyResponse).collect { result ->
-                                _addHistoryResponseState.value = result
-                                _isLoading.value = result is ResultState.Loading
+                        Log.d("HistoryViewModel", "Is history already added? ${result.data}")
+                        if (!result.data) {
+                            historyRepository.addHistory(historyResponse).collect { addResult ->
+                                _addHistoryResponseState.value = addResult
+                                _isLoading.value = addResult is ResultState.Loading
                             }
                         }
                     }
 
-                    is ResultState.Error -> {}
-                    is ResultState.Initial -> {}
-                }
+                    is ResultState.Error -> {
+                        _isLoading.value = false
+                    }
 
+                    is ResultState.Initial -> {
+                    }
+                }
             }
         }
     }
+
 
 }

@@ -3,7 +3,6 @@ package com.nutrigoal.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
@@ -79,9 +78,6 @@ class MainActivity : AppCompatActivity() {
     private fun setUpView() {
         viewModel.getSession()
 
-        surveyViewModel.isLoading.observe(this) { isLoading ->
-            showLoading(isLoading)
-        }
 
         lifecycleScope.launch {
             viewModel.userLocalEntitySessionState.collect { result ->
@@ -134,7 +130,6 @@ class MainActivity : AppCompatActivity() {
             surveyViewModel.getSurveyResult(surveyRequest)
         } else {
             if (index == 0) {
-                Log.d("FLORAAAA", "WADAWWWWW: ")
                 historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
             }
         }
@@ -147,6 +142,7 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 if (index == 0) {
                     showLoading(false)
+                    showMealTimePopup()
                     val calendar = Calendar.getInstance()
                     val dateFormat =
                         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
@@ -172,7 +168,6 @@ class MainActivity : AppCompatActivity() {
                         ),
                     )
                     historyViewModel.addHistory(historyResponse)
-                    showMealTimePopup()
                 }
                 index += 1
             }
@@ -297,7 +292,6 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 historyResponse.userId = result.data?.id
                 viewModel.setCurrentUser(result.data)
-                historyViewModel.getHistoryResult(result.data?.id ?: "")
             }
 
             is ResultState.Error -> {

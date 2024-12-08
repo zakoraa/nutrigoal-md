@@ -19,7 +19,7 @@ class SurveyViewModel @Inject constructor(
     private val surveyRepository: SurveyRepository
 ) : ViewModel() {
 
-    private val _isLoading = MutableLiveData<Boolean>()
+    private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _surveyResult = MutableLiveData<SurveyResponse>()

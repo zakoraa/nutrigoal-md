@@ -1,12 +1,16 @@
 package com.nutrigoal.nutrigoal.ui.plan_diet
 
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.remote.entity.RecommendedFoodPreferenceItem
 import com.nutrigoal.nutrigoal.databinding.FragmentPlanDietBinding
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
@@ -44,6 +48,22 @@ class PlanDietFragment : Fragment() {
             surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
                 tvCalorieNeeds.text = it.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds
             }
+
+            val gradient = LinearGradient(
+                0f, 0f, 0f, tvCalorieNeeds.textSize,
+                intArrayOf(
+                    ContextCompat.getColor(requireContext(), R.color.primary_80),
+                    ContextCompat.getColor(requireContext(), R.color.primary_80),
+                    ContextCompat.getColor(requireContext(), R.color.primary_80),
+                    ContextCompat.getColor(requireContext(), R.color.primary_80),
+                    ContextCompat.getColor(requireContext(), R.color.primary_80),
+                    ContextCompat.getColor(requireContext(), R.color.primary_80),
+                    ContextCompat.getColor(requireContext(), R.color.primary_30)
+                ),
+                null,
+                Shader.TileMode.CLAMP
+            )
+            tvCalorieNeeds.paint.shader = gradient
         }
     }
 

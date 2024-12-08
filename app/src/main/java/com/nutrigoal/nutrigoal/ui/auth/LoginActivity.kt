@@ -13,10 +13,15 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
+import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.databinding.ActivityLoginBinding
+import com.nutrigoal.nutrigoal.ui.MainActivity
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.survey.Survey1Activity
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
 import com.nutrigoal.nutrigoal.utils.InputValidator
@@ -28,6 +33,7 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: AuthViewModel by viewModels()
+    private val historyViewModel: HistoryViewModel by viewModels()
     private val inputValidator: InputValidator by lazy { InputValidator(this@LoginActivity) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +68,12 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.currentUserState.collect { result ->
                 handleGetUser(result)
+            }
+        }
+
+        lifecycleScope.launch {
+            historyViewModel.historyResponseState.collect { result ->
+                handleGetHistoryState(result)
             }
         }
     }
@@ -106,20 +118,44 @@ class LoginActivity : AppCompatActivity() {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
+                if (result.data !== null) historyViewModel.getHistoryResult(result.data.uid)
                 showLoading(false)
-                ToastUtil.showToast(this, getString(R.string.login_success))
-                viewModel.getCurrentUser()
-                val userResult = result.data
-                val userEntity = UserEntity(
-                    username = userResult?.displayName,
-                    email = userResult?.email,
-                    photoProfile = userResult?.photoUrl.toString()
-                )
-                val intent = Intent(this, Survey1Activity::class.java)
-                intent.putExtra(EXTRA_SURVEY, userEntity)
-                startActivity(intent)
+            }
 
-                finish()
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.error_login))
+            }
+
+            is ResultState.Initial -> {}
+
+        }
+    }
+
+    private fun handleGetHistoryState(result: ResultState<HistoryResponse?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                val data = result.data
+                if (data == null) {
+                    viewModel.getCurrentUser()
+                    val userEntity = UserEntity(
+                        username = Firebase.auth.currentUser?.displayName,
+                        email = Firebase.auth.currentUser?.email,
+                        photoProfile = Firebase.auth.currentUser?.photoUrl.toString()
+                    )
+                    val intent = Intent(this, Survey1Activity::class.java)
+                    intent.putExtra(EXTRA_SURVEY, userEntity)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+
+                ToastUtil.showToast(this, getString(R.string.login_success))
+                showLoading(false)
             }
 
             is ResultState.Error -> {

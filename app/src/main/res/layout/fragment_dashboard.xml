@@ -68,6 +68,30 @@
         <include layout="@layout/list_of_card_shimmer" />
     </com.facebook.shimmer.ShimmerFrameLayout>
 
+    <View
+        android:id="@+id/card_bmi_shimmer_base"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="@drawable/card_background"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/iv_header"
+        app:layout_constraintStart_toStartOf="@id/tv_greetings"
+        app:layout_constraintTop_toBottomOf="@id/iv_header" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/card_bmi_shimmer_loading"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/iv_header"
+        app:layout_constraintStart_toStartOf="@id/tv_greetings"
+        app:layout_constraintTop_toBottomOf="@id/iv_header"
+        app:shimmer_duration="3000">
+
+        <include layout="@layout/card_shimmer" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card_bmi"
         android:layout_width="0dp"
@@ -380,10 +404,11 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/tv_weight_gain_percentage"
                         style="@style/TextTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="10%"
+                        tools:text="10%"
                         android:textColor="@color/onPrimary"
                         app:layout_constraintEnd_toEndOf="@id/tv_weight_gain_title"
                         app:layout_constraintStart_toStartOf="@id/tv_weight_gain_title"
@@ -426,7 +451,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            tools:text="@string/last_7_days"
+            android:text="@string/last_7_days"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -473,7 +498,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            tools:text="@string/last_7_days"
+            android:text="@string/last_7_days"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

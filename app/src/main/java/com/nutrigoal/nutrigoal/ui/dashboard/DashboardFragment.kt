@@ -21,6 +21,7 @@ import com.nutrigoal.nutrigoal.databinding.FragmentDashboardBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
+import com.nutrigoal.nutrigoal.utils.AppUtil
 import com.nutrigoal.nutrigoal.utils.DateFormatter.parseDateToMonthAndDay
 
 
@@ -39,19 +40,24 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        setUpView()
         return root
     }
 
-    private fun setUpView() {
-        setUpNutrientsCharts()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        surveyViewModel.isLoading.observe(viewLifecycleOwner) {
-            showLoading(it)
+        setUpView()
+    }
+
+    private fun setUpView() {
+
+        surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            showLoading(isLoading)
         }
 
         historyViewModel.historyResult.observe(viewLifecycleOwner) {
             setUpWeightProgressAdapter(it)
+            setUpNutrientsCharts(it)
         }
 
     }
@@ -88,6 +94,7 @@ class DashboardFragment : Fragment() {
 
         val adapter = BodyWeightProgressAdapter(weightList)
         with(binding) {
+            tvWeightGainPercentage.text = "${calculateWeightPercentage(weightList)}%"
             tvBodyWeightProgressRange.text =
                 if (weightList.size == 1) getString(R.string.today) else {
                     getString(R.string.last_days, weightList.size.toString())
@@ -105,68 +112,73 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun setUpNutrientsCharts() {
-        surveyViewModel.surveyResult.observe(viewLifecycleOwner) { surveyResult ->
-            binding.apply {
-                val caloriesChart = chartCalories
-                val proteinChart = chartProtein
-                val fatChart = chartFat
-                val carbohydratesChart = chartCarbohydrates
+    private fun setUpNutrientsCharts(historyResponse: HistoryResponse) {
+        binding.apply {
+            val caloriesChart = chartCalories
+            val proteinChart = chartProtein
+            val fatChart = chartFat
+            val carbohydratesChart = chartCarbohydrates
 
-                val recommendedFoodPreferences =
-                    surveyResult?.recommendedFoodPreference ?: emptyList()
+            val dates = mutableListOf<Float>()
+            val dateLabels = mutableListOf<String>()
 
-                val entriesCount = maxOf(recommendedFoodPreferences.size, 7)
+            val caloriesEntries = mutableListOf<Entry>()
+            val proteinEntries = mutableListOf<Entry>()
+            val fatEntries = mutableListOf<Entry>()
+            val carbohydratesEntries = mutableListOf<Entry>()
 
-                val dates = (1..entriesCount).map { it.toFloat() }
-                val dateLabels = (1..entriesCount).map { "Day $it" }
+            historyResponse.perDay?.forEachIndexed { dayIndex, perDayItem ->
+                val dayNumber = dayIndex + 1
+                dates.add(dayNumber.toFloat())
+                dateLabels.add("Day $dayNumber")
 
-                val caloriesEntries = recommendedFoodPreferences.mapIndexed { index, item ->
-                    Entry(dates[index], item?.calories?.toString()?.toFloat() ?: 0f)
+                var totalCalories = 0
+                var totalProtein = 0f
+                var totalFat = 0f
+                var totalCarbs = 0f
+
+                perDayItem.foodRecommendation?.forEach { foodItem ->
+                    totalCalories += foodItem.calories ?: 0
+                    totalProtein += foodItem.protein ?: 0f
+                    totalFat += foodItem.fat ?: 0f
+                    totalCarbs += foodItem.carbohydrate ?: 0f
                 }
 
-                val proteinEntries = recommendedFoodPreferences.mapIndexed { index, item ->
-                    Entry(dates[index], item?.proteinG.toString().toFloat())
-                }
-
-                val fatEntries = recommendedFoodPreferences.mapIndexed { index, item ->
-                    Entry(dates[index], item?.fatG.toString().toFloat())
-                }
-
-                val carbohydratesEntries = recommendedFoodPreferences.mapIndexed { index, item ->
-                    Entry(dates[index], item?.carbohydrateG.toString().toFloat())
-                }
-
-                setupSingleChart(
-                    caloriesChart,
-                    caloriesEntries,
-                    dateLabels,
-                    "Calories",
-                    R.color.primary,
-                    5f,
-                )
-                setupSingleChart(
-                    proteinChart,
-                    proteinEntries,
-                    dateLabels,
-                    "Protein",
-                    R.color.secondary
-                )
-                setupSingleChart(
-                    fatChart,
-                    fatEntries,
-                    dateLabels,
-                    "Fat",
-                    R.color.error
-                )
-                setupSingleChart(
-                    carbohydratesChart,
-                    carbohydratesEntries,
-                    dateLabels,
-                    "Carbohydrates",
-                    R.color.tertiary
-                )
+                caloriesEntries.add(Entry(dayNumber.toFloat(), totalCalories.toFloat()))
+                proteinEntries.add(Entry(dayNumber.toFloat(), totalProtein))
+                fatEntries.add(Entry(dayNumber.toFloat(), totalFat))
+                carbohydratesEntries.add(Entry(dayNumber.toFloat(), totalCarbs))
             }
+
+            setupSingleChart(
+                caloriesChart,
+                caloriesEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.calories_title),
+                R.color.primary,
+                5f
+            )
+            setupSingleChart(
+                proteinChart,
+                proteinEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.protein_title),
+                R.color.secondary
+            )
+            setupSingleChart(
+                fatChart,
+                fatEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.fat_title),
+                R.color.error
+            )
+            setupSingleChart(
+                carbohydratesChart,
+                carbohydratesEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.carbohydrates_title),
+                R.color.tertiary
+            )
         }
     }
 
@@ -209,12 +221,14 @@ class DashboardFragment : Fragment() {
                 tvGreetings.text =
                     getString(R.string.dashboard_greetings, it?.username)
             }
-            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
-                tvCurrentWeight.text = it?.recommendedFoodBasedOnCalories?.rfbocWeightKg.toString()
+            historyViewModel.historyResult.observe(viewLifecycleOwner) {
+                val index = AppUtil.getTodayDataFromPerDay(it)
+                val perDay = it?.perDay?.get(index)
+                tvCurrentWeight.text = perDay?.bodyWeight.toString()
                 setBMILineWidths(
-                    it?.recommendedFoodBasedOnCalories?.rfbocWeightKg
+                    perDay?.bodyWeight
                         ?: 0f,
-                    it?.recommendedFoodBasedOnCalories?.rfbocHeightCm
+                    perDay?.height
                         ?: 0f
                 )
             }
@@ -340,6 +354,18 @@ class DashboardFragment : Fragment() {
             tvBmiType.text = bmiType.toString()
             tvBmiType.setTextColor(resources.getColor(color, null))
         }
+    }
+
+    private fun calculateWeightPercentage(weightList: List<WeightProgress>): Float {
+        if (weightList.isEmpty()) return 0f
+
+        val firstWeight = weightList.firstOrNull()?.bodyWeight ?: 0f
+        val lastWeight = weightList.lastOrNull()?.bodyWeight ?: 0f
+
+        if (firstWeight == 0f || lastWeight == 0f) return 0f
+
+        val weightDifference = lastWeight - firstWeight
+        return (weightDifference / firstWeight) * 100
     }
 
 }
