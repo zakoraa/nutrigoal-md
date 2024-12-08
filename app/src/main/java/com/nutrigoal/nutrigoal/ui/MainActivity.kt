@@ -3,6 +3,7 @@ package com.nutrigoal.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
@@ -19,6 +20,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.database.DailyCheckInPreference
@@ -36,6 +38,7 @@ import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
+import com.nutrigoal.nutrigoal.ui.survey.Survey1Activity
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
 import com.nutrigoal.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
@@ -106,6 +109,25 @@ class MainActivity : AppCompatActivity() {
             historyViewModel.historyResponseState.collect { result ->
                 handleGetHistoryResult(result)
             }
+        }
+
+        lifecycleScope.launch {
+            historyViewModel.addHistoryResponseState.collect {
+                handleAddHistory(it)
+            }
+        }
+    }
+
+    private fun handleAddHistory(result: ResultState<Unit?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
+                showLoading(false)
+            }
+
+            is ResultState.Error -> showLoading(false)
+            is ResultState.Initial -> {}
         }
     }
 
@@ -198,23 +220,36 @@ class MainActivity : AppCompatActivity() {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
+                Log.d("FLORAAAAA", "WADAWWWW: ${result.data} ")
                 val it = result.data
-                val index = getTodayDataFromPerDay(it)
-                if (index != -1) {
-                    val perDay = it?.perDay?.get(index)
-                    val surveyRequest = SurveyRequest(
-                        age = perDay?.age ?: 0,
-                        height = perDay?.height ?: 0f,
-                        weight = perDay?.bodyWeight ?: 0f,
-                        gender = getGenderCode(it?.gender.toString()),
-                        activity_level = perDay?.activityLevel.toString()
-                            .split(" ")[0].toIntOrNull() ?: 1,
-                        diet_category = perDay?.dietCategory
-                            ?: DietCategory.KETO.toString(),
-                        has_gastric_issue = perDay?.hasGastricIssue ?: "false",
-                        food_preference = perDay?.foodPreference ?: emptyList()
+                if (it !== null) {
+                    val index = getTodayDataFromPerDay(it)
+                    if (index != -1) {
+                        val perDay = it.perDay?.get(index)
+                        val surveyRequest = SurveyRequest(
+                            age = perDay?.age ?: 0,
+                            height = perDay?.height ?: 0f,
+                            weight = perDay?.bodyWeight ?: 0f,
+                            gender = getGenderCode(it.gender.toString()),
+                            activity_level = perDay?.activityLevel.toString()
+                                .split(" ")[0].toIntOrNull() ?: 1,
+                            diet_category = perDay?.dietCategory
+                                ?: DietCategory.KETO.toString(),
+                            has_gastric_issue = perDay?.hasGastricIssue ?: "false",
+                            food_preference = perDay?.foodPreference ?: emptyList()
+                        )
+                        surveyViewModel.getSurveyResult(surveyRequest)
+                    }
+                } else {
+                    val userEntity = UserEntity(
+                        username = com.google.firebase.ktx.Firebase.auth.currentUser?.displayName,
+                        email = com.google.firebase.ktx.Firebase.auth.currentUser?.email,
+                        photoProfile = com.google.firebase.ktx.Firebase.auth.currentUser?.photoUrl.toString()
                     )
-                    surveyViewModel.getSurveyResult(surveyRequest)
+                    val intent = Intent(this, Survey1Activity::class.java)
+                    intent.putExtra(EXTRA_SURVEY, userEntity)
+                    startActivity(intent)
+                    finish()
                 }
             }
 

@@ -7,7 +7,7 @@ import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.utils.DateFormatter
-import com.nutrigoal.nutrigoal.utils.asResultState
+import com.nutrigoal.nutrigoal.data.extension.asResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -30,7 +30,7 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
 
     fun getHistoryById(
         userId: String
-    ): Flow<ResultState<HistoryResponse>> {
+    ): Flow<ResultState<HistoryResponse?>> {
         return flow {
             val snapshot = firestore.historiesCollection()
                 .document(userId)
@@ -41,6 +41,8 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
 
             if (historyResponse != null) {
                 emit(historyResponse)
+            }else{
+                emit(null)
             }
         }.asResultState()
     }

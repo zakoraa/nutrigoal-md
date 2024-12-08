@@ -4,6 +4,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -118,7 +119,9 @@ class LoginActivity : AppCompatActivity() {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
+                Log.d("FLORAAAAA", "resss: ${result.data} ")
                 if (result.data !== null) historyViewModel.getHistoryResult(result.data.uid)
+                Log.d("FLORAAAAA", "jalannnn: ${result.data} ")
                 showLoading(false)
             }
 

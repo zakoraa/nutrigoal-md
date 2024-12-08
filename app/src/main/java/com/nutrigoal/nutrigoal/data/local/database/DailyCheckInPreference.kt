@@ -38,6 +38,12 @@ class DailyCheckInPreference private constructor(private val dataStore: DataStor
         return dateFormat.format(Date())
     }
 
+    suspend fun clearCheckInDate() {
+        dataStore.edit { preferences ->
+            preferences.remove(LAST_CHECK_IN_DATE_KEY)
+        }
+    }
+
     companion object {
         @Volatile
         private var INSTANCE: DailyCheckInPreference? = null

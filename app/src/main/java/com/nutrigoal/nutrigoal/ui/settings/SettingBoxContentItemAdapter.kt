@@ -96,7 +96,7 @@ class SettingBoxContentItemAdapter(
                                     context.startForegroundService(serviceIntent)
 
                                     val targetTime = Calendar.getInstance().apply {
-                                        set(Calendar.HOUR_OF_DAY, 6)
+                                        set(Calendar.HOUR_OF_DAY, 9)
                                         set(Calendar.MINUTE, 0)
                                         set(Calendar.SECOND, 0)
                                         set(Calendar.MILLISECOND, 0)
@@ -128,23 +128,33 @@ class SettingBoxContentItemAdapter(
                                         .setConstraints(constraints)
                                         .build()
 
+                                    workManager.getWorkInfosForUniqueWorkLiveData("DailyReminderWorker")
+                                        .observe(lifecycleOwner) { workInfos ->
+                                            val isWorkerScheduled = workInfos?.any { workInfo ->
+                                                workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING
+                                            } ?: false
 
-                                    workManager.enqueueUniquePeriodicWork(
-                                        "DailyReminderWorker",
-                                        ExistingPeriodicWorkPolicy.UPDATE,
-                                        dailyReminderRequest
-                                    )
+                                            if (!isWorkerScheduled) {
+                                                workManager.enqueueUniquePeriodicWork(
+                                                    "DailyReminderWorker",
+                                                    ExistingPeriodicWorkPolicy.KEEP,
+                                                    dailyReminderRequest
+                                                )
+                                            }
+                                        }
 
-                                    workManager.enqueueUniquePeriodicWork(
-                                        "InsertDailyCheckInNotificationWorker",
-                                        ExistingPeriodicWorkPolicy.UPDATE,
-                                        checkInNotificationRequest
-                                    )
+                                    workManager.getWorkInfosForUniqueWorkLiveData("InsertDailyCheckInNotificationWorker")
+                                        .observe(lifecycleOwner) { workInfos ->
+                                            val isWorkerScheduled = workInfos?.any { workInfo ->
+                                                workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING
+                                            } ?: false
 
-                                    workManager.getWorkInfoByIdLiveData(checkInNotificationRequest.id)
-                                        .observe(lifecycleOwner) { workInfo ->
-                                            if (workInfo?.state == WorkInfo.State.RUNNING) {
-                                                workManager.enqueue(checkInNotificationRequest)
+                                            if (!isWorkerScheduled) {
+                                                workManager.enqueueUniquePeriodicWork(
+                                                    "InsertDailyCheckInNotificationWorker",
+                                                    ExistingPeriodicWorkPolicy.KEEP,
+                                                    checkInNotificationRequest
+                                                )
                                             }
                                         }
 

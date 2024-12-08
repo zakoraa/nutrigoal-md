@@ -52,8 +52,10 @@ class PlanDietFragment : Fragment() {
             val gradient = LinearGradient(
                 0f, 0f, 0f, tvCalorieNeeds.textSize,
                 intArrayOf(
-                    ContextCompat.getColor(requireContext(), R.color.primary_80),
-                    ContextCompat.getColor(requireContext(), R.color.primary_80),
+                    ContextCompat.getColor(requireContext(), R.color.primary),
+                    ContextCompat.getColor(requireContext(), R.color.primary),
+                    ContextCompat.getColor(requireContext(), R.color.primary),
+                    ContextCompat.getColor(requireContext(), R.color.primary),
                     ContextCompat.getColor(requireContext(), R.color.primary_80),
                     ContextCompat.getColor(requireContext(), R.color.primary_80),
                     ContextCompat.getColor(requireContext(), R.color.primary_80),

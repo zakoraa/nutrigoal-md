@@ -60,6 +60,10 @@ class DashboardFragment : Fragment() {
             setUpNutrientsCharts(it)
         }
 
+        historyViewModel.isLoading.observe(viewLifecycleOwner) {
+            showLoading(it)
+        }
+
     }
 
     private fun showLoading(isLoading: Boolean) {

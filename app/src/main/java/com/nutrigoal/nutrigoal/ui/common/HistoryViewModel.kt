@@ -36,21 +36,21 @@ class HistoryViewModel @Inject constructor(
     val addHistoryResponseState: StateFlow<ResultState<Unit?>> get() = _addHistoryResponseState
 
     fun getHistoryResult(userId: String) {
-        _isLoading.value = true
         viewModelScope.launch {
+            _isLoading.value = true
             historyRepository.getHistoryById(userId).collect { result ->
                 _historyResponseState.value = result
-                _isLoading.value = result is ResultState.Loading
                 if (result is ResultState.Success) {
                     _historyResult.value = result.data
                 }
             }
+            _isLoading.value = false
         }
     }
 
     fun addHistory(historyResponse: HistoryResponse) {
-        _isLoading.value = true
         viewModelScope.launch {
+            _isLoading.value = true
             val userId = historyResponse.userId ?: return@launch
             Log.d("HistoryViewModel", "userId: ${userId}")
 
@@ -62,13 +62,15 @@ class HistoryViewModel @Inject constructor(
                     }
 
                     is ResultState.Success -> {
+                        _isLoading.value = true
+
                         Log.d("HistoryViewModel", "Is history already added? ${result.data}")
                         if (!result.data) {
                             historyRepository.addHistory(historyResponse).collect { addResult ->
                                 _addHistoryResponseState.value = addResult
-                                _isLoading.value = addResult is ResultState.Loading
                             }
                         }
+                        _isLoading.value = true
                     }
 
                     is ResultState.Error -> {
@@ -79,6 +81,7 @@ class HistoryViewModel @Inject constructor(
                     }
                 }
             }
+            _isLoading.value = false
         }
     }
 
