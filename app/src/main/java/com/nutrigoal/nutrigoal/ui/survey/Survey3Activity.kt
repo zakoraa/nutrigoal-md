@@ -86,24 +86,25 @@ class Survey3Activity : AppCompatActivity() {
         with(binding) {
             val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId
 
-            userEntity?.dietCategory = when (selectedDietCategoryId) {
-                R.id.rb_vegan -> {
-                    adapter.updateItems(
+            rgDietCategory.setOnCheckedChangeListener { _, checkedId ->
+                val updatedItems = when (checkedId) {
+                    R.id.rb_vegan -> {
                         favoriteProcessedList.filterNot { animalMap.containsKey(it) }
-                    )
-                    DietCategory.VEGAN.toString()
-                }
-
-                R.id.rb_keto -> {
-                    val allItems = mutableListOf<String>().apply {
-                        addAll(fruitMap.keys)
-                        addAll(vegetableMap.keys)
-                        addAll(animalMap.keys)
                     }
-                    adapter.updateItems(allItems)
-                    DietCategory.KETO.toString()
-                }
 
+                    R.id.rb_keto -> {
+                        fruitMap.keys + vegetableMap.keys + animalMap.keys
+                    }
+
+                    else -> emptyList()
+                }
+                adapter.clearCheckedItems()
+                adapter.updateItems(updatedItems)
+            }
+
+            userEntity?.dietCategory = when (selectedDietCategoryId) {
+                R.id.rb_vegan -> DietCategory.VEGAN.toString()
+                R.id.rb_keto -> DietCategory.KETO.toString()
                 else -> null
             }
 

@@ -1,5 +1,6 @@
 package com.nutrigoal.nutrigoal.ui.survey
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +35,7 @@ class FavoriteProcessedAdapter(
     fun updateItems(newItems: Collection<String>) {
         this.items = newItems.toList()
         filteredItems = this.items
+        Log.d("FLORAAA", "updateItems: ${filteredItems}")
         notifyDataSetChanged()
     }
 
@@ -55,6 +57,11 @@ class FavoriteProcessedAdapter(
     }
 
     override fun getItemCount(): Int = filteredItems.size
+
+    fun clearCheckedItems() {
+        checkedItems.clear()
+        notifyDataSetChanged()
+    }
 
     fun filter(query: String) {
         filteredItems = if (query.isEmpty()) {
