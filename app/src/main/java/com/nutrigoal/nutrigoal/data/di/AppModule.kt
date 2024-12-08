@@ -9,10 +9,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.nutrigoal.nutrigoal.BuildConfig
 import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
+import com.nutrigoal.nutrigoal.data.local.database.DailyCheckInPreference
 import com.nutrigoal.nutrigoal.data.local.database.NotificationDao
 import com.nutrigoal.nutrigoal.data.local.database.NotificationLocalEntityRoomDatabase
 import com.nutrigoal.nutrigoal.data.local.database.SettingPreference
 import com.nutrigoal.nutrigoal.data.local.database.authDataStore
+import com.nutrigoal.nutrigoal.data.local.database.dailyCheckInDataStore
 import com.nutrigoal.nutrigoal.data.local.database.settingDataStore
 import com.nutrigoal.nutrigoal.data.local.repository.NotificationRepository
 import com.nutrigoal.nutrigoal.data.remote.repository.AuthRepository
@@ -22,6 +24,7 @@ import com.nutrigoal.nutrigoal.data.remote.retrofit.SurveyService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -133,6 +136,19 @@ object AppModule {
     @Singleton
     @SettingDataStore
     fun provideSettingDataStore(context: Context): DataStore<Preferences> = context.settingDataStore
+
+    @Provides
+    @Singleton
+    @DailyCheckInDataStore
+    fun provideDailyCheckInDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dailyCheckInDataStore
+    }
+
+    @Provides
+    @Singleton
+    fun provideDailyCheckInPreference(@DailyCheckInDataStore dailyCheckInDataStore: DataStore<Preferences>): DailyCheckInPreference {
+        return DailyCheckInPreference.getInstance(dailyCheckInDataStore)
+    }
 
 
     @Provides

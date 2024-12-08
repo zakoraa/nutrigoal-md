@@ -21,6 +21,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.local.database.DailyCheckInPreference
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
@@ -45,6 +46,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -55,6 +57,9 @@ class MainActivity : AppCompatActivity() {
     private val historyViewModel: HistoryViewModel by viewModels()
     private val historyResponse = HistoryResponse()
     private var index = 0
+
+    @Inject
+    lateinit var dailyCheckInPreference: DailyCheckInPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,7 +147,14 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 if (index == 0) {
                     showLoading(false)
-                    showMealTimePopup()
+
+                    lifecycleScope.launch {
+                        val hasCheckedInToday = dailyCheckInPreference.hasCheckedInToday()
+
+                        if (!hasCheckedInToday) {
+                            showMealTimePopup()
+                        }
+                    }
                     val calendar = Calendar.getInstance()
                     val dateFormat =
                         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
@@ -246,6 +258,9 @@ class MainActivity : AppCompatActivity() {
                     val dinnerTime = dropdownDinnerTime.text.toString()
 
                     saveMealTimes(breakfastTime, lunchTime, dinnerTime)
+                    lifecycleScope.launch {
+                        dailyCheckInPreference.saveCheckInDate()
+                    }
                     dialog.dismiss()
                 }
                 .create()
