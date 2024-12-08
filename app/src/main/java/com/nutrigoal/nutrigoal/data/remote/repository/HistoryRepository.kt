@@ -6,13 +6,11 @@ import com.nutrigoal.nutrigoal.data.extension.historiesCollection
 import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
+import com.nutrigoal.nutrigoal.utils.DateFormatter
 import com.nutrigoal.nutrigoal.utils.asResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 import java.util.UUID
 
 class HistoryRepository(private val firestore: FirebaseFirestore) {
@@ -113,42 +111,12 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
 
             val historyResponse = snapshot.toObject(HistoryResponse::class.java)
 
-            val today = getTodayDate()
+            val today = DateFormatter.getTodayDate()
             val alreadyAdded = historyResponse?.perDay?.any {
-                val createdAtDate = parseDate(it.createdAt)
+                val createdAtDate = DateFormatter.parseDate(it.createdAt)
                 createdAtDate == today
             } ?: false
             emit(alreadyAdded)
         }.asResultState()
-    }
-
-    private fun parseDate(dateString: String?): String? {
-        if (dateString == null) return null
-        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
-        return try {
-            val date = format.parse(dateString)
-            val calendar = Calendar.getInstance()
-            if (date != null) {
-                calendar.time = date
-            }
-
-            String.format(
-                "%04d-%02d-%02d",
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH) + 1,
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun getTodayDate(): String {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH) + 1
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        return String.format("%04d-%02d-%02d", year, month, day)
     }
 }

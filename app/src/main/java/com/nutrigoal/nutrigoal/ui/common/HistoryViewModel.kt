@@ -28,7 +28,7 @@ class HistoryViewModel @Inject constructor(
     val historyResult: LiveData<HistoryResponse> = _historyResult
 
     private val _historyResponseState =
-        MutableStateFlow<ResultState<HistoryResponse?>>(ResultState.Loading)
+        MutableStateFlow<ResultState<HistoryResponse?>>(ResultState.Initial)
     val historyResponseState: StateFlow<ResultState<HistoryResponse?>> get() = _historyResponseState
 
     private val _addHistoryResponseState =

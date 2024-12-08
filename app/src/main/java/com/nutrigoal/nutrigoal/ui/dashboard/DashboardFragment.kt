@@ -47,9 +47,10 @@ class DashboardFragment : Fragment() {
         setUpNutrientsCharts()
         setUpWeightProgressAdapter()
 
-        surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            showLoading(isLoading)
+        surveyViewModel.isLoading.observe(viewLifecycleOwner) {
+            showLoading(it)
         }
+
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -194,7 +195,6 @@ class DashboardFragment : Fragment() {
         chart.animateX(1000)
         chart.invalidate()
     }
-
 
     private fun handleShowCurrentUserData() {
         with(binding) {

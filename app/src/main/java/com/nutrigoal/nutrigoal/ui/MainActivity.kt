@@ -18,11 +18,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
-import com.nutrigoal.nutrigoal.data.remote.entity.Gender
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
@@ -36,6 +37,8 @@ import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
+import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
+import com.nutrigoal.nutrigoal.utils.DateFormatter
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -68,12 +71,14 @@ class MainActivity : AppCompatActivity() {
             findNavController(R.id.nav_host_fragment_activity_main)
         navView.setupWithNavController(navController)
 
+        getSurveyResult()
         bottomNavScrollAnimation()
         setUpView()
     }
 
     private fun setUpView() {
-        getSurveyResult()
+        viewModel.getSession()
+
         surveyViewModel.isLoading.observe(this) { isLoading ->
             showLoading(isLoading)
         }
@@ -95,6 +100,12 @@ class MainActivity : AppCompatActivity() {
                 handleGetSurveyResult(result)
             }
         }
+
+        lifecycleScope.launch {
+            historyViewModel.historyResponseState.collect { result ->
+                handleGetHistoryResult(result)
+            }
+        }
     }
 
     private fun getSurveyResult() {
@@ -109,15 +120,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (userEntity !== null) {
-            var genderValue = 1
-            if (userEntity.gender == Gender.FEMALE) {
-                genderValue = 2
-            }
+
             val surveyRequest = SurveyRequest(
                 age = userEntity.age ?: 0,
                 height = userEntity.height ?: 0f,
                 weight = userEntity.bodyWeight ?: 0f,
-                gender = genderValue,
+                gender = getGenderCode(userEntity.gender.toString()),
                 activity_level = userEntity.activityLevel ?: 1,
                 diet_category = userEntity.dietCategory ?: DietCategory.VEGAN.toString(),
                 has_gastric_issue = userEntity.hasGastricIssue.toString(),
@@ -125,41 +133,40 @@ class MainActivity : AppCompatActivity() {
             )
             surveyViewModel.getSurveyResult(surveyRequest)
         } else {
-            val surveyRequest = SurveyRequest(
-                age = 20,
-                height = 170f,
-                weight = 70f,
-                gender = 0,
-                activity_level = 1,
-                diet_category = "vegan",
-                has_gastric_issue = "true",
-                food_preference = listOf("Apple", "Banana", "Orange", "Mango", "Strawberry")
-            )
-            surveyViewModel.getSurveyResult(surveyRequest)
-            viewModel.getSession()
+            if (index == 0) {
+                Log.d("FLORAAAA", "WADAWWWWW: ")
+                historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
+            }
         }
     }
+
 
     private fun handleGetSurveyResult(result: ResultState<SurveyResponse?>) {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 if (index == 0) {
-                    Log.d("FLORAAAAAA", "handleGetSurveyResult: ${result.data}")
                     showLoading(false)
                     val calendar = Calendar.getInstance()
-                    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+                    val dateFormat =
+                        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
 
                     val createdAt = dateFormat.format(calendar.time)
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     val dietTime = dateFormat.format(calendar.time)
                     val it = result.data
+                    val data = it?.recommendedFoodBasedOnCalories
+                    historyResponse.gender = data?.rfbocGender
                     historyResponse.perDay = listOf(
                         PerDayItem(
                             id = UUID.randomUUID().toString(),
-                            bodyWeight = it?.recommendedFoodBasedOnCalories?.rfbocWeightKg,
-                            age = it?.recommendedFoodBasedOnCalories?.rfbocAge,
-                            height = it?.recommendedFoodBasedOnCalories?.rfbocHeightCm,
+                            bodyWeight = data?.rfbocWeightKg,
+                            age = data?.rfbocAge,
+                            height = data?.rfbocHeightCm,
+                            activityLevel = data?.rfbocActivityLevel,
+                            dietCategory = data?.rfbocDietType,
+                            hasGastricIssue = data?.rfbocHistoryOfGastritisOrGerd,
+                            foodPreference = it?.favoriteFoodName?.ffnName,
                             createdAt = createdAt,
                             dietTime = dietTime,
                         ),
@@ -180,6 +187,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun handleGetHistoryResult(result: ResultState<HistoryResponse?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                val it = result.data
+                val today = DateFormatter.getTodayDate()
+                val index = it?.perDay?.indexOfFirst { date ->
+                    val createdAtDate = DateFormatter.parseDate(date.createdAt)
+                    createdAtDate == today
+                } ?: -1
+                if (index != -1) {
+                    val perDay = it?.perDay?.get(index)
+                    val surveyRequest = SurveyRequest(
+                        age = perDay?.age ?: 0,
+                        height = perDay?.height ?: 0f,
+                        weight = perDay?.bodyWeight ?: 0f,
+                        gender = getGenderCode(it?.gender.toString()),
+                        activity_level = perDay?.activityLevel.toString()
+                            .split(" ")[0].toIntOrNull() ?: 1,
+                        diet_category = perDay?.dietCategory
+                            ?: DietCategory.KETO.toString(),
+                        has_gastric_issue = perDay?.hasGastricIssue ?: "false",
+                        food_preference = perDay?.foodPreference ?: emptyList()
+                    )
+                    surveyViewModel.getSurveyResult(surveyRequest)
+                }
+            }
+
+            is ResultState.Error -> {
+                showLoading(false)
+                ToastUtil.showToast(this, getString(R.string.error_get_user))
+            }
+
+            is ResultState.Initial -> {}
+
+        }
+    }
+
 
     private fun showMealTimePopup() {
         val bindingPopup = PopUpCheckInBinding.inflate(LayoutInflater.from(this))
@@ -187,7 +232,8 @@ class MainActivity : AppCompatActivity() {
         val launchTimes = resources.getStringArray(R.array.launch_times)
         val dinnerTimes = resources.getStringArray(R.array.dinner_times)
 
-        val breakfastAdapter = ArrayAdapter(this, R.layout.dropdown_item, breakfastTimes)
+        val breakfastAdapter =
+            ArrayAdapter(this, R.layout.dropdown_item, breakfastTimes)
         val launchAdapter = ArrayAdapter(this, R.layout.dropdown_item, launchTimes)
         val dinnerAdapter = ArrayAdapter(this, R.layout.dropdown_item, dinnerTimes)
 
@@ -215,12 +261,20 @@ class MainActivity : AppCompatActivity() {
             alertDialog.show()
 
             alertDialog.window?.setBackgroundDrawable(
-                ResourcesCompat.getDrawable(resources, R.drawable.card_background, theme)
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.card_background,
+                    theme
+                )
             )
         }
     }
 
-    private fun saveMealTimes(breakfastTime: String, lunchTime: String, dinnerTime: String) {
+    private fun saveMealTimes(
+        breakfastTime: String,
+        lunchTime: String,
+        dinnerTime: String
+    ) {
         val sharedPreferences = getSharedPreferences("MealTimes", MODE_PRIVATE)
         sharedPreferences.edit().apply {
             putString("Breakfast", breakfastTime)
@@ -247,6 +301,7 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 historyResponse.userId = result.data?.id
                 viewModel.setCurrentUser(result.data)
+                historyViewModel.getHistoryResult(result.data?.id ?: "")
             }
 
             is ResultState.Error -> {
@@ -299,7 +354,8 @@ class MainActivity : AppCompatActivity() {
                 NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
                     if (scrollY > oldScrollY) {
                         bottomNavCard.animate()
-                            .translationY(bottomNavCard.height.toFloat() + 70).setInterpolator(
+                            .translationY(bottomNavCard.height.toFloat() + 70)
+                            .setInterpolator(
                                 DecelerateInterpolator()
                             ).start()
                     } else if (scrollY < oldScrollY) {

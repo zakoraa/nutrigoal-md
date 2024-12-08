@@ -14,5 +14,5 @@ data class FavoriteFoodName(
     val ffnId: String? = null,
 
     @field:SerializedName("ffn_name")
-    val ffnName: List<String?>? = null
+    val ffnName: List<String>? = null
 )

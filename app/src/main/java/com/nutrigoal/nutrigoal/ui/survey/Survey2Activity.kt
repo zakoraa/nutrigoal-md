@@ -80,8 +80,8 @@ class Survey2Activity : AppCompatActivity() {
                 val selectedGenderId = groupRadio.checkedRadioButtonId
 
                 userEntity?.gender = when (selectedGenderId) {
-                    R.id.rb_male -> Gender.MALE
-                    R.id.rb_female -> Gender.FEMALE
+                    R.id.rb_male -> Gender.MALE.toString()
+                    R.id.rb_female -> Gender.FEMALE.toString()
                     else -> null
                 }
 

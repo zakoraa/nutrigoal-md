@@ -4,5 +4,6 @@ import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 
 data class HistoryResponse(
 	var userId: String? = null,
+	var gender: String? = null,
 	var perDay: List<PerDayItem>? = null
 )
