@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: AuthViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
     private val surveyViewModel: SurveyViewModel by viewModels()
+    private var index = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +70,10 @@ class MainActivity : AppCompatActivity() {
         getAppThemes()
 
         getSurveyResult()
+
+        surveyViewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
 
         lifecycleScope.launch {
             viewModel.userLocalEntitySessionState.collect { result ->
@@ -138,7 +144,8 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 Log.d("FLORAAAAAA", "handleGetSurveyResult: ${result.data}")
                 showLoading(false)
-                showMealTimePopup()
+                if(index == 0) {showMealTimePopup()}
+                index += 1
             }
 
             is ResultState.Error -> {
@@ -214,13 +221,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleGetUser(result: ResultState<UserEntity?>) {
         when (result) {
-            is ResultState.Loading -> showLoading(true)
+            is ResultState.Loading -> {}
             is ResultState.Success -> {
                 viewModel.setCurrentUser(result.data)
             }
 
             is ResultState.Error -> {
-                showLoading(false)
                 ToastUtil.showToast(this, getString(R.string.error_get_user))
             }
 

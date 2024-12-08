@@ -33,9 +33,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/card_background"
         android:paddingHorizontal="10dp"
-        android:layout_marginTop="15dp"
         android:paddingVertical="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,28 +62,53 @@
         app:layout_constraintTop_toBottomOf="@id/card_date"
         app:shimmer_duration="3000">
 
-        <include layout="@layout/card_shimmer" />
+        <include layout="@layout/list_of_card_shimmer" />
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card_calorie_needs"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/card_background"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
         android:paddingHorizontal="10dp"
-        android:paddingVertical="15dp"
         app:layout_constraintEnd_toEndOf="@id/card_date"
         app:layout_constraintStart_toStartOf="@id/card_date"
         app:layout_constraintTop_toBottomOf="@id/card_date">
 
         <TextView
+            android:id="@+id/tv_calorie_needs_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_background"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:text="@string/calorie_needs"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_calorie_needs"
             style="@style/TextLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/calorie_needs"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/primary_80"
+            android:textSize="50sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/tv_calorie_needs_title"
+            tools:text="150" />
+
+        <TextView
+            style="@style/TextLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_calorie_needs"
+            app:layout_constraintStart_toEndOf="@id/tv_calorie_needs"
+            android:text="@string/kcal" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -92,7 +117,7 @@
         android:id="@+id/card_table_recommendation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/card_background"
         android:paddingHorizontal="10dp"
         android:paddingVertical="15dp"
@@ -101,12 +126,22 @@
         app:layout_constraintTop_toBottomOf="@id/card_calorie_needs">
 
         <TextView
+            android:id="@+id/tv_food_recommendation"
             style="@style/TextLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/meal_recommendation"
+            android:text="@string/food_recommendation"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_recommendation_food"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_food_recommendation" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

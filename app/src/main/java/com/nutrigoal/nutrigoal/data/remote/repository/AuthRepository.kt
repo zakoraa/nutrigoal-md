@@ -53,7 +53,7 @@ class AuthRepository(private val auth: FirebaseAuth, private val authPreference:
                     photoProfile = it.photoUrl.toString(),
                     username = it.displayName ?: "",
                     email = it.email ?: "",
-                    age = 17,
+                    age = 20,
                     gender = Gender.MALE,
                     bodyWeight = 70f,
                     height = 170f

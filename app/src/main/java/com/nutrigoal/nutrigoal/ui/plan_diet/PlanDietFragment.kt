@@ -6,15 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.ResultState
-import com.nutrigoal.nutrigoal.data.remote.response.SurveyResponse
+import com.nutrigoal.nutrigoal.data.remote.entity.RecommendedFoodPreferenceItem
 import com.nutrigoal.nutrigoal.databinding.FragmentPlanDietBinding
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
-import com.nutrigoal.nutrigoal.utils.ToastUtil
-import kotlinx.coroutines.launch
 
 class PlanDietFragment : Fragment() {
     private var _binding: FragmentPlanDietBinding? = null
@@ -22,8 +17,7 @@ class PlanDietFragment : Fragment() {
     private val surveyViewModel: SurveyViewModel by activityViewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPlanDietBinding.inflate(inflater, container, false)
 
@@ -37,12 +31,23 @@ class PlanDietFragment : Fragment() {
     }
 
     private fun setUpView() {
-        lifecycleScope.launch {
-            surveyViewModel.surveyResponseState.collect { result ->
-                handleGetSurveyResult(result)
+        surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            showLoading(isLoading)
+        }
+        setUpDateAdapter()
+        setUpSurveyResultData()
+
+    }
+
+    private fun setUpSurveyResultData() {
+        binding.apply {
+            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
+                tvCalorieNeeds.text = it.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds
             }
         }
+    }
 
+    private fun setUpDateAdapter() {
         val dateList = listOf(
             DateItem("Des", "20"),
             DateItem("Des", "21"),
@@ -54,31 +59,37 @@ class PlanDietFragment : Fragment() {
         )
 
         val adapter = DateAdapter(dateList)
-        binding.recyclerView.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerView.adapter = adapter
 
-    }
+        val selectedRecommendationFood = mutableListOf<RecommendedFoodPreferenceItem?>()
+        binding.apply {
+            recyclerView.layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            recyclerView.setHasFixedSize(true)
+            recyclerView.adapter = adapter
 
-    private fun handleGetSurveyResult(result: ResultState<SurveyResponse?>) {
-        when (result) {
-            is ResultState.Loading -> showLoading(true)
-            is ResultState.Success -> {
-                showLoading(false)
+            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
+
+                val recommendationFoodAdapter = RecommendationFoodAdapter(
+                    requireContext(),
+                    it?.recommendedFoodPreference ?: emptyList(),
+                    selectedRecommendationFood
+                )
+                rvRecommendationFood.setLayoutManager(object :
+                    LinearLayoutManager(requireContext()) {
+                    override fun canScrollVertically(): Boolean {
+                        return false
+                    }
+                })
+                rvRecommendationFood.setHasFixedSize(true)
+                rvRecommendationFood.adapter = recommendationFoodAdapter
+
             }
-
-            is ResultState.Error -> {
-                showLoading(false)
-                ToastUtil.showToast(requireContext(), getString(R.string.error_get_user))
-            }
-
-            is ResultState.Initial -> {}
-
         }
     }
 
+
     private fun showLoading(isLoading: Boolean) {
-        with(binding) {
+        binding.apply {
             if (isLoading) {
                 cardCalorieNeeds.visibility = View.GONE
                 cardTableRecommendation.visibility = View.GONE

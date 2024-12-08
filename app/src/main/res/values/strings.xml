@@ -120,7 +120,7 @@
 
     <string-array name="breakfast_times">
         <item>03:00 AM</item>
-        <item>04:20 AM</item>
+        <item>04:00 AM</item>
         <item>05:00 AM</item>
         <item>06:00 AM</item>
         <item>07:00 AM</item>
@@ -354,8 +354,16 @@
     <string name="no_activity">No Activity</string>
     <string name="iv_header_image_desc">Display header image</string>
     <string name="calorie_needs">Calorie Needs</string>
-    <string name="meal_recommendation">Meal Recommendation</string>
+    <string name="food_recommendation">Food Recommendation</string>
     <string name="last_7_days">Last 7 Days</string>
     <string name="current_bmi">Current BMI</string>
+    <string name="carbohydrates">Carbohydrates:</string>
+    <string name="protein">Protein:</string>
+    <string name="fat">Fat:</string>
+    <string name="calories">Calories:</string>
+    <string name="select">Select</string>
+    <string name="selected">Selected</string>
+    <string name="only_choose">Only choose %s</string>
+    <string name="kcal">kcal</string>
 
 </resources>

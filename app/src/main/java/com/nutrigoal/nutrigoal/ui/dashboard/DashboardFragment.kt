@@ -8,7 +8,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -17,13 +16,9 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.ResultState
-import com.nutrigoal.nutrigoal.data.remote.response.SurveyResponse
 import com.nutrigoal.nutrigoal.databinding.FragmentDashboardBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
-import com.nutrigoal.nutrigoal.utils.ToastUtil
-import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
@@ -47,47 +42,33 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setUpView() {
-        handleShowHeader()
         setUpNutrientsCharts()
         setUpWeightProgressAdapter()
-        setBMILineWidths()
 
-        lifecycleScope.launch {
-            surveyViewModel.surveyResponseState.collect { result ->
-                handleGetSurveyResult(result)
-            }
-        }
-    }
-
-    private fun handleGetSurveyResult(result: ResultState<SurveyResponse?>) {
-        when (result) {
-            is ResultState.Loading -> showLoading(true)
-            is ResultState.Success -> {
-                showLoading(false)
-            }
-
-            is ResultState.Error -> {
-                showLoading(false)
-                ToastUtil.showToast(requireContext(), getString(R.string.error_get_user))
-            }
-
-            is ResultState.Initial -> {}
-
+        surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            showLoading(isLoading)
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
         with(binding) {
             if (isLoading) {
+                cardBmi.visibility = View.GONE
+                cardBmiShimmerBase.visibility = View.VISIBLE
+                cardBmiShimmerLoading.visibility = View.VISIBLE
                 cardNutrients.visibility = View.GONE
                 cardBodyWeightProgress.visibility = View.GONE
                 cardBodyWeightInfo.visibility = View.GONE
                 shimmerLoading.visibility = View.VISIBLE
             } else {
+                cardBmi.visibility = View.VISIBLE
+                cardBmiShimmerBase.visibility = View.GONE
+                cardBmiShimmerLoading.visibility = View.GONE
                 cardNutrients.visibility = View.VISIBLE
                 cardBodyWeightProgress.visibility = View.VISIBLE
                 cardBodyWeightInfo.visibility = View.VISIBLE
                 shimmerLoading.visibility = View.GONE
+                handleShowCurrentUserData()
             }
         }
 
@@ -121,45 +102,84 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setUpNutrientsCharts() {
-        val caloriesChart = binding.chartCalories
-        val proteinChart = binding.chartProtein
-        val fatChart = binding.chartFat
-        val carbohydratesChart = binding.chartCarbohydrates
+        surveyViewModel.surveyResult.observe(viewLifecycleOwner) { surveyResult ->
+            binding.apply {
+                val caloriesChart = chartCalories
+                val proteinChart = chartProtein
+                val fatChart = chartFat
+                val carbohydratesChart = chartCarbohydrates
 
-        val dates = (1..10).map { it.toFloat() }
-        val dateLabels = (1..10).map { "Day $it" }
+                val recommendedFoodPreferences =
+                    surveyResult?.recommendedFoodPreference ?: emptyList()
 
-        val caloriesEntries =
-            dates.mapIndexed { index, date -> Entry(date, (1800 + index * 10).toFloat()) }
-        val proteinEntries =
-            dates.mapIndexed { index, date -> Entry(date, (80 + index * 2).toFloat()) }
-        val fatEntries = dates.mapIndexed { index, date -> Entry(date, (30 + index).toFloat()) }
-        val carbohydratesEntries =
-            dates.mapIndexed { index, date -> Entry(date, (200 + index * 5).toFloat()) }
+                val entriesCount = maxOf(recommendedFoodPreferences.size, 7)
 
-        setupSingleChart(caloriesChart, caloriesEntries, dateLabels, "Calories", R.color.primary)
-        setupSingleChart(proteinChart, proteinEntries, dateLabels, "Protein", R.color.secondary)
-        setupSingleChart(fatChart, fatEntries, dateLabels, "Fat", R.color.error)
-        setupSingleChart(
-            carbohydratesChart,
-            carbohydratesEntries,
-            dateLabels,
-            "Carbohydrates",
-            R.color.tertiary
-        )
+                val dates = (1..entriesCount).map { it.toFloat() }
+                val dateLabels = (1..entriesCount).map { "Day $it" }
+
+                val caloriesEntries = recommendedFoodPreferences.mapIndexed { index, item ->
+                    Entry(dates[index], item?.calories?.toString()?.toFloat() ?: 0f)
+                }
+
+                val proteinEntries = recommendedFoodPreferences.mapIndexed { index, item ->
+                    Entry(dates[index], item?.proteinG.toString().toFloat())
+                }
+
+                val fatEntries = recommendedFoodPreferences.mapIndexed { index, item ->
+                    Entry(dates[index], item?.fatG.toString().toFloat())
+                }
+
+                val carbohydratesEntries = recommendedFoodPreferences.mapIndexed { index, item ->
+                    Entry(dates[index], item?.carbohydrateG.toString().toFloat())
+                }
+
+                setupSingleChart(
+                    caloriesChart,
+                    caloriesEntries,
+                    dateLabels,
+                    "Calories",
+                    R.color.primary,
+                    5f,
+                )
+                setupSingleChart(
+                    proteinChart,
+                    proteinEntries,
+                    dateLabels,
+                    "Protein",
+                    R.color.secondary
+                )
+                setupSingleChart(
+                    fatChart,
+                    fatEntries,
+                    dateLabels,
+                    "Fat",
+                    R.color.error
+                )
+                setupSingleChart(
+                    carbohydratesChart,
+                    carbohydratesEntries,
+                    dateLabels,
+                    "Carbohydrates",
+                    R.color.tertiary
+                )
+            }
+        }
     }
+
 
     private fun setupSingleChart(
         chart: LineChart,
         entries: List<Entry>,
         labels: List<String>,
         label: String,
-        colorRes: Int
+        colorRes: Int,
+        textSize: Float = 10f
     ) {
         val dataSet = LineDataSet(entries, label).apply {
             color = ContextCompat.getColor(requireContext(), colorRes)
             valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
+            lineWidth = 3f
+            valueTextSize = textSize
         }
 
         chart.data = LineData(dataSet)
@@ -180,24 +200,26 @@ class DashboardFragment : Fragment() {
     }
 
 
-    private fun handleShowHeader() {
+    private fun handleShowCurrentUserData() {
         with(binding) {
             viewModel.currentUser.observe(viewLifecycleOwner) {
+                tvCurrentWeight.text = it?.bodyWeight.toString()
                 tvGreetings.text =
                     getString(R.string.dashboard_greetings, it?.username)
+                setBMILineWidths(it?.bodyWeight ?: 0f, it?.height ?: 0f)
             }
 
         }
     }
 
     private fun calculateBMI(weight: Float, height: Float): Float {
-        if (height <= 0) throw IllegalArgumentException("Height must be more than 0")
+        if (height <= 0){return 0f}
         val heightInMeter = height / 100
         return weight / (heightInMeter * heightInMeter)
     }
 
-    private fun setBMILineWidths() {
-        val bmiValue = calculateBMI(71.0f, 170f)
+    private fun setBMILineWidths(weight: Float, height: Float) {
+        val bmiValue = calculateBMI(weight, height)
         val differenceWidth = 15.0
         val totalWidth = 40.0 - differenceWidth
         val underWeight = 18.5 - differenceWidth
