@@ -35,6 +35,14 @@ class DailyReminderService : Service() {
         startCountdown()
     }
 
+    override fun onDestroy() {
+        stopSelf()
+        stopForeground(STOP_FOREGROUND_DETACH)
+        handler.removeCallbacksAndMessages(null)
+        super.onDestroy()
+    }
+
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -64,7 +72,6 @@ class DailyReminderService : Service() {
                     insertNotificationToDatabase(mealTitle)
                 }
 
-
                 handler.postDelayed(this, 1000L)
             }
         }, 1000L)
@@ -76,7 +83,6 @@ class DailyReminderService : Service() {
             OneTimeWorkRequest.Builder(InsertTimeToEatWorker::class.java)
                 .setInputData(workDataOf("mealTitle" to title))
                 .build()
-
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
     }
 

@@ -26,6 +26,11 @@ android {
             "WEB_CLIENT_ID",
             "\"526047333608-aibmtojeq8r985t7alvp4gd5ct6ctg74.apps.googleusercontent.com\""
         )
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"http://192.168.100.84:5000/\""
+        )
     }
 
     buildTypes {
@@ -92,6 +97,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.room.runtime)
-    implementation (libs.androidx.room.ktx)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.startup.runtime)
+    implementation(libs.firebase.firestore)
 }

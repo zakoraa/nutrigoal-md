@@ -4,28 +4,33 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.bumptech.glide.Glide
-import com.github.mikephil.charting.components.Description
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.databinding.FragmentDashboardBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
+import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
+import com.nutrigoal.nutrigoal.utils.AppUtil
+import com.nutrigoal.nutrigoal.utils.DateFormatter.parseDateToMonthAndDay
 
 
 class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AuthViewModel by activityViewModels()
+    private val historyViewModel: HistoryViewModel by activityViewModels()
+    private val surveyViewModel: SurveyViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,143 +40,344 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        setUpView()
         return root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpView()
+    }
+
     private fun setUpView() {
-        handleShowHeader()
-        setUpWeightProgressChart()
-        setUpNutrientsChart()
+
+        surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            showLoading(isLoading)
+        }
+
+        historyViewModel.historyResult.observe(viewLifecycleOwner) {
+            setUpWeightProgressAdapter(it)
+            setUpNutrientsCharts(it)
+        }
+
     }
 
-    private fun setUpWeightProgressChart() {
-        val xValues =
-            mutableListOf("20 Dec", "21 Dec", "22 Dec", "23 Dec", "24 Dec", "25 Dec", "26 Dec")
-
+    private fun showLoading(isLoading: Boolean) {
         with(binding) {
-            chartBodyWeightProgress.axisRight.setDrawLabels(false)
-            val description = Description()
-            description.text = ""
-            chartBodyWeightProgress.description = description
+            if (isLoading) {
+                cardNutrients.visibility = View.GONE
+                cardBodyWeightProgress.visibility = View.GONE
+                cardBodyWeightInfo.visibility = View.GONE
+                shimmerLoading.visibility = View.VISIBLE
+            } else {
+                cardNutrients.visibility = View.VISIBLE
+                cardBodyWeightProgress.visibility = View.VISIBLE
+                cardBodyWeightInfo.visibility = View.VISIBLE
+                shimmerLoading.visibility = View.GONE
+                handleShowCurrentUserData()
+            }
+        }
 
-            val xAxis = chartBodyWeightProgress.xAxis
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.valueFormatter = IndexAxisValueFormatter(xValues)
-            xAxis.labelCount = 7
-            xAxis.granularity = 1f
-            xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+    }
 
-            val yAxis = chartBodyWeightProgress.axisLeft
-            yAxis.axisMinimum = 55f
-            yAxis.axisMaximum = 70f
-            yAxis.axisLineWidth = 2f
-            yAxis.axisLineColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            yAxis.labelCount = 5
-            yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
+    private fun setUpWeightProgressAdapter(historyResponse: HistoryResponse) {
+        val weightList = historyResponse.perDay?.mapIndexed { index, perDayItem ->
+            val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
 
-            val entries: MutableList<BarEntry> = ArrayList()
-            entries.add(BarEntry(0f, 60f))
-            entries.add(BarEntry(1f, 61f))
-            entries.add(BarEntry(2f, 63f))
-            entries.add(BarEntry(3f, 64f))
-            entries.add(BarEntry(4f, 63f))
-            entries.add(BarEntry(5f, 62f))
-            entries.add(BarEntry(6f, 61f))
-
-            val dataSet = BarDataSet(entries, "Body Weight")
-            dataSet.colors = listOf(
-                ContextCompat.getColor(requireContext(), R.color.error),
-                ContextCompat.getColor(requireContext(), R.color.primary_80),
-                ContextCompat.getColor(requireContext(), R.color.secondary),
-                ContextCompat.getColor(requireContext(), R.color.tertiary),
-                ContextCompat.getColor(requireContext(), R.color.onBackground),
-                ContextCompat.getColor(requireContext(), R.color.primaryVariant),
-                ContextCompat.getColor(requireContext(), R.color.primary)
+            WeightProgress(
+                month = month,
+                day = day,
+                title = "Day ${index + 1}",
+                bodyWeight = perDayItem.bodyWeight ?: 0f
             )
-            dataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            dataSet.valueTextSize = 12f
-            dataSet.setDrawValues(true)
+        } ?: emptyList()
 
-            val barData = BarData(dataSet)
-            chartBodyWeightProgress.data = barData
+        val adapter = BodyWeightProgressAdapter(weightList)
+        with(binding) {
+            tvWeightGainPercentage.text = "${calculateWeightPercentage(weightList)}%"
+            tvBodyWeightProgressRange.text =
+                if (weightList.size == 1) getString(R.string.today) else {
+                    getString(R.string.last_days, weightList.size.toString())
+                }
+            rvWeightProgress.adapter = adapter
+            rvWeightProgress.setHasFixedSize(true)
+            rvWeightProgress.setLayoutManager(object : LinearLayoutManager(requireContext()) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            }.apply {
+                reverseLayout = true
+            })
 
-            chartBodyWeightProgress.setFitBars(true)
-            chartBodyWeightProgress.animateY(1000)
-            chartBodyWeightProgress.invalidate()
         }
     }
 
-    private fun setUpNutrientsChart() {
-        val lineChart = binding.chartNutrients
+    private fun setUpNutrientsCharts(historyResponse: HistoryResponse) {
+        binding.apply {
+            val caloriesChart = chartCalories
+            val proteinChart = chartProtein
+            val fatChart = chartFat
+            val carbohydratesChart = chartCarbohydrates
 
-        val dates = (1..10).map { it.toFloat() }
-        val dateLabels = (1..10).map { "Day $it" }
+            val dates = mutableListOf<Float>()
+            val dateLabels = mutableListOf<String>()
 
-        val caloriesEntries =
-            dates.mapIndexed { index, date -> Entry(date, (1800 + index * 10).toFloat()) }
-        val proteinEntries =
-            dates.mapIndexed { index, date -> Entry(date, (80 + index * 2).toFloat()) }
-        val fatEntries = dates.mapIndexed { index, date -> Entry(date, (30 + index).toFloat()) }
-        val carbohydratesEntries =
-            dates.mapIndexed { index, date -> Entry(date, (200 + index * 5).toFloat()) }
+            val caloriesEntries = mutableListOf<Entry>()
+            val proteinEntries = mutableListOf<Entry>()
+            val fatEntries = mutableListOf<Entry>()
+            val carbohydratesEntries = mutableListOf<Entry>()
 
-        val caloriesDataSet = LineDataSet(caloriesEntries, "Calories").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.primary)
-            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
+            historyResponse.perDay?.forEachIndexed { dayIndex, perDayItem ->
+                val dayNumber = dayIndex + 1
+                dates.add(dayNumber.toFloat())
+                dateLabels.add("Day $dayNumber")
+
+                var totalCalories = 0
+                var totalProtein = 0f
+                var totalFat = 0f
+                var totalCarbs = 0f
+
+                perDayItem.foodRecommendation?.forEach { foodItem ->
+                    totalCalories += foodItem.calories ?: 0
+                    totalProtein += foodItem.protein ?: 0f
+                    totalFat += foodItem.fat ?: 0f
+                    totalCarbs += foodItem.carbohydrate ?: 0f
+                }
+
+                caloriesEntries.add(Entry(dayNumber.toFloat(), totalCalories.toFloat()))
+                proteinEntries.add(Entry(dayNumber.toFloat(), totalProtein))
+                fatEntries.add(Entry(dayNumber.toFloat(), totalFat))
+                carbohydratesEntries.add(Entry(dayNumber.toFloat(), totalCarbs))
+            }
+
+            setupSingleChart(
+                caloriesChart,
+                caloriesEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.calories_title),
+                R.color.primary,
+                5f
+            )
+            setupSingleChart(
+                proteinChart,
+                proteinEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.protein_title),
+                R.color.secondary
+            )
+            setupSingleChart(
+                fatChart,
+                fatEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.fat_title),
+                R.color.error
+            )
+            setupSingleChart(
+                carbohydratesChart,
+                carbohydratesEntries,
+                dateLabels,
+                ContextCompat.getString(requireContext(), R.string.carbohydrates_title),
+                R.color.tertiary
+            )
         }
-        val proteinDataSet = LineDataSet(proteinEntries, "Protein").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.secondary)
+    }
+
+
+    private fun setupSingleChart(
+        chart: LineChart,
+        entries: List<Entry>,
+        labels: List<String>,
+        label: String,
+        colorRes: Int,
+        textSize: Float = 10f
+    ) {
+        val dataSet = LineDataSet(entries, label).apply {
+            color = ContextCompat.getColor(requireContext(), colorRes)
             valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
-        }
-        val fatDataSet = LineDataSet(fatEntries, "Fat").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.error)
-            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
-        }
-        val carbohydratesDataSet = LineDataSet(carbohydratesEntries, "Carbohydrates").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.tertiary)
-            valueTextColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-            lineWidth = 2f
+            lineWidth = 3f
+            valueTextSize = textSize
         }
 
-        val lineData = LineData(caloriesDataSet, proteinDataSet, fatDataSet, carbohydratesDataSet)
-        lineChart.data = lineData
+        chart.data = LineData(dataSet)
 
-        val xAxis = lineChart.xAxis
+        val xAxis = chart.xAxis
         xAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
         xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.valueFormatter = IndexAxisValueFormatter(dateLabels)
+        xAxis.valueFormatter = IndexAxisValueFormatter(labels)
         xAxis.granularity = 1f
         xAxis.labelCount = 7
 
-        val yAxis = lineChart.axisLeft
+        val yAxis = chart.axisLeft
         yAxis.textColor = ContextCompat.getColor(requireContext(), R.color.textColor)
-        lineChart.axisRight.isEnabled = false
-        lineChart.description.text = ""
-        lineChart.animateX(1000)
-        lineChart.invalidate()
+        chart.axisRight.isEnabled = false
+        chart.description.text = ""
+        chart.animateX(1000)
+        chart.invalidate()
     }
 
-
-    private fun handleShowHeader() {
+    private fun handleShowCurrentUserData() {
         with(binding) {
             viewModel.currentUser.observe(viewLifecycleOwner) {
-                Glide.with(requireContext())
-                    .load(it?.photoProfile)
-                    .placeholder(R.drawable.photo_profile)
-                    .into(binding.ivPhotoProfile)
                 tvGreetings.text =
                     getString(R.string.dashboard_greetings, it?.username)
             }
-
+            historyViewModel.historyResult.observe(viewLifecycleOwner) {
+                val index = AppUtil.getTodayDataFromPerDay(it)
+                val perDay = it?.perDay?.get(index)
+                tvCurrentWeight.text = perDay?.bodyWeight.toString()
+                setBMILineWidths(
+                    perDay?.bodyWeight
+                        ?: 0f,
+                    perDay?.height
+                        ?: 0f
+                )
+            }
         }
+
     }
+
+    private fun calculateBMI(weight: Float, height: Float): Float {
+        if (height <= 0) {
+            return 0f
+        }
+        val heightInMeter = height / 100
+        return weight / (heightInMeter * heightInMeter)
+    }
+
+    private fun setBMILineWidths(weight: Float, height: Float) {
+        val bmiValue = calculateBMI(weight, height)
+        val differenceWidth = 15.0
+        val totalWidth = 40.0 - differenceWidth
+        val underWeight = 18.5 - differenceWidth
+        val normalWeight = 25 - differenceWidth
+        val overWeight = 30 - differenceWidth
+        val obesity = 35.0 - differenceWidth
+
+        val bmiValuePercent = ((bmiValue - differenceWidth) / totalWidth).toFloat()
+        val underWeightPercent = (underWeight / totalWidth).toFloat()
+        val normalWeightPercent = (normalWeight / totalWidth).toFloat()
+        val overWeightPercent = (overWeight / totalWidth).toFloat()
+        val obesityPercent = (obesity / totalWidth).toFloat()
+        val extremeObesityPercent = 1f
+
+        with(binding) {
+            tvCurrentBmiValue.text = String.format("%.1f", bmiValue)
+
+            bmiMarker.layoutParams =
+                (bmiMarker.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = bmiValuePercent
+                }
+
+            underWeightLine.layoutParams =
+                (underWeightLine.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = underWeightPercent
+                }
+
+            normalWeightLine.layoutParams =
+                (normalWeightLine.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = normalWeightPercent
+                }
+
+            overWeightLine.layoutParams =
+                (overWeightLine.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = overWeightPercent
+                }
+
+            obesityLine.layoutParams =
+                (obesityLine.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = obesityPercent
+                }
+
+            extremeObesityLine.layoutParams =
+                (extremeObesityLine.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = extremeObesityPercent
+                }
+
+            tvUnderUnderWeight.text = String.format("15")
+            tvUnderWeight.text = String.format("18.5")
+            tvNormalWeight.text = String.format("25")
+            tvOverWeight.text = String.format("30")
+            tvObesity.text = String.format("35")
+            tvExtremeObesity.text = String.format("40")
+
+            val additionalPercent = 0.02f
+
+            tvUnderWeight.layoutParams =
+                (tvUnderWeight.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = underWeightPercent + additionalPercent
+                }
+
+            tvNormalWeight.layoutParams =
+                (tvNormalWeight.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = normalWeightPercent + additionalPercent
+                }
+
+            tvOverWeight.layoutParams =
+                (tvOverWeight.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = overWeightPercent + additionalPercent
+                }
+
+            tvObesity.layoutParams =
+                (tvObesity.layoutParams as ConstraintLayout.LayoutParams).apply {
+                    matchConstraintPercentWidth = obesityPercent + additionalPercent
+                }
+        }
+        setUpBMIType(bmiValue)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setUpBMIType(bmiValue: Float) {
+        val bmiType = when {
+            bmiValue < 18.5 -> BMIType.UNDER_WEIGHT
+            bmiValue < 25 -> BMIType.NORMAL_WEIGHT
+            bmiValue < 30 -> BMIType.OVER_WEIGHT
+            bmiValue < 35 -> BMIType.OBESITY
+            bmiValue <= 40 -> BMIType.EXTREME_OBESITY
+            else -> throw IllegalArgumentException("BMI value out of range")
+        }
+
+
+        val color = when (bmiType) {
+            BMIType.UNDER_WEIGHT -> R.color.primary
+            BMIType.NORMAL_WEIGHT -> R.color.secondary_50
+            BMIType.OVER_WEIGHT -> R.color.yellow
+            BMIType.OBESITY -> R.color.tertiary
+            BMIType.EXTREME_OBESITY -> R.color.error
+        }
+
+        with(binding) {
+            tvBmiType.text = bmiType.toString()
+            tvBmiType.setTextColor(resources.getColor(color, null))
+        }
+    }
+
+    private fun calculateWeightPercentage(weightList: List<WeightProgress>): Float {
+        if (weightList.isEmpty()) return 0f
+
+        val firstWeight = weightList.firstOrNull()?.bodyWeight ?: 0f
+        val lastWeight = weightList.lastOrNull()?.bodyWeight ?: 0f
+
+        if (firstWeight == 0f || lastWeight == 0f) return 0f
+
+        val weightDifference = lastWeight - firstWeight
+        return (weightDifference / firstWeight) * 100
+    }
+
+}
+
+enum class BMIType(private val displayName: String) {
+    UNDER_WEIGHT("Under Weight"),
+    NORMAL_WEIGHT("Normal Weight"),
+    OVER_WEIGHT("Over Weight"),
+    OBESITY("Obesity"),
+    EXTREME_OBESITY("Extreme Obesity");
+
+    override fun toString(): String {
+        return displayName
     }
 }

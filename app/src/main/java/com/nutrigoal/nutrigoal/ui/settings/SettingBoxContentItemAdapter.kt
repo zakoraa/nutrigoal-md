@@ -2,7 +2,6 @@ package com.nutrigoal.nutrigoal.ui.settings
 
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -65,6 +64,10 @@ class SettingBoxContentItemAdapter(
                 endIcon.setImageResource(item.endIconResId)
                 val context = itemView.context
 
+                val serviceIntent = Intent(context, DailyReminderService::class.java)
+                val workManager =
+                    WorkManager.getInstance(context)
+
                 if (item.isToggleButton) {
                     toggleButton.visibility = View.VISIBLE
                     endIcon.visibility = View.GONE
@@ -86,17 +89,11 @@ class SettingBoxContentItemAdapter(
                                 .observe(lifecycleOwner) { isEnabled ->
                                     toggleButton.isChecked = isEnabled
                                 }
-
-                            val workManager =
-                                WorkManager.getInstance(context)
-
-
                             val currentTime = Calendar.getInstance()
 
                             toggleButton.setOnCheckedChangeListener { _, isChecked ->
                                 if (isChecked) {
-                                    val intent = Intent(context, DailyReminderService::class.java)
-                                    context.startForegroundService(intent)
+                                    context.startForegroundService(serviceIntent)
 
                                     val targetTime = Calendar.getInstance().apply {
                                         set(Calendar.HOUR_OF_DAY, 6)
@@ -153,16 +150,6 @@ class SettingBoxContentItemAdapter(
 
                                     workManager.getWorkInfoByIdLiveData(dailyReminderRequest.id)
                                         .observe(lifecycleOwner) { workInfo ->
-                                            Log.d("FLORAAAA", "APA: ${workInfo?.state} ")
-                                            if (workInfo?.state == WorkInfo.State.RUNNING) {
-                                                toggleButton.isChecked = true
-                                                Log.d("FLORAAAA", "DIAJALNAKN: ")
-                                                lifecycleOwner.lifecycleScope.launch {
-                                                    settingsViewModel.saveDailyReminderSetting(true)
-                                                }
-
-                                            }
-
                                             if (workInfo?.state == WorkInfo.State.FAILED) {
                                                 Toast.makeText(
                                                     context,
@@ -173,8 +160,7 @@ class SettingBoxContentItemAdapter(
                                         }
                                 } else {
                                     toggleButton.isChecked = false
-                                    val intent = Intent(context, DailyReminderService::class.java)
-                                    context.stopService(intent)
+                                    context.stopService(serviceIntent)
                                     workManager.cancelAllWork()
                                     toggleButton.isChecked = false
                                     lifecycleOwner.lifecycleScope.launch {
@@ -208,7 +194,11 @@ class SettingBoxContentItemAdapter(
                                 AlertDialogUtil.showDialog(
                                     context,
                                     context.getString(R.string.confirm_logout_message),
-                                    onAccept = { viewModel.logout() }
+                                    onAccept = {
+                                        context.stopService(serviceIntent)
+                                        workManager.cancelAllWork()
+                                        viewModel.logout()
+                                    }
                                 )
                             }
                         }

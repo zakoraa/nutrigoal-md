@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.databinding.FavoriteProcessedFoodItemBinding
 
 class FavoriteProcessedAdapter(
-    private val items: List<String>,
+    private var items: List<String>,
 ) : RecyclerView.Adapter<FavoriteProcessedAdapter.ItemViewHolder>() {
 
     private val checkedItems = mutableSetOf<String>()
@@ -28,6 +28,16 @@ class FavoriteProcessedAdapter(
                 }
             }
         }
+    }
+
+    fun updateItems(newItems: Collection<String>) {
+        this.items = emptyList()
+        this.items = newItems.toList()
+        notifyDataSetChanged()
+    }
+
+    fun getCheckedItems(): List<String> {
+        return checkedItems.toList()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {

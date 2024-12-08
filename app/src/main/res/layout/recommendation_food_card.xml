@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:elevation="0dp"
+    app:cardBackgroundColor="@color/background"
+    app:cardCornerRadius="15dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/primary_80"
+            app:layout_constraintEnd_toStartOf="@+id/btn_select"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Strawberry Brunch Cake" />
+
+        <TextView
+            android:id="@+id/tv_calories"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/calories"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tv_calories_value"
+            app:layout_constraintStart_toStartOf="@id/tv_name"
+            app:layout_constraintTop_toTopOf="@id/tv_calories_value" />
+
+        <TextView
+            android:id="@+id/tv_calories_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/card_background"
+            android:backgroundTint="@color/secondary_50"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_calories"
+            app:layout_constraintTop_toBottomOf="@id/tv_name"
+            tools:text="2220 kcal" />
+
+
+        <TextView
+            android:id="@+id/btn_select"
+            android:layout_width="100dp"
+            android:layout_height="0dp"
+            android:background="@drawable/recommended_food_button"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:text="@string/select"
+            android:textColor="@color/primary_80"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

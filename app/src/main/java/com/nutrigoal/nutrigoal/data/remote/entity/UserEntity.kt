@@ -5,18 +5,32 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class UserEntity(
-    val photoProfile: String?,
-    val username: String,
-    val email: String,
-    val age: Int,
-    val gender: Gender,
-    val bodyWeight: Float,
-    val height: Float,
-): Parcelable
+    val id: String? = null,
+    val photoProfile: String? = null,
+    val username: String? = null,
+    val email: String? = null,
+    var age: Int? = null,
+    var gender: String? = null,
+    var bodyWeight: Float? = null,
+    var height: Float? = null,
+    var activityLevel: Int? = null,
+    var dietCategory: String? = null,
+    var hasGastricIssue: Boolean? = null,
+    var foodPreference: List<String>? = null
+) : Parcelable
 
 enum class Gender(private val displayName: String) {
     MALE("Male"),
     FEMALE("Female");
+
+    override fun toString(): String {
+        return displayName
+    }
+}
+
+enum class DietCategory(private val displayName: String) {
+    VEGAN("vegan"),
+    KETO("keto");
 
     override fun toString(): String {
         return displayName

@@ -5,6 +5,7 @@
     <string name="register_success">Register successful</string>
     <string name="logout_success">Logout is successful</string>
 
+    <string name="error_favorite_food">You must choose your favorite food</string>
     <string name="error_get_notification">Get notification failed. Please try again.</string>
     <string name="error_get_user">Get user failed. Please try again.</string>
     <string name="error_login">Login failed. Please try again.</string>
@@ -109,6 +110,7 @@
     <string name="iv_back_from_profile_desc">Back from profile page</string>
     <string name="iv_photo_profile_desc">Display photo profile</string>
     <string name="confirm_logout_message">Are you sure you want to logout?</string>
+    <string name="last_days">Last %s days</string>
 
     <string-array name="activity_levels">
         <item>Sedentary (little to no exercise)</item>
@@ -119,7 +121,8 @@
     </string-array>
 
     <string-array name="breakfast_times">
-        <item>04:05 AM</item>
+        <item>03:00 AM</item>
+        <item>04:00 AM</item>
         <item>05:00 AM</item>
         <item>06:00 AM</item>
         <item>07:00 AM</item>
@@ -332,9 +335,9 @@
     <string name="Pangolin">Pangolin</string>
     <string name="Armadillo">Armadillo</string>
 
-    <string name="dashboard_greetings_desc">Keep track of your diet and maintain a healthy eating pattern!</string>
-    <string name="dashboard_greetings">Hi %s!</string>
-    <string name="body_weight_progress_title">Your body weight progress (kg)</string>
+    <string name="dashboard_greetings_desc">Keep track of your diet!</string>
+    <string name="dashboard_greetings">Hi %s</string>
+    <string name="body_weight_progress_title">Body Weight Progress</string>
     <string name="current_weight">Current Weight</string>
     <string name="weight_gain">Weight Gain</string>
     <string name="daily_progress_title">Daily Nutrient Consumption</string>
@@ -343,7 +346,7 @@
     <string name="fat_title">Fat</string>
     <string name="carbohydrates_title">Carbohydrates</string>
     <string name="select_your_activity_level">Select your activity level</string>
-    <string name="nutrients_title">Nutrients</string>
+    <string name="nutrients_title">Nutrients Progress</string>
     <string name="daily_check_in">Daily Check-in</string>
     <string name="breakfast_time">Breakfast Time</string>
     <string name="select_time">Select Time</string>
@@ -351,5 +354,19 @@
     <string name="dinner_time">Dinner Time</string>
     <string name="done">Done</string>
     <string name="no_activity">No Activity</string>
+    <string name="iv_header_image_desc">Display header image</string>
+    <string name="calorie_needs">Calorie Needs</string>
+    <string name="food_recommendation">Food Recommendation</string>
+    <string name="last_7_days">Last 7 Days</string>
+    <string name="current_bmi">Current BMI</string>
+    <string name="carbohydrates">Carbohydrates:</string>
+    <string name="protein">Protein:</string>
+    <string name="fat">Fat:</string>
+    <string name="calories">Calories:</string>
+    <string name="select">Select</string>
+    <string name="selected">Selected</string>
+    <string name="only_choose">Only choose %s</string>
+    <string name="kcal">kcal</string>
+    <string name="save">Save</string>
 
 </resources>

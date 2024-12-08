@@ -9,8 +9,6 @@ import com.nutrigoal.nutrigoal.data.local.entity.NotificationLocalEntity
 import com.nutrigoal.nutrigoal.data.local.entity.NotificationType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -36,10 +34,7 @@ class InsertTimeToEatWorker @AssistedInject constructor(
             time = formattedTime
         )
 
-        withContext(Dispatchers.IO) {
-            notificationDao.insert(notificationEntity)
-        }
-
+        notificationDao.insert(notificationEntity)
         return Result.success()
     }
 }

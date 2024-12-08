@@ -2,13 +2,16 @@ package com.nutrigoal.nutrigoal.ui.survey
 
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivitySurvey1Binding
+import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
 
 class Survey1Activity : AppCompatActivity() {
@@ -29,7 +32,18 @@ class Survey1Activity : AppCompatActivity() {
         setUpAction()
     }
 
+
     private fun setUpAction() {
+        val userEntity = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(
+                EXTRA_SURVEY,
+                UserEntity::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_SURVEY)
+        }
+
         with(binding) {
             btnBack.setOnClickListener {
                 finish()
@@ -37,6 +51,7 @@ class Survey1Activity : AppCompatActivity() {
 
             btnNext.setOnClickListener {
                 val intent = Intent(this@Survey1Activity, Survey2Activity::class.java)
+                intent.putExtra(EXTRA_SURVEY, userEntity)
                 startActivity(intent)
             }
         }

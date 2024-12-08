@@ -18,6 +18,11 @@
         <item name="android:textColor">@color/textColor</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:scrollbars">none</item>
+        <item name="progressBarStyle">@style/CustomProgressBar</item>
+    </style>
+
+    <style name="CustomProgressBar">
+        <item name="android:progressTint">@color/primary</item>
     </style>
 
     <style name="Theme.Nutrigoal" parent="Base.Theme.Nutrigoal" />

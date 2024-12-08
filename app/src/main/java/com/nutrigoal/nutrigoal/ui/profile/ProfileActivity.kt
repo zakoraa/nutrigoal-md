@@ -57,8 +57,8 @@ class ProfileActivity : AppCompatActivity() {
             .into(binding.ivPhotoProfile)
 
         val profileItems = listOf(
-            ProfileItem(getString(R.string.username), user.username),
-            ProfileItem(getString(R.string.email), user.email),
+            ProfileItem(getString(R.string.username), user.username?: ""),
+            ProfileItem(getString(R.string.email), user.email?: ""),
             ProfileItem(getString(R.string.age), user.age.toString()),
             ProfileItem(getString(R.string.gender), user.gender.toString()),
             ProfileItem(getString(R.string.body_weight), "${user.bodyWeight} Kg"),
