@@ -18,6 +18,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.FragmentDashboardBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import java.util.Calendar
 import java.util.Locale
@@ -27,6 +28,7 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     private val viewModel: AuthViewModel by activityViewModels()
+    private val historyViewModel: HistoryViewModel by activityViewModels()
     private val surveyViewModel: SurveyViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -53,17 +55,11 @@ class DashboardFragment : Fragment() {
     private fun showLoading(isLoading: Boolean) {
         with(binding) {
             if (isLoading) {
-                cardBmi.visibility = View.GONE
-                cardBmiShimmerBase.visibility = View.VISIBLE
-                cardBmiShimmerLoading.visibility = View.VISIBLE
                 cardNutrients.visibility = View.GONE
                 cardBodyWeightProgress.visibility = View.GONE
                 cardBodyWeightInfo.visibility = View.GONE
                 shimmerLoading.visibility = View.VISIBLE
             } else {
-                cardBmi.visibility = View.VISIBLE
-                cardBmiShimmerBase.visibility = View.GONE
-                cardBmiShimmerLoading.visibility = View.GONE
                 cardNutrients.visibility = View.VISIBLE
                 cardBodyWeightProgress.visibility = View.VISIBLE
                 cardBodyWeightInfo.visibility = View.VISIBLE
@@ -215,8 +211,8 @@ class DashboardFragment : Fragment() {
                         ?: 0f
                 )
             }
-
         }
+
     }
 
     private fun calculateBMI(weight: Float, height: Float): Float {

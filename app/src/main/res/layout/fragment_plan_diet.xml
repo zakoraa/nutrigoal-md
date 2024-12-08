@@ -106,9 +106,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:text="@string/kcal"
             app:layout_constraintBottom_toBottomOf="@id/tv_calorie_needs"
-            app:layout_constraintStart_toEndOf="@id/tv_calorie_needs"
-            android:text="@string/kcal" />
+            app:layout_constraintStart_toEndOf="@id/tv_calorie_needs" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -128,10 +128,20 @@
         <TextView
             android:id="@+id/tv_food_recommendation"
             style="@style/TextLabel"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/food_recommendation"
+            app:layout_constraintBottom_toBottomOf="@id/btn_save"
+            app:layout_constraintEnd_toStartOf="@id/btn_save"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/btn_save" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -141,7 +151,7 @@
             android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_food_recommendation" />
+            app:layout_constraintTop_toBottomOf="@id/btn_save" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

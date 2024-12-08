@@ -366,5 +366,6 @@
     <string name="selected">Selected</string>
     <string name="only_choose">Only choose %s</string>
     <string name="kcal">kcal</string>
+    <string name="save">Save</string>
 
 </resources>

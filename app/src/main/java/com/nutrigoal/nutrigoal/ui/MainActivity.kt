@@ -23,19 +23,26 @@ import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
 import com.nutrigoal.nutrigoal.data.remote.entity.Gender
+import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
+import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.data.remote.response.SurveyResponse
 import com.nutrigoal.nutrigoal.databinding.ActivityMainBinding
 import com.nutrigoal.nutrigoal.databinding.PopUpCheckInBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.UUID
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -43,23 +50,22 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: AuthViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
     private val surveyViewModel: SurveyViewModel by viewModels()
+    private val historyViewModel: HistoryViewModel by viewModels()
+    private val historyResponse = HistoryResponse()
     private var index = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        getAppThemes()
 
         installSplashScreen()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView
-
         val navController =
             findNavController(R.id.nav_host_fragment_activity_main)
-
         navView.setupWithNavController(navController)
 
         bottomNavScrollAnimation()
@@ -67,10 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpView() {
-        getAppThemes()
-
         getSurveyResult()
-
         surveyViewModel.isLoading.observe(this) { isLoading ->
             showLoading(isLoading)
         }
@@ -92,7 +95,6 @@ class MainActivity : AppCompatActivity() {
                 handleGetSurveyResult(result)
             }
         }
-
     }
 
     private fun getSurveyResult() {
@@ -142,9 +144,29 @@ class MainActivity : AppCompatActivity() {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
-                Log.d("FLORAAAAAA", "handleGetSurveyResult: ${result.data}")
-                showLoading(false)
-                if(index == 0) {showMealTimePopup()}
+                if (index == 0) {
+                    Log.d("FLORAAAAAA", "handleGetSurveyResult: ${result.data}")
+                    showLoading(false)
+                    val calendar = Calendar.getInstance()
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+
+                    val createdAt = dateFormat.format(calendar.time)
+                    calendar.add(Calendar.DAY_OF_YEAR, 1)
+                    val dietTime = dateFormat.format(calendar.time)
+                    val it = result.data
+                    historyResponse.perDay = listOf(
+                        PerDayItem(
+                            id = UUID.randomUUID().toString(),
+                            bodyWeight = it?.recommendedFoodBasedOnCalories?.rfbocWeightKg,
+                            age = it?.recommendedFoodBasedOnCalories?.rfbocAge,
+                            height = it?.recommendedFoodBasedOnCalories?.rfbocHeightCm,
+                            createdAt = createdAt,
+                            dietTime = dietTime,
+                        ),
+                    )
+                    historyViewModel.addHistory(historyResponse)
+                    showMealTimePopup()
+                }
                 index += 1
             }
 
@@ -223,6 +245,7 @@ class MainActivity : AppCompatActivity() {
         when (result) {
             is ResultState.Loading -> {}
             is ResultState.Success -> {
+                historyResponse.userId = result.data?.id
                 viewModel.setCurrentUser(result.data)
             }
 

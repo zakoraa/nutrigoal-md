@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.nutrigoal.nutrigoal.BuildConfig
 import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
 import com.nutrigoal.nutrigoal.data.local.database.NotificationDao
@@ -15,6 +16,7 @@ import com.nutrigoal.nutrigoal.data.local.database.authDataStore
 import com.nutrigoal.nutrigoal.data.local.database.settingDataStore
 import com.nutrigoal.nutrigoal.data.local.repository.NotificationRepository
 import com.nutrigoal.nutrigoal.data.remote.repository.AuthRepository
+import com.nutrigoal.nutrigoal.data.remote.repository.HistoryRepository
 import com.nutrigoal.nutrigoal.data.remote.repository.SurveyRepository
 import com.nutrigoal.nutrigoal.data.remote.retrofit.SurveyService
 import dagger.Module
@@ -32,6 +34,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideFirebaseFirestore(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
+    }
 
     @Provides
     @Singleton
@@ -110,6 +118,11 @@ object AppModule {
     @Singleton
     fun provideSurveyRepository(surveyService: SurveyService): SurveyRepository =
         SurveyRepository(surveyService)
+
+    @Provides
+    @Singleton
+    fun provideHistoryRepository(firestore: FirebaseFirestore): HistoryRepository =
+        HistoryRepository(firestore)
 
     @Provides
     @Singleton

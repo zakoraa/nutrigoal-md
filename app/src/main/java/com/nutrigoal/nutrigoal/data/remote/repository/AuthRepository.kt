@@ -50,6 +50,7 @@ class AuthRepository(private val auth: FirebaseAuth, private val authPreference:
             lateinit var user: UserEntity;
             currentUser?.let {
                 user = UserEntity(
+                    id = it.uid,
                     photoProfile = it.photoUrl.toString(),
                     username = it.displayName ?: "",
                     email = it.email ?: "",

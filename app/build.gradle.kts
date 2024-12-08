@@ -29,7 +29,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"http://192.168.100.188:5000/\""
+            "\"http://192.168.100.84:5000/\""
         )
     }
 
@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.room.runtime)
-    implementation (libs.androidx.room.ktx)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.startup.runtime)
+    implementation(libs.firebase.firestore)
 }
