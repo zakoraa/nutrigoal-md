@@ -2,7 +2,6 @@ package com.nutrigoal.nutrigoal.ui.plan_diet
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.FragmentPlanDietBinding
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
-import com.nutrigoal.nutrigoal.ui.survey.AddFoodRecommendationActivity
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.DateFormatter.parseDateToMonthAndDay
 
@@ -56,23 +55,43 @@ class PlanDietFragment : Fragment() {
 
     private fun setUpAction() {
         binding.apply {
-            btnToAddFoodRecommendation.setOnClickListener {
-                startActivity(Intent(requireActivity(), AddFoodRecommendationActivity::class.java))
-            }
+
         }
     }
 
 
     private fun setUpDateAdapter() {
-
         historyViewModel.historyResult.observe(viewLifecycleOwner) {
-            Log.d("FLORAAAAA", "PAANSIH: ${it} ")
             val dateList = it.perDay?.mapIndexed { _, perDayItem ->
                 val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
                 DateItem(month, day)
             } ?: emptyList()
 
             binding.apply {
+                val lastPerDay = it.perDay?.lastIndex ?: -1
+                val perDay = it.perDay?.get(lastPerDay)
+                var hasGastricIssue = true
+                if (perDay?.hasGastricIssue == "No") {
+                    hasGastricIssue = false
+                }
+                val userEntity =
+                    UserEntity(
+                        id = it.userId,
+                        height = perDay?.height,
+                        bodyWeight = perDay?.bodyWeight,
+                        dietCategory = perDay?.dietCategory,
+                        hasGastricIssue = hasGastricIssue,
+                        age = perDay?.age,
+                        gender = it.gender,
+                        activityLevel = perDay?.activityLevel
+                    )
+                btnToAddFoodRecommendation.setOnClickListener {
+                    val intent =
+                        Intent(requireActivity(), AddFoodRecommendationActivity::class.java)
+                    intent.putExtra(EXTRA_PLAN_DIET_USER, userEntity)
+                    startActivity(intent)
+                }
+
                 val adapter = DateAdapter(dateList) { position ->
                     viewPager.currentItem = position
                 }
@@ -81,7 +100,7 @@ class PlanDietFragment : Fragment() {
                 recyclerView.setHasFixedSize(true)
                 recyclerView.adapter = adapter
 
-                val pagerAdapter = FoodPagerAdapter(requireParentFragment(), dateList)
+                val pagerAdapter = FoodPagerAdapter(requireParentFragment(), dateList, it)
                 viewPager.adapter = pagerAdapter
 
                 adapter.setOnItemClickListener { position ->
@@ -111,5 +130,7 @@ class PlanDietFragment : Fragment() {
 
     }
 
-
+    companion object {
+        const val EXTRA_PLAN_DIET_USER = "extra_plan_diet_user"
+    }
 }

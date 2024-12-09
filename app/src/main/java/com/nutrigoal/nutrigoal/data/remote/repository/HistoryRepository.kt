@@ -2,12 +2,12 @@ package com.nutrigoal.nutrigoal.data.remote.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.extension.asResultState
 import com.nutrigoal.nutrigoal.data.extension.historiesCollection
 import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.utils.DateFormatter
-import com.nutrigoal.nutrigoal.data.extension.asResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -41,7 +41,7 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
 
             if (historyResponse != null) {
                 emit(historyResponse)
-            }else{
+            } else {
                 emit(null)
             }
         }.asResultState()
@@ -97,9 +97,13 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
 
                 if (historyResponse != null) {
                     documentRef.set(historyResponse).await()
+                    emit(Unit)
+                } else {
+                    emit(null)
                 }
 
-                emit(Unit)
+            } else {
+                emit(null)
             }
         }.asResultState()
     }

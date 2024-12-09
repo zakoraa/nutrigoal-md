@@ -1,11 +1,11 @@
 package com.nutrigoal.nutrigoal.ui.common
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.repository.HistoryRepository
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +35,20 @@ class HistoryViewModel @Inject constructor(
         MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
     val addHistoryResponseState: StateFlow<ResultState<Unit?>> get() = _addHistoryResponseState
 
+    private val _addPerDayItemState =
+        MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
+    val addPerDayItemState: StateFlow<ResultState<Unit?>> get() = _addPerDayItemState
+
+    fun addPerDayItem(userId: String, perDayItem: PerDayItem) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            historyRepository.addPerDayItem(userId, perDayItem).collect { result ->
+                _addPerDayItemState.value = result
+            }
+            _isLoading.value = false
+        }
+    }
+
     fun getHistoryResult(userId: String) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -52,8 +66,6 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             val userId = historyResponse.userId ?: return@launch
-            Log.d("HistoryViewModel", "userId: ${userId}")
-
             val isAlreadyAdded = historyRepository.isHistoryAlreadyAdded(userId)
 
             isAlreadyAdded.collect { result ->
@@ -64,7 +76,6 @@ class HistoryViewModel @Inject constructor(
                     is ResultState.Success -> {
                         _isLoading.value = true
 
-                        Log.d("HistoryViewModel", "Is history already added? ${result.data}")
                         if (!result.data) {
                             historyRepository.addHistory(historyResponse).collect { addResult ->
                                 _addHistoryResponseState.value = addResult

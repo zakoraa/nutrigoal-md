@@ -2,7 +2,9 @@ package com.nutrigoal.nutrigoal.ui.plan_diet
 
 import android.graphics.LinearGradient
 import android.graphics.Shader
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +13,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.remote.entity.RecommendedFoodPreferenceItem
+import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
+import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
+import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.databinding.FragmentFoodRecommendationBinding
-import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 
 class FoodRecommendationFragment : Fragment() {
     private var _binding: FragmentFoodRecommendationBinding? = null
     private val binding get() = _binding!!
-    private val surveyViewModel: SurveyViewModel by activityViewModels()
+    private val historyViewModel: HistoryViewModel by activityViewModels()
+    private var historyResponse: HistoryResponse? = null
+    private var perDayItem: PerDayItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,12 +43,10 @@ class FoodRecommendationFragment : Fragment() {
     }
 
     private fun setUpView() {
-        surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+        historyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             showLoading(isLoading)
         }
-        setUpDateAdapter()
         setUpSurveyResultData()
-
     }
 
     private fun setUpAction() {
@@ -52,10 +56,24 @@ class FoodRecommendationFragment : Fragment() {
     }
 
     private fun setUpSurveyResultData() {
-        binding.apply {
-            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
-                tvCalorieNeeds.text = it.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds
+        arguments?.let {
+            historyResponse = if (Build.VERSION.SDK_INT >= 33) {
+                it.getParcelable(FoodPagerAdapter.HISTORY_DATA, HistoryResponse::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                it.getParcelable(FoodPagerAdapter.HISTORY_DATA)
             }
+
+            perDayItem = if (Build.VERSION.SDK_INT >= 33) {
+                it.getParcelable(FoodPagerAdapter.PER_DAY, PerDayItem::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                it.getParcelable(FoodPagerAdapter.PER_DAY)
+            }
+        }
+
+        binding.apply {
+            tvCalorieNeeds.text = perDayItem?.calorieNeeds.toString()
 
             val gradient = LinearGradient(
                 0f, 0f, 0f, tvCalorieNeeds.textSize,
@@ -75,30 +93,28 @@ class FoodRecommendationFragment : Fragment() {
             )
             tvCalorieNeeds.paint.shader = gradient
         }
+        setUpDateAdapter()
     }
 
     private fun setUpDateAdapter() {
 
-        val selectedRecommendationFood = mutableListOf<RecommendedFoodPreferenceItem?>()
+        val selectedRecommendationFood = mutableListOf<FoodRecommendationItem?>()
         binding.apply {
 
-            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
+            val recommendationFoodAdapter = RecommendationFoodAdapter(
+                requireContext(),
+                perDayItem?.foodRecommendation ?: emptyList(),
+                selectedRecommendationFood
+            )
+            rvRecommendationFood.setLayoutManager(object :
+                LinearLayoutManager(requireContext()) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            })
+            rvRecommendationFood.setHasFixedSize(true)
+            rvRecommendationFood.adapter = recommendationFoodAdapter
 
-                val recommendationFoodAdapter = RecommendationFoodAdapter(
-                    requireContext(),
-                    it?.recommendedFoodPreference ?: emptyList(),
-                    selectedRecommendationFood
-                )
-                rvRecommendationFood.setLayoutManager(object :
-                    LinearLayoutManager(requireContext()) {
-                    override fun canScrollVertically(): Boolean {
-                        return false
-                    }
-                })
-                rvRecommendationFood.setHasFixedSize(true)
-                rvRecommendationFood.adapter = recommendationFoodAdapter
-
-            }
         }
     }
 

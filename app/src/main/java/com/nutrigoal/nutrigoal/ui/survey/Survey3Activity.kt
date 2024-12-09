@@ -119,7 +119,7 @@ class Survey3Activity : AppCompatActivity() {
                     instantFoods[2] -> 3
                     instantFoods[3] -> 4
                     instantFoods[4] -> 5
-                    else -> null
+                    else -> 1
                 }
 
                 val selectedHistoryMagId = rgHistoryMag.checkedRadioButtonId

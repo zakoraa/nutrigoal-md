@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.survey.AddFoodRecommendationActivity">
+    tools:context=".ui.plan_diet.AddFoodRecommendationActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -64,6 +64,29 @@
                 app:layout_constraintStart_toStartOf="@id/tv_title"
                 app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
+            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+                android:id="@+id/ed_age"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/edt_height"
+                android:layout_marginTop="@dimen/edt_gap"
+                android:hint="@string/age"
+                android:inputType="number"
+                app:layout_constraintEnd_toEndOf="@id/tv_title"
+                app:layout_constraintStart_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+
+            <TextView
+                android:id="@+id/tv_error_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/edt_error_text_margin_start"
+                android:layout_marginTop="@dimen/edt_error_text_margin_top"
+                android:textColor="@color/error"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toBottomOf="@id/ed_age"
+                tools:text="Wrong input" />
+
             <TextView
                 android:id="@+id/tv_history_mag"
                 style="@style/TextLabel"
@@ -73,7 +96,7 @@
                 android:text="@string/is_there_a_history_of_mag_disease"
                 app:layout_constraintEnd_toEndOf="@id/tv_title"
                 app:layout_constraintStart_toStartOf="@id/tv_title"
-                app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+                app:layout_constraintTop_toBottomOf="@id/tv_error_age" />
 
             <RadioGroup
                 android:id="@+id/rg_history_mag"
@@ -213,6 +236,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_percent="0.5" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_btn_save"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/btn_height"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.5"
+        app:shimmer_duration="3000">
+
+        <include layout="@layout/shimmer_button" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

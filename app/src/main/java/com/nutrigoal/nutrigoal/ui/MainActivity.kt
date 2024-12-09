@@ -3,7 +3,6 @@ package com.nutrigoal.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
@@ -26,6 +25,7 @@ import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.database.DailyCheckInPreference
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
+import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     private fun setUpView() {
         viewModel.getSession()
 
-
         lifecycleScope.launch {
             viewModel.userLocalEntitySessionState.collect { result ->
                 handleGetUserSession(result)
@@ -99,23 +98,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch {
-            surveyViewModel.surveyResponseState.collect { result ->
-                handleGetSurveyResult(result)
-            }
-        }
-
-        lifecycleScope.launch {
-            historyViewModel.historyResponseState.collect { result ->
-                handleGetHistoryResult(result)
-            }
-        }
-
-        lifecycleScope.launch {
-            historyViewModel.addHistoryResponseState.collect {
-                handleAddHistory(it)
-            }
-        }
     }
 
     private fun handleAddHistory(result: ResultState<Unit?>) {
@@ -187,16 +169,37 @@ class MainActivity : AppCompatActivity() {
                     val it = result.data
                     val data = it?.recommendedFoodBasedOnCalories
                     historyResponse.gender = data?.rfbocGender
+                    val activityLevels = resources.getStringArray(R.array.activity_levels)
+                    val activityLevel = when (data?.rfbocActivityLevel) {
+                        activityLevels[0] -> 1
+                        activityLevels[1] -> 2
+                        activityLevels[2] -> 3
+                        activityLevels[3] -> 4
+                        activityLevels[4] -> 5
+                        else -> 1
+                    }
+                    val foodRecommendationList = it?.recommendedFoodPreference?.map { item ->
+                        FoodRecommendationItem(
+                            id = item?.rfpId,
+                            name = item?.name,
+                            calories = item?.calories,
+                            protein = item?.proteinG,
+                            carbohydrate = item?.carbohydrateG,
+                            fat = item?.fatG
+                        )
+                    }
                     historyResponse.perDay = listOf(
                         PerDayItem(
                             id = UUID.randomUUID().toString(),
                             bodyWeight = data?.rfbocWeightKg,
                             age = data?.rfbocAge,
                             height = data?.rfbocHeightCm,
-                            activityLevel = data?.rfbocActivityLevel,
+                            activityLevel = activityLevel,
                             dietCategory = data?.rfbocDietType,
                             hasGastricIssue = data?.rfbocHistoryOfGastritisOrGerd,
                             foodPreference = it?.favoriteFoodName?.ffnName,
+                            foodRecommendation = foodRecommendationList,
+                            calorieNeeds = it?.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds?.toFloatOrNull(),
                             createdAt = createdAt,
                             dietTime = dietTime,
                         ),
@@ -220,7 +223,6 @@ class MainActivity : AppCompatActivity() {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
-                Log.d("FLORAAAAA", "WADAWWWW: ${result.data} ")
                 val it = result.data
                 if (it !== null) {
                     val index = getTodayDataFromPerDay(it)
@@ -342,6 +344,24 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 historyResponse.userId = result.data?.id
                 viewModel.setCurrentUser(result.data)
+
+                lifecycleScope.launch {
+                    surveyViewModel.surveyResponseState.collect { result ->
+                        handleGetSurveyResult(result)
+                    }
+                }
+
+                lifecycleScope.launch {
+                    historyViewModel.historyResponseState.collect { result ->
+                        handleGetHistoryResult(result)
+                    }
+                }
+
+                lifecycleScope.launch {
+                    historyViewModel.addHistoryResponseState.collect {
+                        handleAddHistory(it)
+                    }
+                }
             }
 
             is ResultState.Error -> {

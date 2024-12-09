@@ -21,7 +21,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ui.survey.AddFoodRecommendationActivity"
+            android:name=".ui.plan_diet.AddFoodRecommendationActivity"
             android:exported="false" />
 
         <provider

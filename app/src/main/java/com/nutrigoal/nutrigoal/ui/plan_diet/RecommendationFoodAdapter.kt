@@ -7,14 +7,14 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.remote.entity.RecommendedFoodPreferenceItem
+import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.databinding.RecommendationFoodCardBinding
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 
 class RecommendationFoodAdapter(
     private val context: Context,
-    private val foodList: List<RecommendedFoodPreferenceItem?>,
-    private val selectedRecommendationFood: MutableList<RecommendedFoodPreferenceItem?>
+    private val foodList: List<FoodRecommendationItem?>,
+    private val selectedRecommendationFood: MutableList<FoodRecommendationItem?>
 ) : RecyclerView.Adapter<RecommendationFoodAdapter.RecommendationFoodViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -36,7 +36,7 @@ class RecommendationFoodAdapter(
     inner class RecommendationFoodViewHolder(private val binding: RecommendationFoodCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(foodItem: RecommendedFoodPreferenceItem?) {
+        fun bind(foodItem: FoodRecommendationItem?) {
             binding.apply {
                 val context = itemView.context
                 tvName.text = foodItem?.name

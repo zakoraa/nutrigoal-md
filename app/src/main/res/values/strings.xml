@@ -6,6 +6,8 @@
     <string name="logout_success">Logout is successful</string>
 
     <string name="error_favorite_food">You must choose your favorite food</string>
+    <string name="error_complete_form">You must fill in all the inputs</string>
+    <string name="error_add_per_day_item">Add food recommendation failed. Please try again.</string>
     <string name="error_get_notification">Get notification failed. Please try again.</string>
     <string name="error_get_user">Get user failed. Please try again.</string>
     <string name="error_login">Login failed. Please try again.</string>
@@ -53,6 +55,8 @@
     <string name="profile">Profile </string>
     <string name="back_btn_profile_desc">Return from profile page</string>
     <string name="description">Description</string>
+
+    <string name="success_add_per_day_item">Add food recommendation success.</string>
 
     <string name="app_logo_desc">display the app logo</string>
     <string name="continue_with_google">Continue with Google</string>
@@ -113,11 +117,11 @@
     <string name="last_days">Last %s days</string>
 
     <string-array name="activity_levels">
-        <item>Sedentary (little to no exercise)</item>
-        <item>Lightly active (light exercise 1–3 days/week)</item>
-        <item>Moderately active (moderate exercise 3–5 days/week)</item>
-        <item>Very active (hard exercise 6–7 days/week)</item>
-        <item>Super active (very hard exercise or physical job)</item>
+        <item>1. Sedentary (little to no exercise)</item>
+        <item>2. Lightly active (light exercise 1–3 days/week)</item>
+        <item>3. Moderately active (moderate exercise 3–5 days/week)</item>
+        <item>4. Very active (hard exercise 6–7 days/week)</item>
+        <item>5. Super active (very hard exercise or physical job)</item>
     </string-array>
 
     <string-array name="breakfast_times">
@@ -368,7 +372,7 @@
     <string name="only_choose">Only choose %s</string>
     <string name="kcal">kcal</string>
     <string name="save">Save</string>
-    <string name="add_food_recommendation_title">Add Food Recommendation for Next Day</string>
+    <string name="add_food_recommendation_title">Add Food Recommendation for The Next Day</string>
     <string name="add_food_recommendation_desc">Your input will be used to generate a personalized food recommendation for the day after the selected date.</string>
 
 </resources>

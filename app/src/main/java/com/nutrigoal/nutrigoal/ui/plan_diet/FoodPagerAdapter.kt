@@ -1,21 +1,32 @@
 package com.nutrigoal.nutrigoal.ui.plan_diet
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 
 class FoodPagerAdapter(
     fragment: Fragment,
-    private val dateList: List<DateItem>
+    private val dateList: List<DateItem>,
+    private val historyResponse: HistoryResponse,
 ) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = dateList.size
 
     override fun createFragment(position: Int): Fragment {
         val fragment = FoodRecommendationFragment()
+        val perDayItem = historyResponse.perDay?.get(position)
+
         fragment.arguments = Bundle().apply {
-            putString("date", "${dateList[position].month} ${dateList[position].day}")
+            putParcelable(HISTORY_DATA, historyResponse)
+            putParcelable(PER_DAY, perDayItem)
         }
         return fragment
+    }
+
+    companion object {
+        const val HISTORY_DATA = "history_data"
+        const val PER_DAY = "per_day"
     }
 }

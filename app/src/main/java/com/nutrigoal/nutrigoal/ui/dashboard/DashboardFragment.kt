@@ -136,13 +136,13 @@ class DashboardFragment : Fragment() {
                 dates.add(dayNumber.toFloat())
                 dateLabels.add("Day $dayNumber")
 
-                var totalCalories = 0
+                var totalCalories = 0f
                 var totalProtein = 0f
                 var totalFat = 0f
                 var totalCarbs = 0f
 
-                perDayItem.foodRecommendation?.forEach { foodItem ->
-                    totalCalories += foodItem.calories ?: 0
+                perDayItem.selectedFoodRecommendation?.forEach { foodItem ->
+                    totalCalories += foodItem.calories ?: 0f
                     totalProtein += foodItem.protein ?: 0f
                     totalFat += foodItem.fat ?: 0f
                     totalCarbs += foodItem.carbohydrate ?: 0f
