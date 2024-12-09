@@ -47,10 +47,10 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
         }.asResultState()
     }
 
-    fun updateFoodRecommendationById(
+    fun updateSelectedFoodRecommendation(
         userId: String,
         perDayId: String,
-        foodRecommendationItem: FoodRecommendationItem
+        foodRecommendationItem: List<FoodRecommendationItem>
     ): Flow<ResultState<Unit?>> {
         return flow {
             val documentRef = firestore.historiesCollection()
@@ -64,12 +64,9 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
                 val perDayItem = historyResponse?.perDay?.find { it.id == perDayId }
 
                 if (perDayItem != null) {
-                    val updatedFoodRecommendations =
-                        perDayItem.foodRecommendation?.toMutableList() ?: mutableListOf()
-                    updatedFoodRecommendations.add(foodRecommendationItem)
-                    perDayItem.foodRecommendation = updatedFoodRecommendations
+                    perDayItem.selectedFoodRecommendation =
+                        foodRecommendationItem
                     documentRef.set(historyResponse).await()
-
                     emit(Unit)
                 }
             }

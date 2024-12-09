@@ -42,11 +42,33 @@ class HistoryViewModel @Inject constructor(
         MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
     val addFoodRecommendationState: StateFlow<ResultState<Unit?>> get() = _addFoodRecommendationState
 
+    private val _updateSelectedFoodRecommendationState =
+        MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
+    val updateSelectedFoodRecommendationState: StateFlow<ResultState<Unit?>> get() = _updateSelectedFoodRecommendationState
+
     fun addPerDayItem(userId: String, perDayItem: PerDayItem) {
         _isLoading.value = true
         viewModelScope.launch {
             historyRepository.addPerDayItem(userId, perDayItem).collect { result ->
                 _addPerDayItemState.value = result
+            }
+        }
+        _isLoading.value = false
+    }
+
+    fun updateSelectedFoodRecommendation(
+        userId: String,
+        perDayId: String,
+        foodRecommendationItem: List<FoodRecommendationItem>
+    ) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            historyRepository.updateSelectedFoodRecommendation(
+                userId,
+                perDayId,
+                foodRecommendationItem
+            ).collect { result ->
+                _updateSelectedFoodRecommendationState.value = result
             }
         }
         _isLoading.value = false
@@ -62,9 +84,6 @@ class HistoryViewModel @Inject constructor(
             historyRepository.addFoodRecommendation(userId, calorieNeeds, foodRecommendation)
                 .collect { result ->
                     _addFoodRecommendationState.value = result
-                    if (result is ResultState.Success) {
-                        getHistoryResult(userId)
-                    }
                 }
         }
     }

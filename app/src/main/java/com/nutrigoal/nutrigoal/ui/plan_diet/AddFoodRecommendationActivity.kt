@@ -98,7 +98,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 ToastUtil.showToast(
                     this@AddFoodRecommendationActivity,
-                    getString(R.string.success_add_per_day_item)
+                    getString(R.string.add_food_recommendation_success)
                 )
                 showLoading(false)
                 finish()
@@ -131,11 +131,12 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                         fat = it?.fatG
                     )
                 }
+
                 historyViewModel.addFoodRecommendation(
                     userId = userEntity?.id ?: "",
                     calorieNeeds = data?.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds?.toFloatOrNull()
                         ?: 0f,
-                    foodRecommendation = foodRecommendationItem ?: emptyList()
+                    foodRecommendation = foodRecommendationItem?.toSet()?.toList() ?: emptyList()
                 )
                 showLoading(false)
             }

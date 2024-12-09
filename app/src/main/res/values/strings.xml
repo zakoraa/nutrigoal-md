@@ -4,9 +4,12 @@
     <string name="login_success">Login is successful</string>
     <string name="register_success">Register successful</string>
     <string name="logout_success">Logout is successful</string>
+    <string name="add_food_recommendation_success">Add food recommendation success</string>
 
     <string name="error_favorite_food">You must choose your favorite food</string>
+    <string name="error_select_recommended_food">You must select %s foods</string>
     <string name="error_complete_form">You must fill in all the inputs</string>
+    <string name="error_add_food_recommendation">Add food recommendation failed. Please try again.</string>
     <string name="error_add_per_day_item">Add food recommendation failed. Please try again.</string>
     <string name="error_get_notification">Get notification failed. Please try again.</string>
     <string name="error_get_user">Get user failed. Please try again.</string>
@@ -55,8 +58,6 @@
     <string name="profile">Profile </string>
     <string name="back_btn_profile_desc">Return from profile page</string>
     <string name="description">Description</string>
-
-    <string name="success_add_per_day_item">Add food recommendation success.</string>
 
     <string name="app_logo_desc">display the app logo</string>
     <string name="continue_with_google">Continue with Google</string>

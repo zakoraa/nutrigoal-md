@@ -4,20 +4,22 @@ import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
+import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.databinding.FragmentFoodRecommendationBinding
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
+import com.nutrigoal.nutrigoal.utils.ToastUtil
+import kotlinx.coroutines.launch
 
 class FoodRecommendationFragment : Fragment() {
     private var _binding: FragmentFoodRecommendationBinding? = null
@@ -47,6 +49,34 @@ class FoodRecommendationFragment : Fragment() {
             showLoading(isLoading)
         }
         setUpSurveyResultData()
+        lifecycleScope.launch {
+            historyViewModel.updateSelectedFoodRecommendationState.collect {
+                handleUpdateSelectedFoodRecommendation(it)
+            }
+        }
+    }
+
+    private fun handleUpdateSelectedFoodRecommendation(result: ResultState<Unit?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                ToastUtil.showToast(
+                    requireContext(),
+                    getString(R.string.add_food_recommendation_success)
+                )
+                showLoading(false)
+            }
+
+            is ResultState.Error -> {
+                ToastUtil.showToast(
+                    requireContext(),
+                    getString(R.string.error_add_food_recommendation)
+                )
+                showLoading(false)
+            }
+
+            is ResultState.Initial -> {}
+        }
     }
 
     private fun setUpAction() {
@@ -98,11 +128,13 @@ class FoodRecommendationFragment : Fragment() {
 
     private fun setUpDateAdapter() {
 
-        val selectedRecommendationFood = mutableListOf<FoodRecommendationItem?>()
-        binding.apply {
+        val selectedRecommendationFood =
+            perDayItem?.selectedFoodRecommendation?.toMutableList() ?: mutableListOf()
 
+        binding.apply {
             val recommendationFoodAdapter = RecommendationFoodAdapter(
                 requireContext(),
+                perDayItem,
                 perDayItem?.foodRecommendation ?: emptyList(),
                 selectedRecommendationFood
             )
@@ -114,7 +146,28 @@ class FoodRecommendationFragment : Fragment() {
             })
             rvRecommendationFood.setHasFixedSize(true)
             rvRecommendationFood.adapter = recommendationFoodAdapter
-
+            val maximumSelect = when (perDayItem?.activityLevel) {
+                1 -> 2
+                2 -> 2
+                3 -> 3
+                4 -> 3
+                5 -> 3
+                else -> 2
+            }
+            btnSave.setOnClickListener {
+                if (selectedRecommendationFood.size != maximumSelect) {
+                    ToastUtil.showToast(
+                        requireContext(),
+                        getString(R.string.error_select_recommended_food, maximumSelect.toString())
+                    )
+                } else {
+                    historyViewModel.updateSelectedFoodRecommendation(
+                        historyResponse?.userId ?: "",
+                        perDayItem?.id ?: "",
+                        selectedRecommendationFood,
+                    )
+                }
+            }
         }
     }
 
@@ -124,9 +177,13 @@ class FoodRecommendationFragment : Fragment() {
             if (isLoading) {
                 cardCalorieNeeds.visibility = View.GONE
                 cardTableRecommendation.visibility = View.GONE
+                shimmerBtnSave.visibility = View.VISIBLE
+                btnSave.visibility = View.GONE
             } else {
                 cardCalorieNeeds.visibility = View.VISIBLE
                 cardTableRecommendation.visibility = View.VISIBLE
+                shimmerBtnSave.visibility = View.GONE
+                btnSave.visibility = View.VISIBLE
             }
         }
 

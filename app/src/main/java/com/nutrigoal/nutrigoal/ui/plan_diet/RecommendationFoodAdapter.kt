@@ -8,13 +8,15 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
+import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.databinding.RecommendationFoodCardBinding
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 
 class RecommendationFoodAdapter(
     private val context: Context,
-    private val foodList: List<FoodRecommendationItem?>,
-    private val selectedRecommendationFood: MutableList<FoodRecommendationItem?>
+    private val perDay: PerDayItem?,
+    private val foodList: List<FoodRecommendationItem>,
+    private val selectedRecommendationFood: MutableList<FoodRecommendationItem>
 ) : RecyclerView.Adapter<RecommendationFoodAdapter.RecommendationFoodViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -26,12 +28,12 @@ class RecommendationFoodAdapter(
         return RecommendationFoodViewHolder(binding)
     }
 
+    override fun getItemCount(): Int = foodList.size
+
     override fun onBindViewHolder(holder: RecommendationFoodViewHolder, position: Int) {
         val foodItem = foodList[position]
         holder.bind(foodItem)
     }
-
-    override fun getItemCount(): Int = foodList.size
 
     inner class RecommendationFoodViewHolder(private val binding: RecommendationFoodCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -41,20 +43,37 @@ class RecommendationFoodAdapter(
                 val context = itemView.context
                 tvName.text = foodItem?.name
                 tvCaloriesValue.text = "${foodItem?.calories}"
+
+                val maximumSelect = when (perDay?.activityLevel) {
+                    1 -> 2
+                    2 -> 2
+                    3 -> 3
+                    4 -> 3
+                    5 -> 3
+                    else -> 2
+                }
+
+                val isSelected = selectedRecommendationFood.contains(foodItem)
+                updateButtonState(isSelected, btnSelect)
+
                 btnSelect.setOnClickListener {
-                    if (selectedRecommendationFood.size == 2) {
-                        ToastUtil.showToast(
-                            context,
-                            context.getString(R.string.only_choose, "${2}")
-                        )
-                    }
-                    if (selectedRecommendationFood.size < 2 && !selectedRecommendationFood.contains(
+                    if (selectedRecommendationFood.size == maximumSelect && !selectedRecommendationFood.contains(
                             foodItem
                         )
                     ) {
-                        selectedRecommendationFood.add(foodItem)
+                        ToastUtil.showToast(
+                            context,
+                            context.getString(R.string.only_choose, "$maximumSelect")
+                        )
+                        return@setOnClickListener
+                    }
+
+                    if (!selectedRecommendationFood.contains(foodItem)) {
+                        foodItem?.let {
+                            selectedRecommendationFood.add(it)
+                        }
                         updateButtonState(true, btnSelect)
-                    } else if (selectedRecommendationFood.contains(foodItem)) {
+                    } else {
                         selectedRecommendationFood.remove(foodItem)
                         updateButtonState(false, btnSelect)
                     }
@@ -75,5 +94,5 @@ class RecommendationFoodAdapter(
             }
         }
     }
-}
 
+}
