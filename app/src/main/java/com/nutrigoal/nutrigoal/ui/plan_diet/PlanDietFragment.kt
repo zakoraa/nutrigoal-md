@@ -1,35 +1,40 @@
 package com.nutrigoal.nutrigoal.ui.plan_diet
 
 import android.content.Intent
-import android.graphics.LinearGradient
-import android.graphics.Shader
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.remote.entity.RecommendedFoodPreferenceItem
+import androidx.viewpager2.widget.ViewPager2
 import com.nutrigoal.nutrigoal.databinding.FragmentPlanDietBinding
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.survey.AddFoodRecommendationActivity
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
+import com.nutrigoal.nutrigoal.utils.DateFormatter.parseDateToMonthAndDay
 
 class PlanDietFragment : Fragment() {
     private var _binding: FragmentPlanDietBinding? = null
     private val binding get() = _binding!!
     private val surveyViewModel: SurveyViewModel by activityViewModels()
+    private val historyViewModel: HistoryViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPlanDietBinding.inflate(inflater, container, false)
 
-        setUpView()
         setUpAction()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpView()
     }
 
     override fun onDestroyView() {
@@ -38,11 +43,14 @@ class PlanDietFragment : Fragment() {
     }
 
     private fun setUpView() {
+        historyViewModel.isLoading.observe(viewLifecycleOwner) {
+            showLoading(it)
+        }
         surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             showLoading(isLoading)
         }
+
         setUpDateAdapter()
-        setUpSurveyResultData()
 
     }
 
@@ -54,83 +62,50 @@ class PlanDietFragment : Fragment() {
         }
     }
 
-    private fun setUpSurveyResultData() {
-        binding.apply {
-            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
-                tvCalorieNeeds.text = it.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds
-            }
-
-            val gradient = LinearGradient(
-                0f, 0f, 0f, tvCalorieNeeds.textSize,
-                intArrayOf(
-                    ContextCompat.getColor(requireContext(), R.color.primary),
-                    ContextCompat.getColor(requireContext(), R.color.primary),
-                    ContextCompat.getColor(requireContext(), R.color.primary),
-                    ContextCompat.getColor(requireContext(), R.color.primary),
-                    ContextCompat.getColor(requireContext(), R.color.primary_80),
-                    ContextCompat.getColor(requireContext(), R.color.primary_80),
-                    ContextCompat.getColor(requireContext(), R.color.primary_80),
-                    ContextCompat.getColor(requireContext(), R.color.primary_80),
-                    ContextCompat.getColor(requireContext(), R.color.primary_30)
-                ),
-                null,
-                Shader.TileMode.CLAMP
-            )
-            tvCalorieNeeds.paint.shader = gradient
-        }
-    }
 
     private fun setUpDateAdapter() {
-        val dateList = listOf(
-            DateItem("Des", "20"),
-            DateItem("Des", "21"),
-            DateItem("Des", "22"),
-            DateItem("Des", "23"),
-            DateItem("Des", "24"),
-            DateItem("Des", "25"),
-            DateItem("Des", "26"),
-        )
 
-        val adapter = DateAdapter(dateList)
+        historyViewModel.historyResult.observe(viewLifecycleOwner) {
+            Log.d("FLORAAAAA", "PAANSIH: ${it} ")
+            val dateList = it.perDay?.mapIndexed { _, perDayItem ->
+                val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
+                DateItem(month, day)
+            } ?: emptyList()
 
-        val selectedRecommendationFood = mutableListOf<RecommendedFoodPreferenceItem?>()
-        binding.apply {
-            recyclerView.layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-            recyclerView.setHasFixedSize(true)
-            recyclerView.adapter = adapter
+            binding.apply {
+                val adapter = DateAdapter(dateList) { position ->
+                    viewPager.currentItem = position
+                }
+                recyclerView.layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                recyclerView.setHasFixedSize(true)
+                recyclerView.adapter = adapter
 
-            surveyViewModel.surveyResult.observe(viewLifecycleOwner) {
+                val pagerAdapter = FoodPagerAdapter(requireParentFragment(), dateList)
+                viewPager.adapter = pagerAdapter
 
-                val recommendationFoodAdapter = RecommendationFoodAdapter(
-                    requireContext(),
-                    it?.recommendedFoodPreference ?: emptyList(),
-                    selectedRecommendationFood
-                )
-                rvRecommendationFood.setLayoutManager(object :
-                    LinearLayoutManager(requireContext()) {
-                    override fun canScrollVertically(): Boolean {
-                        return false
+                adapter.setOnItemClickListener { position ->
+                    viewPager.currentItem = position
+                }
+
+                viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        adapter.setSelectedPosition(position)
                     }
                 })
-                rvRecommendationFood.setHasFixedSize(true)
-                rvRecommendationFood.adapter = recommendationFoodAdapter
 
             }
         }
     }
-
 
     private fun showLoading(isLoading: Boolean) {
         binding.apply {
             if (isLoading) {
-                cardCalorieNeeds.visibility = View.GONE
-                cardTableRecommendation.visibility = View.GONE
                 shimmerLoading.visibility = View.VISIBLE
+                viewPager.visibility = View.GONE
             } else {
-                cardCalorieNeeds.visibility = View.VISIBLE
-                cardTableRecommendation.visibility = View.VISIBLE
                 shimmerLoading.visibility = View.GONE
+                viewPager.visibility = View.VISIBLE
             }
         }
 
