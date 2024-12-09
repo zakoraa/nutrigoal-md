@@ -191,13 +191,11 @@ class RegisterActivity : AppCompatActivity() {
             if (isLoading) {
                 btnRegister.visibility = View.INVISIBLE
                 btnLoginWithGoogle.isClickable = false
-                btnLoginWithFacebook.isClickable = false
                 shimmerBtnRegister.visibility = View.VISIBLE
                 shimmerBtnRegister.startShimmer()
             } else {
                 btnRegister.visibility = View.VISIBLE
                 btnLoginWithGoogle.isClickable = true
-                btnLoginWithFacebook.isClickable = true
                 shimmerBtnRegister.visibility = View.INVISIBLE
                 shimmerBtnRegister.stopShimmer()
             }
@@ -223,7 +221,6 @@ class RegisterActivity : AppCompatActivity() {
                 AnimationUtil.createTranslationAnimator(dividerRight),
                 AnimationUtil.createTranslationAnimator(tvOr),
                 AnimationUtil.createTranslationAnimator(btnLoginWithGoogle),
-                AnimationUtil.createTranslationAnimator(btnLoginWithFacebook)
             )
 
             val together = AnimatorSet().apply {

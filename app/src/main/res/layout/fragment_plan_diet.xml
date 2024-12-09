@@ -28,6 +28,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/btn_to_add_food_recommendation"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_add"
+        android:contentDescription="@string/add_food_recommendation_title"
+        android:background="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_plan_diet"
+        app:layout_constraintBottom_toBottomOf="@id/tv_plan_diet"
+        android:layout_marginEnd="20dp"/>
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card_date"
         android:layout_width="0dp"

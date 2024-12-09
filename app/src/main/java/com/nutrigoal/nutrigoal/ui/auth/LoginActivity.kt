@@ -119,9 +119,7 @@ class LoginActivity : AppCompatActivity() {
         when (result) {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
-                Log.d("FLORAAAAA", "resss: ${result.data} ")
                 if (result.data !== null) historyViewModel.getHistoryResult(result.data.uid)
-                Log.d("FLORAAAAA", "jalannnn: ${result.data} ")
                 showLoading(false)
             }
 
@@ -241,13 +239,11 @@ class LoginActivity : AppCompatActivity() {
             if (isLoading) {
                 btnLogin.visibility = View.INVISIBLE
                 btnLoginWithGoogle.isClickable = false
-                btnLoginWithFacebook.isClickable = false
                 shimmerBtnLogin.visibility = View.VISIBLE
                 shimmerBtnLogin.startShimmer()
             } else {
                 btnLogin.visibility = View.VISIBLE
                 btnLoginWithGoogle.isClickable = true
-                btnLoginWithFacebook.isClickable = true
                 shimmerBtnLogin.visibility = View.INVISIBLE
                 shimmerBtnLogin.stopShimmer()
             }
@@ -277,7 +273,6 @@ class LoginActivity : AppCompatActivity() {
                 AnimationUtil.createTranslationAnimator(dividerRight),
                 AnimationUtil.createTranslationAnimator(tvOr),
                 AnimationUtil.createTranslationAnimator(btnLoginWithGoogle),
-                AnimationUtil.createTranslationAnimator(btnLoginWithFacebook)
             )
 
             val together = AnimatorSet().apply {

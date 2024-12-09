@@ -368,5 +368,7 @@
     <string name="only_choose">Only choose %s</string>
     <string name="kcal">kcal</string>
     <string name="save">Save</string>
+    <string name="add_food_recommendation_title">Add Food Recommendation for Tomorrow</string>
+    <string name="add_food_recommendation_desc">Your input will be used to generate a personalized food recommendation for the day after the selected date.</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package com.nutrigoal.nutrigoal.ui.plan_diet
 
+import android.content.Intent
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Bundle
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.remote.entity.RecommendedFoodPreferenceItem
 import com.nutrigoal.nutrigoal.databinding.FragmentPlanDietBinding
+import com.nutrigoal.nutrigoal.ui.survey.AddFoodRecommendationActivity
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 
 class PlanDietFragment : Fragment() {
@@ -26,6 +28,7 @@ class PlanDietFragment : Fragment() {
         _binding = FragmentPlanDietBinding.inflate(inflater, container, false)
 
         setUpView()
+        setUpAction()
         return binding.root
     }
 
@@ -41,6 +44,14 @@ class PlanDietFragment : Fragment() {
         setUpDateAdapter()
         setUpSurveyResultData()
 
+    }
+
+    private fun setUpAction() {
+        binding.apply {
+            btnToAddFoodRecommendation.setOnClickListener {
+                startActivity(Intent(requireActivity(), AddFoodRecommendationActivity::class.java))
+            }
+        }
     }
 
     private fun setUpSurveyResultData() {
