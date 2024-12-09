@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.repository.HistoryRepository
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
@@ -18,8 +19,6 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     private val historyRepository: HistoryRepository
 ) : ViewModel() {
-
-    val historyResponse = HistoryResponse()
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
@@ -39,15 +38,37 @@ class HistoryViewModel @Inject constructor(
         MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
     val addPerDayItemState: StateFlow<ResultState<Unit?>> get() = _addPerDayItemState
 
+    private val _addFoodRecommendationState =
+        MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
+    val addFoodRecommendationState: StateFlow<ResultState<Unit?>> get() = _addFoodRecommendationState
+
     fun addPerDayItem(userId: String, perDayItem: PerDayItem) {
+        _isLoading.value = true
         viewModelScope.launch {
-            _isLoading.value = true
             historyRepository.addPerDayItem(userId, perDayItem).collect { result ->
                 _addPerDayItemState.value = result
             }
-            _isLoading.value = false
+        }
+        _isLoading.value = false
+    }
+
+    fun addFoodRecommendation(
+        userId: String,
+        calorieNeeds: Float,
+        foodRecommendation: List<FoodRecommendationItem>
+    ) {
+        viewModelScope.launch {
+            _addFoodRecommendationState.value = ResultState.Loading
+            historyRepository.addFoodRecommendation(userId, calorieNeeds, foodRecommendation)
+                .collect { result ->
+                    _addFoodRecommendationState.value = result
+                    if (result is ResultState.Success) {
+                        getHistoryResult(userId)
+                    }
+                }
         }
     }
+
 
     fun getHistoryResult(userId: String) {
         viewModelScope.launch {

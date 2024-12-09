@@ -76,6 +76,40 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
         }.asResultState()
     }
 
+    fun addFoodRecommendation(
+        userId: String,
+        calorieNeeds: Float,
+        foodRecommendation: List<FoodRecommendationItem>
+    ): Flow<ResultState<Unit?>> {
+        return flow {
+            val documentRef = firestore.historiesCollection()
+                .document(userId)
+
+            val snapshot = documentRef.get().await()
+
+            if (snapshot.exists()) {
+                val historyResponse = snapshot.toObject(HistoryResponse::class.java)
+
+                val lastPerDay = historyResponse?.perDay?.lastOrNull()
+
+                if (lastPerDay != null) {
+                    lastPerDay.calorieNeeds = calorieNeeds
+                    val updatedFoodRecommendations =
+                        lastPerDay.foodRecommendation?.toMutableList() ?: mutableListOf()
+                    updatedFoodRecommendations.addAll(foodRecommendation)
+                    lastPerDay.foodRecommendation = updatedFoodRecommendations
+
+                    documentRef.set(historyResponse).await()
+                    emit(Unit)
+                } else {
+                    emit(null)
+                }
+            } else {
+                emit(null)
+            }
+        }.asResultState()
+    }
+
 
     fun addPerDayItem(
         userId: String,

@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         getSurveyResult()
         bottomNavScrollAnimation()
         setUpView()
+        setUpAction()
     }
 
     private fun setUpView() {
@@ -406,6 +407,17 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 
+    }
+
+    private fun setUpAction() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            refreshHistoryData()
+        }
+    }
+
+    private fun refreshHistoryData() {
+        historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     private fun bottomNavScrollAnimation() {

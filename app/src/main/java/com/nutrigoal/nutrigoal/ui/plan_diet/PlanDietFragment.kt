@@ -63,7 +63,7 @@ class PlanDietFragment : Fragment() {
     private fun setUpDateAdapter() {
         historyViewModel.historyResult.observe(viewLifecycleOwner) {
             val dateList = it.perDay?.mapIndexed { _, perDayItem ->
-                val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
+                val (month, day) = parseDateToMonthAndDay(perDayItem.dietTime)
                 DateItem(month, day)
             } ?: emptyList()
 
@@ -89,6 +89,7 @@ class PlanDietFragment : Fragment() {
                     val intent =
                         Intent(requireActivity(), AddFoodRecommendationActivity::class.java)
                     intent.putExtra(EXTRA_PLAN_DIET_USER, userEntity)
+                    intent.putExtra(EXTRA_PER_DAY, perDay)
                     startActivity(intent)
                 }
 
@@ -122,15 +123,17 @@ class PlanDietFragment : Fragment() {
             if (isLoading) {
                 shimmerLoading.visibility = View.VISIBLE
                 viewPager.visibility = View.GONE
+                btnToAddFoodRecommendation.visibility = View.GONE
             } else {
                 shimmerLoading.visibility = View.GONE
                 viewPager.visibility = View.VISIBLE
+                btnToAddFoodRecommendation.visibility = View.VISIBLE
             }
         }
-
     }
 
     companion object {
         const val EXTRA_PLAN_DIET_USER = "extra_plan_diet_user"
+        const val EXTRA_PER_DAY = "extra_per_day"
     }
 }
