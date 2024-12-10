@@ -39,17 +39,15 @@ class DashboardFragment : Fragment() {
     ): View {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        setUpView()
 
         return root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setUpView()
-    }
-
     private fun setUpView() {
+        historyViewModel.isLoading.observe(viewLifecycleOwner) {
+            showLoading(it)
+        }
 
         surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             showLoading(isLoading)
@@ -58,10 +56,6 @@ class DashboardFragment : Fragment() {
         historyViewModel.historyResult.observe(viewLifecycleOwner) {
             setUpWeightProgressAdapter(it)
             setUpNutrientsCharts(it)
-        }
-
-        historyViewModel.isLoading.observe(viewLifecycleOwner) {
-            showLoading(it)
         }
 
     }
@@ -135,6 +129,11 @@ class DashboardFragment : Fragment() {
                 val dayNumber = dayIndex + 1
                 dates.add(dayNumber.toFloat())
                 dateLabels.add("Day $dayNumber")
+
+                tvNutrientsRange.text =
+                    if (dayNumber == 1) getString(R.string.today) else {
+                        getString(R.string.last_days, dayNumber.toString())
+                    }
 
                 var totalCalories = 0f
                 var totalProtein = 0f

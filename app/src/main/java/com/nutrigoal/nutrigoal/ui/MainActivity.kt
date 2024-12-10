@@ -85,11 +85,6 @@ class MainActivity : AppCompatActivity() {
         setUpAction()
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.swipeRefreshLayout.isEnabled = true
-    }
-
     private fun setUpView() {
         viewModel.getSession()
 
@@ -161,7 +156,6 @@ class MainActivity : AppCompatActivity() {
 
                     lifecycleScope.launch {
                         val hasCheckedInToday = dailyCheckInPreference.hasCheckedInToday()
-                        Log.d("FLORAAAA", "INI KENAPAAAA ${hasCheckedInToday} ")
 
                         if (!hasCheckedInToday) {
                             showMealTimePopup()
@@ -186,6 +180,9 @@ class MainActivity : AppCompatActivity() {
                         activityLevels[4] -> 5
                         else -> 1
                     }
+                    Log.d("FLORAAAAA", "ANEEH: ${data?.rfbocActivityLevel} ")
+                    Log.d("FLORAAAAA", "YANGG: ${activityLevel} ")
+
                     val foodRecommendationList = it?.recommendedFoodPreference?.map { item ->
                         FoodRecommendationItem(
                             id = item?.rfpId,
@@ -242,7 +239,7 @@ class MainActivity : AppCompatActivity() {
                             weight = perDay?.bodyWeight ?: 0f,
                             gender = getGenderCode(it.gender.toString()),
                             activity_level = perDay?.activityLevel.toString()
-                                .split(" ")[0].toIntOrNull() ?: 1,
+                                .split("")[0].toIntOrNull() ?: 1,
                             diet_category = perDay?.dietCategory
                                 ?: DietCategory.KETO.toString(),
                             has_gastric_issue = perDay?.hasGastricIssue ?: "false",

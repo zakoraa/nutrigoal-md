@@ -77,7 +77,7 @@
     <string name="_3_of_3_steps">3 of 3 steps</string>
     <string name="step_3">Step 3</string>
     <string name="survey3_title">Personalized Diet</string>
-    <string name="survey3_desc">Answer a few questions about your dietary habits and preferences. Together, we’ll create a diet plan that fits your goals and lifestyle perfectly!</string>
+    <string name="survey3_desc">*The information you provide will personalize your diet plan for the next day.</string>
     <string name="body_weight">Body weight</string>
     <string name="height">Height</string>
     <string name="age">Age</string>
@@ -119,8 +119,8 @@
     <string-array name="activity_levels">
         <item>1. Sedentary (little to no exercise)</item>
         <item>2. Lightly active (light exercise 1–3 days/week)</item>
-        <item>3. Moderately active (moderate exercise 3–5 days/week)</item>
-        <item>4. Very active (hard exercise 6–7 days/week)</item>
+        <item>3. Moderately active (moderate exercise 3-5 days/week)</item>
+        <item>4. Very active (hard exercise 6-7 days/week)</item>
         <item>5. Super active (very hard exercise or physical job)</item>
     </string-array>
 
