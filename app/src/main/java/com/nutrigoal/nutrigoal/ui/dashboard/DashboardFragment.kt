@@ -328,12 +328,6 @@ class DashboardFragment : Fragment() {
         setUpBMIType(bmiValue)
     }
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     private fun setUpBMIType(bmiValue: Float) {
         val bmiType = when {
             bmiValue < 18.5 -> BMIType.UNDER_WEIGHT
@@ -341,9 +335,8 @@ class DashboardFragment : Fragment() {
             bmiValue < 30 -> BMIType.OVER_WEIGHT
             bmiValue < 35 -> BMIType.OBESITY
             bmiValue <= 40 -> BMIType.EXTREME_OBESITY
-            else -> throw IllegalArgumentException("BMI value out of range")
+            else -> BMIType.EXTREME_OBESITY
         }
-
 
         val color = when (bmiType) {
             BMIType.UNDER_WEIGHT -> R.color.primary
@@ -357,6 +350,11 @@ class DashboardFragment : Fragment() {
             tvBmiType.text = bmiType.toString()
             tvBmiType.setTextColor(resources.getColor(color, null))
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun calculateWeightPercentage(weightList: List<WeightProgress>): Float {

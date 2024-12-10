@@ -16,7 +16,8 @@ data class UserEntity(
     var activityLevel: Int? = null,
     var dietCategory: String? = null,
     var hasGastricIssue: Boolean? = null,
-    var foodPreference: List<String>? = null
+    var foodPreference: List<String>? = null,
+    var mealSchedule: MealScheduleItem? = null
 ) : Parcelable
 
 enum class Gender(private val displayName: String) {

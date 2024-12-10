@@ -1,8 +1,9 @@
 package com.nutrigoal.nutrigoal.ui.plan_diet
 
-import android.animation.AnimatorSet
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +18,7 @@ import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
 import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
+import com.nutrigoal.nutrigoal.data.remote.entity.MealScheduleItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
@@ -27,7 +29,6 @@ import com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PER
 import com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PLAN_DIET_USER
 import com.nutrigoal.nutrigoal.ui.survey.FavoriteProcessedAdapter
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
-import com.nutrigoal.nutrigoal.utils.AnimationUtil
 import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
 import com.nutrigoal.nutrigoal.utils.InputValidator
 import com.nutrigoal.nutrigoal.utils.ToastUtil
@@ -51,6 +52,9 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
     private val historyViewModel: HistoryViewModel by viewModels()
     private val surveyViewModel: SurveyViewModel by viewModels()
     private val inputValidator: InputValidator by lazy { InputValidator(this@AddFoodRecommendationActivity) }
+    private lateinit var breakfastTimes: Array<String>
+    private lateinit var launchTimes: Array<String>
+    private lateinit var dinnerTimes: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +67,6 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
             insets
         }
 
-        playAnimation()
         setUpView()
         setUpAction()
     }
@@ -71,6 +74,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
     private fun setUpView() {
         addMapItems()
         setUpAdapter()
+        setUpMealScheduleDropdown()
 
         lifecycleScope.launch {
             historyViewModel.addPerDayItemState.collect {
@@ -182,8 +186,43 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
         }
     }
 
+    private fun setUpMealScheduleDropdown() {
+        binding.apply {
+            breakfastTimes = resources.getStringArray(R.array.breakfast_times)
+            launchTimes = resources.getStringArray(R.array.launch_times)
+            dinnerTimes = resources.getStringArray(R.array.dinner_times)
+
+            val breakfastAdapter =
+                ArrayAdapter(
+                    this@AddFoodRecommendationActivity,
+                    R.layout.dropdown_item,
+                    breakfastTimes
+                )
+            val launchAdapter = ArrayAdapter(
+                this@AddFoodRecommendationActivity,
+                R.layout.dropdown_item,
+                launchTimes
+            )
+            val dinnerAdapter = ArrayAdapter(
+                this@AddFoodRecommendationActivity,
+                R.layout.dropdown_item,
+                dinnerTimes
+            )
+
+            dropdownBreakfastTime.setText(breakfastTimes[0])
+            dropdownLunchTime.setText(launchTimes[0])
+            dropdownDinnerTime.setText(dinnerTimes[0])
+
+            dropdownBreakfastTime.setAdapter(breakfastAdapter)
+            dropdownLunchTime.setAdapter(launchAdapter)
+            dropdownDinnerTime.setAdapter(dinnerAdapter)
+        }
+    }
+
     private fun setUpAction() {
         with(binding) {
+
+
             ivBack.setOnClickListener {
                 finish()
             }
@@ -272,18 +311,83 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                 else -> null
             }
 
-            val selectedActivityLevel = autoCompleteTextView.text.toString()
-            val instantFoods = resources.getStringArray(R.array.activity_levels)
+            val activityLevels = resources.getStringArray(R.array.activity_levels)
 
+            val selectedActivityLevel = autoCompleteTextView.text.toString()
             userEntity?.activityLevel = when (selectedActivityLevel) {
-                instantFoods[0] -> 1
-                instantFoods[1] -> 2
-                instantFoods[2] -> 3
-                instantFoods[3] -> 4
-                instantFoods[4] -> 5
+                activityLevels[0] -> 1
+                activityLevels[1] -> 2
+                activityLevels[2] -> 3
+                activityLevels[3] -> 4
+                activityLevels[4] -> 5
                 else -> 1
             }
 
+            var breakfastTime: String? = null
+            var lunchTime = dropdownLunchTime.text.toString()
+            var dinnerTime = dropdownDinnerTime.text.toString()
+
+            when (userEntity?.activityLevel) {
+                1, 2 -> {
+                    inputLayoutBreakfast.visibility = View.GONE
+                    tvBreakfast.visibility = View.GONE
+                    breakfastTime = null
+                }
+
+                3, 4, 5 -> {
+                    inputLayoutBreakfast.visibility = View.VISIBLE
+                    tvBreakfast.visibility = View.VISIBLE
+                    breakfastTime = breakfastTimes[0]
+                }
+            }
+
+            autoCompleteTextView.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val selectedActivity = autoCompleteTextView.text.toString()
+                    userEntity?.activityLevel = when (selectedActivity) {
+                        activityLevels[0] -> 1
+                        activityLevels[1] -> 2
+                        activityLevels[2] -> 3
+                        activityLevels[3] -> 4
+                        activityLevels[4] -> 5
+                        else -> 1
+                    }
+
+                    when (userEntity?.activityLevel) {
+                        1, 2 -> {
+                            inputLayoutBreakfast.visibility = View.GONE
+                            tvBreakfast.visibility = View.GONE
+                            breakfastTime = null
+                        }
+
+                        3, 4, 5 -> {
+                            inputLayoutBreakfast.visibility = View.VISIBLE
+                            tvBreakfast.visibility = View.VISIBLE
+                            breakfastTime = breakfastTimes[0]
+                        }
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {}
+            })
+
+            dropdownBreakfastTime.setOnItemClickListener { _, _, position, _ ->
+                breakfastTime = breakfastTimes[position]
+            }
+            dropdownLunchTime.setOnItemClickListener { _, _, position, _ ->
+                lunchTime = launchTimes[position]
+            }
+            dropdownDinnerTime.setOnItemClickListener { _, _, position, _ ->
+                dinnerTime = dinnerTimes[position]
+            }
 
             userEntity?.hasGastricIssue?.let { hasIssue ->
                 val selectedRadioButtonId = if (hasIssue) R.id.rb_yes else R.id.rb_no
@@ -291,6 +395,12 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
             }
 
             btnSave.setOnClickListener {
+                val mealScheduleItem = MealScheduleItem(
+                    breakfastTime = breakfastTime,
+                    launchTime = lunchTime,
+                    dinnerTime = dinnerTime
+                )
+
                 val age = edAge.text?.trim().toString()
                 userEntity?.age = age.toIntOrNull()
                 val ageError = inputValidator.validateInput(edAge, getString(R.string.age))
@@ -310,6 +420,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                 userEntity?.foodPreference = selectedFoodPreferences
 
                 if (ageError == null && selectedFoodPreferences.isNotEmpty()) {
+                    userEntity?.mealSchedule = mealScheduleItem
                     val calendar = Calendar.getInstance()
                     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
 
@@ -345,6 +456,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                         dietCategory = userEntity?.dietCategory,
                         hasGastricIssue = userEntity?.hasGastricIssue.toString(),
                         foodPreference = userEntity?.foodPreference,
+                        mealSchedule = userEntity?.mealSchedule,
                         createdAt = createdAt,
                         dietTime = dietTime,
                     )
@@ -356,34 +468,6 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                     )
                 }
 
-            }
-        }
-    }
-
-    private fun playAnimation() {
-        with(binding) {
-            val durationDefault = 1000L
-
-            val animators = listOf(
-                AnimationUtil.createTranslationAnimator(tvTitle, durationDefault + 100),
-                AnimationUtil.createTranslationAnimator(tvDesc, durationDefault + 150),
-                AnimationUtil.createTranslationAnimator(tvHistoryMag, durationDefault + 200),
-                AnimationUtil.createTranslationAnimator(rgHistoryMag, durationDefault + 250),
-                AnimationUtil.createTranslationAnimator(tvDietCategory, durationDefault + 300),
-                AnimationUtil.createTranslationAnimator(rgDietCategory, durationDefault + 350),
-                AnimationUtil.createTranslationAnimator(
-                    tvFavoriteProcessedFood,
-                    durationDefault + 400
-                ),
-            )
-
-            val together = AnimatorSet().apply {
-                playTogether(animators)
-            }
-
-            AnimatorSet().apply {
-                playSequentially(together)
-                start()
             }
         }
     }

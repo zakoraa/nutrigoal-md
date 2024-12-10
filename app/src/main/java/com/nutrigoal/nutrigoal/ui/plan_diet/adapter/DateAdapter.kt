@@ -1,4 +1,4 @@
-package com.nutrigoal.nutrigoal.ui.plan_diet
+package com.nutrigoal.nutrigoal.ui.plan_diet.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

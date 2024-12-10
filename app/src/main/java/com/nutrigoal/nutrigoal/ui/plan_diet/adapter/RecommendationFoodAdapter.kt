@@ -1,4 +1,4 @@
-package com.nutrigoal.nutrigoal.ui.plan_diet
+package com.nutrigoal.nutrigoal.ui.plan_diet.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.databinding.RecommendationFoodCardBinding
 import com.nutrigoal.nutrigoal.utils.ToastUtil
+import java.util.Locale
 
 class RecommendationFoodAdapter(
     private val context: Context,
@@ -41,7 +42,13 @@ class RecommendationFoodAdapter(
         fun bind(foodItem: FoodRecommendationItem?) {
             binding.apply {
                 val context = itemView.context
-                tvName.text = foodItem?.name
+                tvName.text = foodItem?.name?.split(" ")?.joinToString(" ") { text ->
+                    text.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(
+                            Locale.getDefault()
+                        ) else it.toString()
+                    }
+                }
                 tvCaloriesValue.text = "${foodItem?.calories}"
 
                 val maximumSelect = when (perDay?.activityLevel) {

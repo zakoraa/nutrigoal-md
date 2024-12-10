@@ -12,6 +12,9 @@ import androidx.viewpager2.widget.ViewPager2
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.FragmentPlanDietBinding
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
+import com.nutrigoal.nutrigoal.ui.plan_diet.adapter.DateAdapter
+import com.nutrigoal.nutrigoal.ui.plan_diet.adapter.DateItem
+import com.nutrigoal.nutrigoal.ui.plan_diet.adapter.FoodPagerAdapter
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.DateFormatter.parseDateToMonthAndDay
 
@@ -84,7 +87,8 @@ class PlanDietFragment : Fragment() {
                         hasGastricIssue = hasGastricIssue,
                         age = perDay?.age,
                         gender = it.gender,
-                        activityLevel = perDay?.activityLevel
+                        activityLevel = perDay?.activityLevel,
+                        mealSchedule = perDay?.mealSchedule
                     )
                 btnToAddFoodRecommendation.setOnClickListener {
                     val intent =

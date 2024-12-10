@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class PerDayItem(
     var id: String? = null,
     var calorieNeeds: Float? = null,
+    var mealSchedule: MealScheduleItem? = null,
     var foodRecommendation: List<FoodRecommendationItem>? = null,
     var selectedFoodRecommendation: List<FoodRecommendationItem>? = null,
     var bodyWeight: Float? = null,

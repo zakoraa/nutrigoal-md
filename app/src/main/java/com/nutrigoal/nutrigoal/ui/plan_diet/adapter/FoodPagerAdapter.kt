@@ -1,9 +1,10 @@
-package com.nutrigoal.nutrigoal.ui.plan_diet
+package com.nutrigoal.nutrigoal.ui.plan_diet.adapter
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
+import com.nutrigoal.nutrigoal.ui.plan_diet.FoodRecommendationFragment
 
 class FoodPagerAdapter(
     fragment: Fragment,

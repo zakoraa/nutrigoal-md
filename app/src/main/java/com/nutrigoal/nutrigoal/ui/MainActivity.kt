@@ -3,7 +3,6 @@ package com.nutrigoal.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
@@ -61,6 +60,7 @@ class MainActivity : AppCompatActivity() {
     private val historyViewModel: HistoryViewModel by viewModels()
     private val historyResponse = HistoryResponse()
     private var index = 0
+    private var userEntity : UserEntity? = null
 
     @Inject
     lateinit var dailyCheckInPreference: DailyCheckInPreference
@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getSurveyResult() {
-        val userEntity = if (Build.VERSION.SDK_INT >= 33) {
+         userEntity = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra(
                 EXTRA_SURVEY,
                 UserEntity::class.java
@@ -129,14 +129,14 @@ class MainActivity : AppCompatActivity() {
         if (userEntity !== null) {
 
             val surveyRequest = SurveyRequest(
-                age = userEntity.age ?: 0,
-                height = userEntity.height ?: 0f,
-                weight = userEntity.bodyWeight ?: 0f,
-                gender = getGenderCode(userEntity.gender.toString()),
-                activity_level = userEntity.activityLevel ?: 1,
-                diet_category = userEntity.dietCategory ?: DietCategory.VEGAN.toString(),
-                has_gastric_issue = userEntity.hasGastricIssue.toString(),
-                food_preference = userEntity.foodPreference ?: emptyList()
+                age = userEntity?.age ?: 0,
+                height = userEntity?.height ?: 0f,
+                weight = userEntity?.bodyWeight ?: 0f,
+                gender = getGenderCode(userEntity?.gender.toString()),
+                activity_level = userEntity?.activityLevel ?: 1,
+                diet_category = userEntity?.dietCategory ?: DietCategory.VEGAN.toString(),
+                has_gastric_issue = userEntity?.hasGastricIssue.toString(),
+                food_preference = userEntity?.foodPreference ?: emptyList()
             )
             surveyViewModel.getSurveyResult(surveyRequest)
         } else {
@@ -180,8 +180,6 @@ class MainActivity : AppCompatActivity() {
                         activityLevels[4] -> 5
                         else -> 1
                     }
-                    Log.d("FLORAAAAA", "ANEEH: ${data?.rfbocActivityLevel} ")
-                    Log.d("FLORAAAAA", "YANGG: ${activityLevel} ")
 
                     val foodRecommendationList = it?.recommendedFoodPreference?.map { item ->
                         FoodRecommendationItem(
@@ -204,6 +202,7 @@ class MainActivity : AppCompatActivity() {
                             hasGastricIssue = data?.rfbocHistoryOfGastritisOrGerd,
                             foodPreference = it?.favoriteFoodName?.ffnName,
                             foodRecommendation = foodRecommendationList,
+                            mealSchedule = userEntity?.mealSchedule,
                             calorieNeeds = it?.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds?.toFloatOrNull(),
                             createdAt = createdAt,
                             dietTime = dietTime,

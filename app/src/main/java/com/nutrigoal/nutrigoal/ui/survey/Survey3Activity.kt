@@ -4,6 +4,9 @@ import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
+import com.nutrigoal.nutrigoal.data.remote.entity.MealScheduleItem
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivitySurvey3Binding
 import com.nutrigoal.nutrigoal.ui.MainActivity
@@ -29,6 +33,9 @@ class Survey3Activity : AppCompatActivity() {
     private lateinit var favoriteProcessedList: List<String>
     private lateinit var adapter: FavoriteProcessedAdapter
     private var userEntity: UserEntity? = null
+    private lateinit var breakfastTimes: Array<String>
+    private lateinit var launchTimes: Array<String>
+    private lateinit var dinnerTimes: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +56,7 @@ class Survey3Activity : AppCompatActivity() {
     private fun setUpView() {
         addMapItems()
         setUpAdapter()
+        setUpMealScheduleDropdown()
     }
 
     private fun setUpAction() {
@@ -75,12 +83,10 @@ class Survey3Activity : AppCompatActivity() {
     private fun handleForm() {
         userEntity = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra(
-                EXTRA_SURVEY,
-                UserEntity::class.java
+                EXTRA_SURVEY, UserEntity::class.java
             )
         } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_SURVEY)
+            @Suppress("DEPRECATION") intent.getParcelableExtra(EXTRA_SURVEY)
         }
 
         with(binding) {
@@ -108,19 +114,92 @@ class Survey3Activity : AppCompatActivity() {
                 else -> null
             }
 
-            btnNext.setOnClickListener {
-                val selectedActivityLevel = autoCompleteTextView.text.toString()
+            val activityLevels = resources.getStringArray(R.array.activity_levels)
 
-                val instantFoods = resources.getStringArray(R.array.activity_levels)
+            val selectedActivityLevel = autoCompleteTextView.text.toString()
+            userEntity?.activityLevel = when (selectedActivityLevel) {
+                activityLevels[0] -> 1
+                activityLevels[1] -> 2
+                activityLevels[2] -> 3
+                activityLevels[3] -> 4
+                activityLevels[4] -> 5
+                else -> 1
+            }
 
-                userEntity?.activityLevel = when (selectedActivityLevel) {
-                    instantFoods[0] -> 1
-                    instantFoods[1] -> 2
-                    instantFoods[2] -> 3
-                    instantFoods[3] -> 4
-                    instantFoods[4] -> 5
-                    else -> 1
+            var breakfastTime: String? = null
+            var lunchTime = dropdownLunchTime.text.toString()
+            var dinnerTime = dropdownDinnerTime.text.toString()
+
+            when (userEntity?.activityLevel) {
+                1, 2 -> {
+                    inputLayoutBreakfast.visibility = View.GONE
+                    tvBreakfast.visibility = View.GONE
+                    breakfastTime = null
                 }
+
+                3, 4, 5 -> {
+                    inputLayoutBreakfast.visibility = View.VISIBLE
+                    tvBreakfast.visibility = View.VISIBLE
+                    breakfastTime = breakfastTimes[0]
+                }
+            }
+
+            autoCompleteTextView.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val selectedActivity = autoCompleteTextView.text.toString()
+                    userEntity?.activityLevel = when (selectedActivity) {
+                        activityLevels[0] -> 1
+                        activityLevels[1] -> 2
+                        activityLevels[2] -> 3
+                        activityLevels[3] -> 4
+                        activityLevels[4] -> 5
+                        else -> 1
+                    }
+
+                    when (userEntity?.activityLevel) {
+                        1, 2 -> {
+                            inputLayoutBreakfast.visibility = View.GONE
+                            tvBreakfast.visibility = View.GONE
+                            breakfastTime = null
+                        }
+
+                        3, 4, 5 -> {
+                            inputLayoutBreakfast.visibility = View.VISIBLE
+                            tvBreakfast.visibility = View.VISIBLE
+                            breakfastTime = breakfastTimes[0]
+                        }
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {}
+            })
+
+            dropdownBreakfastTime.setOnItemClickListener { _, _, position, _ ->
+                breakfastTime = breakfastTimes[position]
+            }
+            dropdownLunchTime.setOnItemClickListener { _, _, position, _ ->
+                lunchTime = launchTimes[position]
+            }
+            dropdownDinnerTime.setOnItemClickListener { _, _, position, _ ->
+                dinnerTime = dinnerTimes[position]
+            }
+
+            btnNext.setOnClickListener {
+                val mealScheduleItem = MealScheduleItem(
+                    breakfastTime = breakfastTime,
+                    launchTime = lunchTime,
+                    dinnerTime = dinnerTime
+                )
+
+                userEntity?.mealSchedule = mealScheduleItem
 
                 val selectedHistoryMagId = rgHistoryMag.checkedRadioButtonId
 
@@ -129,7 +208,6 @@ class Survey3Activity : AppCompatActivity() {
                     R.id.rb_no -> false
                     else -> null
                 }
-
                 val selectedFoodPreferences = adapter.getCheckedItems()
 
                 userEntity?.foodPreference = selectedFoodPreferences
@@ -140,8 +218,7 @@ class Survey3Activity : AppCompatActivity() {
                     startActivity(intent)
                 } else {
                     ToastUtil.showToast(
-                        this@Survey3Activity,
-                        getString(R.string.error_favorite_food)
+                        this@Survey3Activity, getString(R.string.error_favorite_food)
                     )
                 }
 
@@ -162,8 +239,7 @@ class Survey3Activity : AppCompatActivity() {
                 AnimationUtil.createTranslationAnimator(tvDietCategory, durationDefault + 300),
                 AnimationUtil.createTranslationAnimator(rgDietCategory, durationDefault + 350),
                 AnimationUtil.createTranslationAnimator(
-                    tvFavoriteProcessedFood,
-                    durationDefault + 400
+                    tvFavoriteProcessedFood, durationDefault + 400
                 ),
             )
 
@@ -175,6 +251,32 @@ class Survey3Activity : AppCompatActivity() {
                 playSequentially(together)
                 start()
             }
+        }
+    }
+
+    private fun setUpMealScheduleDropdown() {
+        binding.apply {
+            breakfastTimes = resources.getStringArray(R.array.breakfast_times)
+            launchTimes = resources.getStringArray(R.array.launch_times)
+            dinnerTimes = resources.getStringArray(R.array.dinner_times)
+
+            val breakfastAdapter = ArrayAdapter(
+                this@Survey3Activity, R.layout.dropdown_item, breakfastTimes
+            )
+            val launchAdapter = ArrayAdapter(
+                this@Survey3Activity, R.layout.dropdown_item, launchTimes
+            )
+            val dinnerAdapter = ArrayAdapter(
+                this@Survey3Activity, R.layout.dropdown_item, dinnerTimes
+            )
+
+            dropdownBreakfastTime.setText(breakfastTimes[0])
+            dropdownLunchTime.setText(launchTimes[0])
+            dropdownDinnerTime.setText(dinnerTimes[0])
+
+            dropdownBreakfastTime.setAdapter(breakfastAdapter)
+            dropdownLunchTime.setAdapter(launchAdapter)
+            dropdownDinnerTime.setAdapter(dinnerAdapter)
         }
     }
 
@@ -370,8 +472,7 @@ class Survey3Activity : AppCompatActivity() {
         animalMap["Pangolin"] = getString(R.string.Pangolin)
         animalMap["Armadillo"] = getString(R.string.Armadillo)
 
-        favoriteProcessedList =
-            fruitMap.values.toList() + vegetableMap.values.toList()
+        favoriteProcessedList = fruitMap.values.toList() + vegetableMap.values.toList()
     }
 
 }

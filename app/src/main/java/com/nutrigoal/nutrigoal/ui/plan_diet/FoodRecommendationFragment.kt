@@ -18,6 +18,9 @@ import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.databinding.FragmentFoodRecommendationBinding
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
+import com.nutrigoal.nutrigoal.ui.plan_diet.adapter.FoodPagerAdapter
+import com.nutrigoal.nutrigoal.ui.plan_diet.adapter.MealScheduleAdapter
+import com.nutrigoal.nutrigoal.ui.plan_diet.adapter.RecommendationFoodAdapter
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import kotlinx.coroutines.launch
 
@@ -105,6 +108,17 @@ class FoodRecommendationFragment : Fragment() {
         binding.apply {
             tvCalorieNeeds.text = perDayItem?.calorieNeeds.toString()
 
+            val mealCount = when (perDayItem?.activityLevel) {
+                1 -> 2
+                2 -> 2
+                3 -> 3
+                4 -> 3
+                5 -> 3
+                else -> 1
+            }
+
+            tvMealScheduleCount.text = getString(R.string.meal_schedule_count, mealCount.toString())
+
             val gradient = LinearGradient(
                 0f, 0f, 0f, tvCalorieNeeds.textSize,
                 intArrayOf(
@@ -132,6 +146,23 @@ class FoodRecommendationFragment : Fragment() {
             perDayItem?.selectedFoodRecommendation?.toMutableList() ?: mutableListOf()
 
         binding.apply {
+            val mealSchedules = listOf(
+                perDayItem?.mealSchedule?.breakfastTime,
+                perDayItem?.mealSchedule?.launchTime,
+                perDayItem?.mealSchedule?.dinnerTime,
+            )
+
+
+            val mealScheduleAdapter = MealScheduleAdapter(mealSchedules)
+            rvMealSchedule.setHasFixedSize(true)
+            rvMealSchedule.setLayoutManager(object :
+                LinearLayoutManager(requireContext(), HORIZONTAL, false) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            })
+            rvMealSchedule.adapter = mealScheduleAdapter
+
             val recommendationFoodAdapter = RecommendationFoodAdapter(
                 requireContext(),
                 perDayItem,
