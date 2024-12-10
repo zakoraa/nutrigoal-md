@@ -91,7 +91,6 @@ class PlanDietFragment : Fragment() {
                         Intent(requireActivity(), AddFoodRecommendationActivity::class.java)
                     intent.putExtra(EXTRA_PLAN_DIET_USER, userEntity)
                     intent.putExtra(EXTRA_PER_DAY, perDay)
-                    intent.putExtra(EXTRA_PER_DAY, perDay)
                     startActivity(intent)
                 }
 

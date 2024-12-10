@@ -111,7 +111,6 @@
     <string name="account">Account</string>
     <string name="content_and_display">Content &amp; Display</string>
     <string name="go_to_the_profile_page">Go to the profile page</string>
-    <string name="update_password">Update Password</string>
     <string name="iv_back_from_profile_desc">Back from profile page</string>
     <string name="iv_photo_profile_desc">Display photo profile</string>
     <string name="confirm_logout_message">Are you sure you want to logout?</string>

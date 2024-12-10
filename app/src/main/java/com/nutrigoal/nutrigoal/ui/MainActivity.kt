@@ -3,6 +3,7 @@ package com.nutrigoal.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
@@ -84,6 +85,11 @@ class MainActivity : AppCompatActivity() {
         setUpAction()
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.swipeRefreshLayout.isEnabled = true
+    }
+
     private fun setUpView() {
         viewModel.getSession()
 
@@ -155,6 +161,7 @@ class MainActivity : AppCompatActivity() {
 
                     lifecycleScope.launch {
                         val hasCheckedInToday = dailyCheckInPreference.hasCheckedInToday()
+                        Log.d("FLORAAAA", "INI KENAPAAAA ${hasCheckedInToday} ")
 
                         if (!hasCheckedInToday) {
                             showMealTimePopup()
