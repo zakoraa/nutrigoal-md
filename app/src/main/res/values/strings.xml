@@ -4,8 +4,13 @@
     <string name="login_success">Login is successful</string>
     <string name="register_success">Register successful</string>
     <string name="logout_success">Logout is successful</string>
+    <string name="add_food_recommendation_success">Add food recommendation success</string>
 
     <string name="error_favorite_food">You must choose your favorite food</string>
+    <string name="error_select_recommended_food">You must select %s foods</string>
+    <string name="error_complete_form">You must fill in all the inputs</string>
+    <string name="error_add_food_recommendation">Add food recommendation failed. Please try again.</string>
+    <string name="error_add_per_day_item">Add food recommendation failed. Please try again.</string>
     <string name="error_get_notification">Get notification failed. Please try again.</string>
     <string name="error_get_user">Get user failed. Please try again.</string>
     <string name="error_login">Login failed. Please try again.</string>
@@ -72,7 +77,7 @@
     <string name="_3_of_3_steps">3 of 3 steps</string>
     <string name="step_3">Step 3</string>
     <string name="survey3_title">Personalized Diet</string>
-    <string name="survey3_desc">Answer a few questions about your dietary habits and preferences. Together, we’ll create a diet plan that fits your goals and lifestyle perfectly!</string>
+    <string name="survey3_desc">*The information you provide will personalize your diet plan for the next day.</string>
     <string name="body_weight">Body weight</string>
     <string name="height">Height</string>
     <string name="age">Age</string>
@@ -106,18 +111,17 @@
     <string name="account">Account</string>
     <string name="content_and_display">Content &amp; Display</string>
     <string name="go_to_the_profile_page">Go to the profile page</string>
-    <string name="update_password">Update Password</string>
     <string name="iv_back_from_profile_desc">Back from profile page</string>
     <string name="iv_photo_profile_desc">Display photo profile</string>
     <string name="confirm_logout_message">Are you sure you want to logout?</string>
     <string name="last_days">Last %s days</string>
 
     <string-array name="activity_levels">
-        <item>Sedentary (little to no exercise)</item>
-        <item>Lightly active (light exercise 1–3 days/week)</item>
-        <item>Moderately active (moderate exercise 3–5 days/week)</item>
-        <item>Very active (hard exercise 6–7 days/week)</item>
-        <item>Super active (very hard exercise or physical job)</item>
+        <item>1. Sedentary (little to no exercise)</item>
+        <item>2. Lightly active (light exercise 1–3 days/week)</item>
+        <item>3. Moderately active (moderate exercise 3-5 days/week)</item>
+        <item>4. Very active (hard exercise 6-7 days/week)</item>
+        <item>5. Super active (very hard exercise or physical job)</item>
     </string-array>
 
     <string-array name="breakfast_times">
@@ -368,5 +372,7 @@
     <string name="only_choose">Only choose %s</string>
     <string name="kcal">kcal</string>
     <string name="save">Save</string>
+    <string name="add_food_recommendation_title">Add Food Recommendation for The Next Day</string>
+    <string name="add_food_recommendation_desc">Your input will be used to generate a personalized food recommendation for the day after the selected date.</string>
 
 </resources>

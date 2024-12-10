@@ -5,11 +5,29 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.databinding.PlanDietDateItemBinding
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
-class DateAdapter(private val items: List<DateItem>) :
-    RecyclerView.Adapter<DateAdapter.DateViewHolder>() {
+class DateAdapter(
+    private val items: List<DateItem>,
+    private val viewPagerCallback: (Int) -> Unit
+) : RecyclerView.Adapter<DateAdapter.DateViewHolder>() {
 
     private var selectedPosition = 0
+    private var onItemClickListener: ((Int) -> Unit)? = null
+
+    fun setOnItemClickListener(listener: (Int) -> Unit) {
+        onItemClickListener = listener
+    }
+
+    fun setSelectedPosition(position: Int) {
+        val previousPosition = selectedPosition
+        selectedPosition = position
+        notifyItemChanged(previousPosition)
+        notifyItemChanged(selectedPosition)
+        viewPagerCallback(selectedPosition)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DateViewHolder {
         val binding =
@@ -23,38 +41,37 @@ class DateAdapter(private val items: List<DateItem>) :
         holder.itemView.setOnClickListener {
             val clickedPosition = holder.adapterPosition
             if (clickedPosition != RecyclerView.NO_POSITION) {
-                val previousPosition = selectedPosition
-                selectedPosition = clickedPosition
-                notifyItemChanged(previousPosition)
-                notifyItemChanged(selectedPosition)
+                setSelectedPosition(clickedPosition)
+                onItemClickListener?.invoke(clickedPosition)
             }
         }
     }
-
 
     override fun getItemCount(): Int = items.size
 
     inner class DateViewHolder(private val binding: PlanDietDateItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: DateItem, isSelected: Boolean) {
-            with(binding) {
-                tvMonth.text = item.month
-                tvDay.text = item.day
-                val context = itemView.context
-
-                if (isSelected) {
-                    tvMonth.setTextColor(context.getColor(R.color.primary))
-                    tvDay.setTextColor(context.getColor(R.color.primary))
-                } else {
-                    tvMonth.setTextColor(context.getColor(R.color.grey))
-                    tvDay.setTextColor(context.getColor(R.color.grey))
+            binding.apply {
+                val calendar = Calendar.getInstance(Locale.ENGLISH).apply {
+                    set(Calendar.MONTH, item.month - 1)
                 }
+                val monthFormat = SimpleDateFormat("MMM", Locale.ENGLISH)
+                val monthName = monthFormat.format(calendar.time)
+
+                tvDay.text = "${item.day}"
+                tvMonth.text = monthName
+                val context = itemView.context
+                val color =
+                    if (isSelected) context.getColor(R.color.primary) else context.getColor(R.color.grey)
+                tvMonth.setTextColor(color)
+                tvDay.setTextColor(color)
             }
         }
     }
 }
 
 data class DateItem(
-    val month: String,
-    val day: String
+    val month: Int,
+    val day: Int
 )

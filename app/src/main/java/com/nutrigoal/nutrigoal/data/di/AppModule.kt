@@ -100,8 +100,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(auth: FirebaseAuth, authPreference: AuthPreference): AuthRepository =
-        AuthRepository(auth, authPreference)
+    fun provideAuthRepository(
+        auth: FirebaseAuth,
+        authPreference: AuthPreference,
+        settingPreference: SettingPreference,
+        dailyCheckInPreference: DailyCheckInPreference
+    ): AuthRepository =
+        AuthRepository(auth, authPreference, settingPreference, dailyCheckInPreference)
 
     @Provides
     @Singleton

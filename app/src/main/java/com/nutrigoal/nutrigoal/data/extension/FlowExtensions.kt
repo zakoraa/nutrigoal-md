@@ -1,4 +1,4 @@
-package com.nutrigoal.nutrigoal.utils
+package com.nutrigoal.nutrigoal.data.extension
 
 import com.nutrigoal.nutrigoal.data.ResultState
 import kotlinx.coroutines.flow.Flow

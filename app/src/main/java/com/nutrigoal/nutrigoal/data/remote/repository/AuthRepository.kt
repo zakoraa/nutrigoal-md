@@ -13,15 +13,22 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
+import com.nutrigoal.nutrigoal.data.local.database.DailyCheckInPreference
+import com.nutrigoal.nutrigoal.data.local.database.SettingPreference
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.Gender
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
-import com.nutrigoal.nutrigoal.utils.asResultState
+import com.nutrigoal.nutrigoal.data.extension.asResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
-class AuthRepository(private val auth: FirebaseAuth, private val authPreference: AuthPreference) {
+class AuthRepository(
+    private val auth: FirebaseAuth,
+    private val authPreference: AuthPreference,
+    private val settingPreference: SettingPreference,
+    private  val dailyCheckInPreference: DailyCheckInPreference
+) {
 
     fun getCredentialResponse(
         context: Context,
@@ -126,6 +133,8 @@ class AuthRepository(private val auth: FirebaseAuth, private val authPreference:
 
     fun logout(): Flow<ResultState<Unit>> {
         return flow {
+            settingPreference.clearSettings()
+            dailyCheckInPreference.clearCheckInDate()
             emit(authPreference.logout())
         }.asResultState()
     }

@@ -8,7 +8,7 @@ data class RecommendedFoodPreferenceItem(
     val fiberG: Any? = null,
 
     @field:SerializedName("Carbohydrate(g)")
-    val carbohydrateG: Any? = null,
+    val carbohydrateG: Float? = null,
 
     @field:SerializedName("rfp_id")
     val rfpId: String? = null,
@@ -20,16 +20,16 @@ data class RecommendedFoodPreferenceItem(
     val saturatedFatG: Any? = null,
 
     @field:SerializedName("Calories")
-    val calories: Any? = null,
+    val calories: Float? = null,
 
     @field:SerializedName("Fat(g)")
-    val fatG: Any? = null,
+    val fatG: Float? = null,
 
     @field:SerializedName("Name")
     val name: String? = null,
 
     @field:SerializedName("Protein(g)")
-    val proteinG: Any? = null,
+    val proteinG: Float? = null,
 
     @field:SerializedName("Cholesterol(mg)")
     val cholesterolMg: Any? = null,

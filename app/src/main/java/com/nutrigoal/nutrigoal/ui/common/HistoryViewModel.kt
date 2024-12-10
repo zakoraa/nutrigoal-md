@@ -1,11 +1,12 @@
 package com.nutrigoal.nutrigoal.ui.common
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
+import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.repository.HistoryRepository
 import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +19,6 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     private val historyRepository: HistoryRepository
 ) : ViewModel() {
-
-    val historyResponse = HistoryResponse()
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
@@ -35,25 +34,78 @@ class HistoryViewModel @Inject constructor(
         MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
     val addHistoryResponseState: StateFlow<ResultState<Unit?>> get() = _addHistoryResponseState
 
-    fun getHistoryResult(userId: String) {
+    private val _addPerDayItemState =
+        MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
+    val addPerDayItemState: StateFlow<ResultState<Unit?>> get() = _addPerDayItemState
+
+    private val _addFoodRecommendationState =
+        MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
+    val addFoodRecommendationState: StateFlow<ResultState<Unit?>> get() = _addFoodRecommendationState
+
+    private val _updateSelectedFoodRecommendationState =
+        MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
+    val updateSelectedFoodRecommendationState: StateFlow<ResultState<Unit?>> get() = _updateSelectedFoodRecommendationState
+
+    fun addPerDayItem(userId: String, perDayItem: PerDayItem) {
         _isLoading.value = true
         viewModelScope.launch {
+            historyRepository.addPerDayItem(userId, perDayItem).collect { result ->
+                _addPerDayItemState.value = result
+            }
+        }
+        _isLoading.value = false
+    }
+
+    fun updateSelectedFoodRecommendation(
+        userId: String,
+        perDayId: String,
+        foodRecommendationItem: List<FoodRecommendationItem>
+    ) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            historyRepository.updateSelectedFoodRecommendation(
+                userId,
+                perDayId,
+                foodRecommendationItem
+            ).collect { result ->
+                _updateSelectedFoodRecommendationState.value = result
+            }
+        }
+        _isLoading.value = false
+    }
+
+    fun addFoodRecommendation(
+        userId: String,
+        calorieNeeds: Float,
+        foodRecommendation: List<FoodRecommendationItem>
+    ) {
+        viewModelScope.launch {
+            _addFoodRecommendationState.value = ResultState.Loading
+            historyRepository.addFoodRecommendation(userId, calorieNeeds, foodRecommendation)
+                .collect { result ->
+                    _addFoodRecommendationState.value = result
+                }
+        }
+    }
+
+
+    fun getHistoryResult(userId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
             historyRepository.getHistoryById(userId).collect { result ->
                 _historyResponseState.value = result
-                _isLoading.value = result is ResultState.Loading
                 if (result is ResultState.Success) {
                     _historyResult.value = result.data
                 }
             }
+            _isLoading.value = false
         }
     }
 
     fun addHistory(historyResponse: HistoryResponse) {
-        _isLoading.value = true
         viewModelScope.launch {
+            _isLoading.value = true
             val userId = historyResponse.userId ?: return@launch
-            Log.d("HistoryViewModel", "userId: ${userId}")
-
             val isAlreadyAdded = historyRepository.isHistoryAlreadyAdded(userId)
 
             isAlreadyAdded.collect { result ->
@@ -62,13 +114,14 @@ class HistoryViewModel @Inject constructor(
                     }
 
                     is ResultState.Success -> {
-                        Log.d("HistoryViewModel", "Is history already added? ${result.data}")
+                        _isLoading.value = true
+
                         if (!result.data) {
                             historyRepository.addHistory(historyResponse).collect { addResult ->
                                 _addHistoryResponseState.value = addResult
-                                _isLoading.value = addResult is ResultState.Loading
                             }
                         }
+                        _isLoading.value = true
                     }
 
                     is ResultState.Error -> {
@@ -79,6 +132,7 @@ class HistoryViewModel @Inject constructor(
                     }
                 }
             }
+            _isLoading.value = false
         }
     }
 

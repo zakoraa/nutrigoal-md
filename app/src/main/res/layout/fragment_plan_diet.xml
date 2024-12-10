@@ -28,6 +28,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/btn_to_add_food_recommendation"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="20dp"
+        android:adjustViewBounds="true"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/add_food_recommendation_title"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_add"
+        app:layout_constraintBottom_toBottomOf="@id/tv_plan_diet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_plan_diet" />
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card_date"
         android:layout_width="0dp"
@@ -65,97 +80,13 @@
         <include layout="@layout/list_of_card_shimmer" />
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/card_calorie_needs"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@android:color/transparent"
-        android:paddingHorizontal="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/card_date"
         app:layout_constraintStart_toStartOf="@id/card_date"
-        app:layout_constraintTop_toBottomOf="@id/card_date">
-
-        <TextView
-            android:id="@+id/tv_calorie_needs_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/card_background"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="3dp"
-            android:text="@string/calorie_needs"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_calorie_needs"
-            style="@style/TextLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/primary_80"
-            android:textSize="50sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_calorie_needs_title"
-            tools:text="150" />
-
-        <TextView
-            android:id="@+id/tv_kcal"
-            style="@style/TextLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/kcal"
-            android:textColor="@color/primary_80"
-            app:layout_constraintBottom_toBottomOf="@id/tv_calorie_needs"
-            app:layout_constraintStart_toEndOf="@id/tv_calorie_needs" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/card_table_recommendation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/card_background"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="15dp"
-        app:layout_constraintEnd_toEndOf="@id/card_date"
-        app:layout_constraintStart_toStartOf="@id/card_date"
-        app:layout_constraintTop_toBottomOf="@id/card_calorie_needs">
-
-        <TextView
-            android:id="@+id/tv_food_recommendation"
-            style="@style/TextLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/food_recommendation"
-            app:layout_constraintBottom_toBottomOf="@id/btn_save"
-            app:layout_constraintEnd_toStartOf="@id/btn_save"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/btn_save" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_save"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="@string/save"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_recommendation_food"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_save" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+        app:layout_constraintTop_toBottomOf="@id/card_date" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

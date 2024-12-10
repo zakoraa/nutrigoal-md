@@ -34,6 +34,7 @@ startupRuntime = "1.2.0"
 workRuntimeKtx = "2.10.0"
 hiltCommon = "1.2.0"
 hiltWork = "1.2.0"
+swiperefreshlayout = "1.1.0"
 
 
 [libraries]
@@ -75,6 +76,7 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltCommon" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
+androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

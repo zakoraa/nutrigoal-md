@@ -29,7 +29,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"http://192.168.100.84:5000/\""
+            "\"http://192.168.100.85:5000/\""
         )
     }
 
@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.swiperefreshlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

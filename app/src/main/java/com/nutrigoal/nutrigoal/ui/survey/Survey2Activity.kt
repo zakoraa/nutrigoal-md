@@ -4,7 +4,6 @@ import android.animation.AnimatorSet
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -60,18 +59,18 @@ class Survey2Activity : AppCompatActivity() {
         with(binding) {
 
             btnNext.setOnClickListener {
-                val age = edAge.text?.trim().toString()
                 val height = edHeight.text?.trim().toString()
                 val bodyWeight = edBodyWeight.text?.trim().toString()
+                val age = edAge.text?.trim().toString()
 
                 userEntity?.age = age.toIntOrNull()
                 userEntity?.height = height.toFloatOrNull()
                 userEntity?.bodyWeight = bodyWeight.toFloatOrNull()
 
-                val ageError = inputValidator.validateInput(edAge, getString(R.string.age))
                 val heightError = inputValidator.validateInput(edHeight, getString(R.string.height))
                 val bodyWeightError =
                     inputValidator.validateInput(edBodyWeight, getString(R.string.body_weight))
+                val ageError = inputValidator.validateInput(edAge, getString(R.string.age))
 
                 inputValidator.checkValidation(tvErrorAge, ageError)
                 inputValidator.checkValidation(tvErrorHeight, heightError)
@@ -85,7 +84,6 @@ class Survey2Activity : AppCompatActivity() {
                     else -> null
                 }
 
-                Log.d("FLORAAAAAA", "handleGetSurveyResult: ${userEntity}")
                 if (ageError == null && heightError == null && bodyWeightError == null) {
                     val intent = Intent(
                         this@Survey2Activity,

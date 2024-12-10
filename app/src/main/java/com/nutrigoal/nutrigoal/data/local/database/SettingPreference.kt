@@ -37,6 +37,12 @@ class SettingPreference private constructor(private val dataStore: DataStore<Pre
         }
     }
 
+    suspend fun clearSettings() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
+
     companion object {
         private val THEME_KEY = booleanPreferencesKey("theme_setting")
         private val DAILY_REMINDER_KEY = booleanPreferencesKey("daily_reminder_setting")

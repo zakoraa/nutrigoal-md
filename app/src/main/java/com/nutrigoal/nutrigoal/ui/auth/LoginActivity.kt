@@ -4,6 +4,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -238,13 +239,11 @@ class LoginActivity : AppCompatActivity() {
             if (isLoading) {
                 btnLogin.visibility = View.INVISIBLE
                 btnLoginWithGoogle.isClickable = false
-                btnLoginWithFacebook.isClickable = false
                 shimmerBtnLogin.visibility = View.VISIBLE
                 shimmerBtnLogin.startShimmer()
             } else {
                 btnLogin.visibility = View.VISIBLE
                 btnLoginWithGoogle.isClickable = true
-                btnLoginWithFacebook.isClickable = true
                 shimmerBtnLogin.visibility = View.INVISIBLE
                 shimmerBtnLogin.stopShimmer()
             }
@@ -274,7 +273,6 @@ class LoginActivity : AppCompatActivity() {
                 AnimationUtil.createTranslationAnimator(dividerRight),
                 AnimationUtil.createTranslationAnimator(tvOr),
                 AnimationUtil.createTranslationAnimator(btnLoginWithGoogle),
-                AnimationUtil.createTranslationAnimator(btnLoginWithFacebook)
             )
 
             val together = AnimatorSet().apply {

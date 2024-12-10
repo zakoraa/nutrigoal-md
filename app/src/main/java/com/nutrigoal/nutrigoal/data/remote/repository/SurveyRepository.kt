@@ -4,7 +4,7 @@ import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.response.SurveyResponse
 import com.nutrigoal.nutrigoal.data.remote.retrofit.SurveyService
-import com.nutrigoal.nutrigoal.utils.asResultState
+import com.nutrigoal.nutrigoal.data.extension.asResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

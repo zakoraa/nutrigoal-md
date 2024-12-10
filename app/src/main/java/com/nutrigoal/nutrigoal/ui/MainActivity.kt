@@ -3,6 +3,7 @@ package com.nutrigoal.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
@@ -19,11 +20,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.nutrigoal.nutrigoal.R
 import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.local.database.DailyCheckInPreference
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
+import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
 import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
@@ -36,6 +39,7 @@ import com.nutrigoal.nutrigoal.ui.auth.LoginActivity
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
+import com.nutrigoal.nutrigoal.ui.survey.Survey1Activity
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
 import com.nutrigoal.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
@@ -78,11 +82,11 @@ class MainActivity : AppCompatActivity() {
         getSurveyResult()
         bottomNavScrollAnimation()
         setUpView()
+        setUpAction()
     }
 
     private fun setUpView() {
         viewModel.getSession()
-
 
         lifecycleScope.launch {
             viewModel.userLocalEntitySessionState.collect { result ->
@@ -96,16 +100,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch {
-            surveyViewModel.surveyResponseState.collect { result ->
-                handleGetSurveyResult(result)
-            }
-        }
+    }
 
-        lifecycleScope.launch {
-            historyViewModel.historyResponseState.collect { result ->
-                handleGetHistoryResult(result)
+    private fun handleAddHistory(result: ResultState<Unit?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
+                showLoading(false)
             }
+
+            is ResultState.Error -> showLoading(false)
+            is ResultState.Initial -> {}
         }
     }
 
@@ -165,16 +171,40 @@ class MainActivity : AppCompatActivity() {
                     val it = result.data
                     val data = it?.recommendedFoodBasedOnCalories
                     historyResponse.gender = data?.rfbocGender
+                    val activityLevels = resources.getStringArray(R.array.activity_levels)
+                    val activityLevel = when (data?.rfbocActivityLevel) {
+                        activityLevels[0] -> 1
+                        activityLevels[1] -> 2
+                        activityLevels[2] -> 3
+                        activityLevels[3] -> 4
+                        activityLevels[4] -> 5
+                        else -> 1
+                    }
+                    Log.d("FLORAAAAA", "ANEEH: ${data?.rfbocActivityLevel} ")
+                    Log.d("FLORAAAAA", "YANGG: ${activityLevel} ")
+
+                    val foodRecommendationList = it?.recommendedFoodPreference?.map { item ->
+                        FoodRecommendationItem(
+                            id = item?.rfpId,
+                            name = item?.name,
+                            calories = item?.calories,
+                            protein = item?.proteinG,
+                            carbohydrate = item?.carbohydrateG,
+                            fat = item?.fatG
+                        )
+                    }
                     historyResponse.perDay = listOf(
                         PerDayItem(
                             id = UUID.randomUUID().toString(),
                             bodyWeight = data?.rfbocWeightKg,
                             age = data?.rfbocAge,
                             height = data?.rfbocHeightCm,
-                            activityLevel = data?.rfbocActivityLevel,
+                            activityLevel = activityLevel,
                             dietCategory = data?.rfbocDietType,
                             hasGastricIssue = data?.rfbocHistoryOfGastritisOrGerd,
                             foodPreference = it?.favoriteFoodName?.ffnName,
+                            foodRecommendation = foodRecommendationList,
+                            calorieNeeds = it?.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds?.toFloatOrNull(),
                             createdAt = createdAt,
                             dietTime = dietTime,
                         ),
@@ -199,22 +229,34 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 val it = result.data
-                val index = getTodayDataFromPerDay(it)
-                if (index != -1) {
-                    val perDay = it?.perDay?.get(index)
-                    val surveyRequest = SurveyRequest(
-                        age = perDay?.age ?: 0,
-                        height = perDay?.height ?: 0f,
-                        weight = perDay?.bodyWeight ?: 0f,
-                        gender = getGenderCode(it?.gender.toString()),
-                        activity_level = perDay?.activityLevel.toString()
-                            .split(" ")[0].toIntOrNull() ?: 1,
-                        diet_category = perDay?.dietCategory
-                            ?: DietCategory.KETO.toString(),
-                        has_gastric_issue = perDay?.hasGastricIssue ?: "false",
-                        food_preference = perDay?.foodPreference ?: emptyList()
+                if (it !== null) {
+                    val index = getTodayDataFromPerDay(it)
+                    if (index != -1) {
+                        val perDay = it.perDay?.get(index)
+                        val surveyRequest = SurveyRequest(
+                            age = perDay?.age ?: 0,
+                            height = perDay?.height ?: 0f,
+                            weight = perDay?.bodyWeight ?: 0f,
+                            gender = getGenderCode(it.gender.toString()),
+                            activity_level = perDay?.activityLevel.toString()
+                                .split("")[0].toIntOrNull() ?: 1,
+                            diet_category = perDay?.dietCategory
+                                ?: DietCategory.KETO.toString(),
+                            has_gastric_issue = perDay?.hasGastricIssue ?: "false",
+                            food_preference = perDay?.foodPreference ?: emptyList()
+                        )
+                        surveyViewModel.getSurveyResult(surveyRequest)
+                    }
+                } else {
+                    val userEntity = UserEntity(
+                        username = com.google.firebase.ktx.Firebase.auth.currentUser?.displayName,
+                        email = com.google.firebase.ktx.Firebase.auth.currentUser?.email,
+                        photoProfile = com.google.firebase.ktx.Firebase.auth.currentUser?.photoUrl.toString()
                     )
-                    surveyViewModel.getSurveyResult(surveyRequest)
+                    val intent = Intent(this, Survey1Activity::class.java)
+                    intent.putExtra(EXTRA_SURVEY, userEntity)
+                    startActivity(intent)
+                    finish()
                 }
             }
 
@@ -307,6 +349,24 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Success -> {
                 historyResponse.userId = result.data?.id
                 viewModel.setCurrentUser(result.data)
+
+                lifecycleScope.launch {
+                    surveyViewModel.surveyResponseState.collect { result ->
+                        handleGetSurveyResult(result)
+                    }
+                }
+
+                lifecycleScope.launch {
+                    historyViewModel.historyResponseState.collect { result ->
+                        handleGetHistoryResult(result)
+                    }
+                }
+
+                lifecycleScope.launch {
+                    historyViewModel.addHistoryResponseState.collect {
+                        handleAddHistory(it)
+                    }
+                }
             }
 
             is ResultState.Error -> {
@@ -351,6 +411,17 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 
+    }
+
+    private fun setUpAction() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            refreshHistoryData()
+        }
+    }
+
+    private fun refreshHistoryData() {
+        historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     private fun bottomNavScrollAnimation() {

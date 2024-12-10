@@ -75,7 +75,6 @@ class SettingsFragment : Fragment() {
                 BoxSection(
                     getString(R.string.account), listOf(
                         SettingBoxContentItem(title = getString(R.string.profile)),
-                        SettingBoxContentItem(title = getString(R.string.update_password))
                     )
                 ),
                 BoxSection(

@@ -26,7 +26,7 @@ class SurveyViewModel @Inject constructor(
     val surveyResult: LiveData<SurveyResponse> = _surveyResult
 
     private val _surveyResponseState =
-        MutableStateFlow<ResultState<SurveyResponse?>>(ResultState.Loading)
+        MutableStateFlow<ResultState<SurveyResponse?>>(ResultState.Initial)
     val surveyResponseState: StateFlow<ResultState<SurveyResponse?>> get() = _surveyResponseState
 
     fun getSurveyResult(surveyRequest: SurveyRequest) {

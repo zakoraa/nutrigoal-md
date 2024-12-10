@@ -1,38 +1,60 @@
-package com.nutrigoal.nutrigoal.ui.survey
+package com.nutrigoal.nutrigoal.ui.plan_diet
 
 import android.animation.AnimatorSet
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.nutrigoal.nutrigoal.R
+import com.nutrigoal.nutrigoal.data.ResultState
 import com.nutrigoal.nutrigoal.data.remote.entity.DietCategory
+import com.nutrigoal.nutrigoal.data.remote.entity.FoodRecommendationItem
+import com.nutrigoal.nutrigoal.data.remote.entity.PerDayItem
+import com.nutrigoal.nutrigoal.data.remote.entity.SurveyRequest
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
-import com.nutrigoal.nutrigoal.databinding.ActivitySurvey3Binding
-import com.nutrigoal.nutrigoal.ui.MainActivity
-import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
+import com.nutrigoal.nutrigoal.data.remote.response.SurveyResponse
+import com.nutrigoal.nutrigoal.databinding.ActivityAddFoodRecommendationBinding
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
+import com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PER_DAY
+import com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PLAN_DIET_USER
+import com.nutrigoal.nutrigoal.ui.survey.FavoriteProcessedAdapter
+import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
 import com.nutrigoal.nutrigoal.utils.AnimationUtil
+import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
+import com.nutrigoal.nutrigoal.utils.InputValidator
 import com.nutrigoal.nutrigoal.utils.ToastUtil
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.UUID
 
-
-class Survey3Activity : AppCompatActivity() {
-    private lateinit var binding: ActivitySurvey3Binding
+@AndroidEntryPoint
+class AddFoodRecommendationActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityAddFoodRecommendationBinding
     private val fruitMap: MutableMap<String, String> = mutableMapOf()
     private val vegetableMap: MutableMap<String, String> = mutableMapOf()
     private val animalMap: MutableMap<String, String> = mutableMapOf()
     private lateinit var favoriteProcessedList: List<String>
     private lateinit var adapter: FavoriteProcessedAdapter
     private var userEntity: UserEntity? = null
+    private var perDay: PerDayItem? = null
+    private val historyViewModel: HistoryViewModel by viewModels()
+    private val surveyViewModel: SurveyViewModel by viewModels()
+    private val inputValidator: InputValidator by lazy { InputValidator(this@AddFoodRecommendationActivity) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySurvey3Binding.inflate(layoutInflater)
+        binding = ActivityAddFoodRecommendationBinding.inflate(layoutInflater)
         enableEdgeToEdge()
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -49,14 +71,122 @@ class Survey3Activity : AppCompatActivity() {
     private fun setUpView() {
         addMapItems()
         setUpAdapter()
+
+        lifecycleScope.launch {
+            historyViewModel.addPerDayItemState.collect {
+                handleAddPerDayItem(it)
+            }
+        }
+
+        lifecycleScope.launch {
+            surveyViewModel.surveyResponseState.collect {
+                handelGetSurveyResult(it)
+            }
+        }
+
+        lifecycleScope.launch {
+            historyViewModel.addFoodRecommendationState.collect {
+                handleAddFoodRecommendation(it)
+            }
+        }
+    }
+
+
+    private fun handleAddFoodRecommendation(result: ResultState<Unit?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                ToastUtil.showToast(
+                    this@AddFoodRecommendationActivity,
+                    getString(R.string.add_food_recommendation_success)
+                )
+                showLoading(false)
+                finish()
+            }
+
+            is ResultState.Error -> {
+                ToastUtil.showToast(
+                    this@AddFoodRecommendationActivity,
+                    getString(R.string.error_add_per_day_item)
+                )
+                showLoading(false)
+            }
+
+            is ResultState.Initial -> {}
+        }
+    }
+
+    private fun handelGetSurveyResult(result: ResultState<SurveyResponse?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                val data = result.data
+                val foodRecommendationItem = data?.recommendedFoodPreference?.map {
+                    FoodRecommendationItem(
+                        id = it?.rfpId,
+                        name = it?.name,
+                        calories = it?.calories,
+                        protein = it?.proteinG,
+                        carbohydrate = it?.carbohydrateG,
+                        fat = it?.fatG
+                    )
+                }
+
+                historyViewModel.addFoodRecommendation(
+                    userId = userEntity?.id ?: "",
+                    calorieNeeds = data?.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds?.toFloatOrNull()
+                        ?: 0f,
+                    foodRecommendation = foodRecommendationItem?.toSet()?.toList() ?: emptyList()
+                )
+                showLoading(false)
+            }
+
+            is ResultState.Error -> {
+                ToastUtil.showToast(
+                    this@AddFoodRecommendationActivity,
+                    getString(R.string.error_add_per_day_item)
+                )
+                showLoading(false)
+            }
+
+            is ResultState.Initial -> {}
+        }
+    }
+
+    private fun handleAddPerDayItem(result: ResultState<Unit?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                val surveyRequest = SurveyRequest(
+                    age = userEntity?.age ?: 0,
+                    height = userEntity?.height ?: 0f,
+                    weight = userEntity?.bodyWeight ?: 0f,
+                    gender = getGenderCode(userEntity?.gender.toString()),
+                    activity_level = userEntity?.activityLevel ?: 1,
+                    diet_category = userEntity?.dietCategory ?: DietCategory.KETO.toString(),
+                    has_gastric_issue = userEntity?.hasGastricIssue.toString(),
+                    food_preference = userEntity?.foodPreference ?: emptyList()
+                )
+                surveyViewModel.getSurveyResult(surveyRequest)
+            }
+
+            is ResultState.Error -> {
+                ToastUtil.showToast(
+                    this@AddFoodRecommendationActivity,
+                    getString(R.string.error_add_per_day_item)
+                )
+                showLoading(false)
+            }
+
+            is ResultState.Initial -> {}
+        }
     }
 
     private fun setUpAction() {
         with(binding) {
-            btnBack.setOnClickListener {
+            ivBack.setOnClickListener {
                 finish()
             }
-
             handleForm()
 
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -75,16 +205,50 @@ class Survey3Activity : AppCompatActivity() {
     private fun handleForm() {
         userEntity = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra(
-                EXTRA_SURVEY,
+                EXTRA_PLAN_DIET_USER,
                 UserEntity::class.java
             )
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_SURVEY)
+            intent.getParcelableExtra(EXTRA_PLAN_DIET_USER)
+        }
+
+        perDay = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(
+                EXTRA_PER_DAY,
+                PerDayItem::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(EXTRA_PER_DAY)
         }
 
         with(binding) {
+            userEntity?.age?.let { edAge.setText(it.toString()) }
+
             val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId
+
+            when (userEntity?.dietCategory) {
+                DietCategory.VEGAN.toString() -> rgDietCategory.check(R.id.rb_vegan)
+                DietCategory.KETO.toString() -> rgDietCategory.check(R.id.rb_keto)
+                else -> rgDietCategory.check(R.id.rb_vegan)
+            }
+
+            val initialCheckedId = rgDietCategory.checkedRadioButtonId
+            val initialItems = when (initialCheckedId) {
+                R.id.rb_vegan -> {
+                    favoriteProcessedList.filterNot { animalMap.containsKey(it) }
+                }
+
+                R.id.rb_keto -> {
+                    fruitMap.keys + vegetableMap.keys + animalMap.keys
+                }
+
+                else -> emptyList()
+            }
+
+            adapter.clearCheckedItems()
+            adapter.updateItems(initialItems)
 
             rgDietCategory.setOnCheckedChangeListener { _, checkedId ->
                 val updatedItems = when (checkedId) {
@@ -108,21 +272,32 @@ class Survey3Activity : AppCompatActivity() {
                 else -> null
             }
 
-            btnNext.setOnClickListener {
-                val selectedActivityLevel = autoCompleteTextView.text.toString()
+            val selectedActivityLevel = autoCompleteTextView.text.toString()
+            val instantFoods = resources.getStringArray(R.array.activity_levels)
 
-                val instantFoods = resources.getStringArray(R.array.activity_levels)
+            userEntity?.activityLevel = when (selectedActivityLevel) {
+                instantFoods[0] -> 1
+                instantFoods[1] -> 2
+                instantFoods[2] -> 3
+                instantFoods[3] -> 4
+                instantFoods[4] -> 5
+                else -> 1
+            }
 
-                userEntity?.activityLevel = when (selectedActivityLevel) {
-                    instantFoods[0] -> 1
-                    instantFoods[1] -> 2
-                    instantFoods[2] -> 3
-                    instantFoods[3] -> 4
-                    instantFoods[4] -> 5
-                    else -> 1
-                }
+
+            userEntity?.hasGastricIssue?.let { hasIssue ->
+                val selectedRadioButtonId = if (hasIssue) R.id.rb_yes else R.id.rb_no
+                rgHistoryMag.check(selectedRadioButtonId)
+            }
+
+            btnSave.setOnClickListener {
+                val age = edAge.text?.trim().toString()
+                userEntity?.age = age.toIntOrNull()
+                val ageError = inputValidator.validateInput(edAge, getString(R.string.age))
+                inputValidator.checkValidation(tvErrorAge, ageError)
 
                 val selectedHistoryMagId = rgHistoryMag.checkedRadioButtonId
+
 
                 userEntity?.hasGastricIssue = when (selectedHistoryMagId) {
                     R.id.rb_yes -> true
@@ -134,14 +309,50 @@ class Survey3Activity : AppCompatActivity() {
 
                 userEntity?.foodPreference = selectedFoodPreferences
 
-                if (selectedFoodPreferences.isNotEmpty()) {
-                    val intent = Intent(this@Survey3Activity, MainActivity::class.java)
-                    intent.putExtra(EXTRA_SURVEY, userEntity)
-                    startActivity(intent)
+                if (ageError == null && selectedFoodPreferences.isNotEmpty()) {
+                    val calendar = Calendar.getInstance()
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+
+                    val createdAt: String
+                    val dietTime: String
+
+                    if (perDay != null) {
+                        val previousCreatedAt = dateFormat.parse(perDay?.createdAt ?: "")
+                        val previousDietTime = dateFormat.parse(perDay?.dietTime ?: "")
+                        if (previousCreatedAt != null) {
+                            calendar.time = previousCreatedAt
+                        }
+                        calendar.add(Calendar.DAY_OF_YEAR, 1)
+                        createdAt = dateFormat.format(calendar.time)
+
+                        if (previousDietTime != null) {
+                            calendar.time = previousDietTime
+                        }
+                        calendar.add(Calendar.DAY_OF_YEAR, 1)
+                        dietTime = dateFormat.format(calendar.time)
+                    } else {
+                        createdAt = dateFormat.format(calendar.time)
+                        calendar.add(Calendar.DAY_OF_YEAR, 1)
+                        dietTime = dateFormat.format(calendar.time)
+                    }
+
+                    val perDayItem = PerDayItem(
+                        id = UUID.randomUUID().toString(),
+                        bodyWeight = userEntity?.bodyWeight,
+                        age = userEntity?.age,
+                        height = userEntity?.height,
+                        activityLevel = userEntity?.activityLevel,
+                        dietCategory = userEntity?.dietCategory,
+                        hasGastricIssue = userEntity?.hasGastricIssue.toString(),
+                        foodPreference = userEntity?.foodPreference,
+                        createdAt = createdAt,
+                        dietTime = dietTime,
+                    )
+                    historyViewModel.addPerDayItem(userEntity?.id ?: "", perDayItem)
                 } else {
                     ToastUtil.showToast(
-                        this@Survey3Activity,
-                        getString(R.string.error_favorite_food)
+                        this@AddFoodRecommendationActivity,
+                        getString(R.string.error_complete_form)
                     )
                 }
 
@@ -154,7 +365,6 @@ class Survey3Activity : AppCompatActivity() {
             val durationDefault = 1000L
 
             val animators = listOf(
-                AnimationUtil.createTranslationAnimator(tvStep3),
                 AnimationUtil.createTranslationAnimator(tvTitle, durationDefault + 100),
                 AnimationUtil.createTranslationAnimator(tvDesc, durationDefault + 150),
                 AnimationUtil.createTranslationAnimator(tvHistoryMag, durationDefault + 200),
@@ -190,7 +400,26 @@ class Survey3Activity : AppCompatActivity() {
             searchView.onActionViewExpanded()
             recyclerView.adapter = adapter
             recyclerView.layoutManager =
-                GridLayoutManager(this@Survey3Activity, 3, GridLayoutManager.VERTICAL, false)
+                GridLayoutManager(
+                    this@AddFoodRecommendationActivity,
+                    3,
+                    GridLayoutManager.VERTICAL,
+                    false
+                )
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.apply {
+            if (isLoading) {
+                btnSave.visibility = View.GONE
+                shimmerBtnSave.visibility = View.VISIBLE
+                ivBack.isClickable = false
+            } else {
+                shimmerBtnSave.visibility = View.GONE
+                btnSave.visibility = View.VISIBLE
+                ivBack.isClickable = true
+            }
         }
     }
 
@@ -373,5 +602,4 @@ class Survey3Activity : AppCompatActivity() {
         favoriteProcessedList =
             fruitMap.values.toList() + vegetableMap.values.toList()
     }
-
 }
