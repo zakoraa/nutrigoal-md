@@ -15,7 +15,7 @@ data class PerDayItem(
     var height: Float? = null,
     var activityLevel: Int? = null,
     var dietCategory: String? = null,
-    var hasGastricIssue: String? = null,
+    var hasGastricIssue: Boolean? = null,
     var foodPreference: List<String>? = null,
     var createdAt: String? = null,
     var dietTime: String? = null

@@ -7,6 +7,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class HistoryResponse(
 	var userId: String? = null,
-	var gender: String? = null,
+	var  gender: Boolean? = null,
 	var perDay: List<PerDayItem>? = null
 ): Parcelable

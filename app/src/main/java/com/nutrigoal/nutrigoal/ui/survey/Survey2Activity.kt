@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.remote.entity.Gender
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
 import com.nutrigoal.nutrigoal.databinding.ActivitySurvey2Binding
 import com.nutrigoal.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
@@ -79,8 +78,8 @@ class Survey2Activity : AppCompatActivity() {
                 val selectedGenderId = groupRadio.checkedRadioButtonId
 
                 userEntity?.gender = when (selectedGenderId) {
-                    R.id.rb_male -> Gender.MALE.toString()
-                    R.id.rb_female -> Gender.FEMALE.toString()
+                    R.id.rb_male -> true
+                    R.id.rb_female -> false
                     else -> null
                 }
 

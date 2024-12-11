@@ -12,13 +12,12 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
 import com.nutrigoal.nutrigoal.data.ResultState
+import com.nutrigoal.nutrigoal.data.extension.asResultState
 import com.nutrigoal.nutrigoal.data.local.database.AuthPreference
 import com.nutrigoal.nutrigoal.data.local.database.DailyCheckInPreference
 import com.nutrigoal.nutrigoal.data.local.database.SettingPreference
 import com.nutrigoal.nutrigoal.data.local.entity.UserLocalEntity
-import com.nutrigoal.nutrigoal.data.remote.entity.Gender
 import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
-import com.nutrigoal.nutrigoal.data.extension.asResultState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -62,7 +61,7 @@ class AuthRepository(
                     username = it.displayName ?: "",
                     email = it.email ?: "",
                     age = 20,
-                    gender = Gender.MALE.toString(),
+                    gender = false,
                     bodyWeight = 70f,
                     height = 170f
                 )

@@ -10,7 +10,7 @@ data class UserEntity(
     val username: String? = null,
     val email: String? = null,
     var age: Int? = null,
-    var gender: String? = null,
+    var gender: Boolean? = null,
     var bodyWeight: Float? = null,
     var height: Float? = null,
     var activityLevel: Int? = null,

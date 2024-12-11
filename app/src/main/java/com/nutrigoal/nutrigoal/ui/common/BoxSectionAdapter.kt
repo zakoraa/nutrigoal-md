@@ -19,6 +19,7 @@ class BoxSectionAdapter<T>(
     private val viewModel: AuthViewModel,
     private val settingsViewModel: SettingsViewModel,
     private val notificationsViewModel: NotificationsViewModel,
+    private val historyViewModel: HistoryViewModel,
     private val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<BoxSectionAdapter<T>.BoxSectionViewHolder>() {
@@ -52,6 +53,7 @@ class BoxSectionAdapter<T>(
                                 items as List<SettingBoxContentItem>,
                                 viewModel,
                                 settingsViewModel,
+                                historyViewModel,
                                 lifecycleOwner,
                             ))
                         }

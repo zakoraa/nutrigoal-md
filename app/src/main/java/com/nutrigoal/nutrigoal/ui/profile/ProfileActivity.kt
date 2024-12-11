@@ -8,8 +8,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.nutrigoal.nutrigoal.R
-import com.nutrigoal.nutrigoal.data.remote.entity.UserEntity
+import com.nutrigoal.nutrigoal.data.remote.entity.Gender
+import com.nutrigoal.nutrigoal.data.remote.response.HistoryResponse
 import com.nutrigoal.nutrigoal.databinding.ActivityProfileBinding
 import com.nutrigoal.nutrigoal.ui.settings.SettingBoxContentItemAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +40,7 @@ class ProfileActivity : AppCompatActivity() {
         val user = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra(
                 SettingBoxContentItemAdapter.EXTRA_USER,
-                UserEntity::class.java
+                HistoryResponse::class.java
             )
         } else {
             @Suppress("DEPRECATION")
@@ -50,19 +53,31 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun updateProfileData(user: UserEntity) {
-         Glide.with(this)
-            .load(user.photoProfile)
+    private fun updateProfileData(user: HistoryResponse) {
+        val firebaseAuth = Firebase.auth.currentUser
+        Glide.with(this)
+            .load(firebaseAuth?.photoUrl)
             .placeholder(R.drawable.photo_profile)
             .into(binding.ivPhotoProfile)
 
+        val lastPerDay = user.perDay?.lastIndex ?: -1
+        val perDay = user.perDay?.get(lastPerDay)
+
+        val userGender = user.gender ?: false
+
+        val gender = if (userGender) {
+            Gender.MALE.toString()
+        } else {
+            Gender.FEMALE.toString()
+        }
+
         val profileItems = listOf(
-            ProfileItem(getString(R.string.username), user.username?: ""),
-            ProfileItem(getString(R.string.email), user.email?: ""),
-            ProfileItem(getString(R.string.age), user.age.toString()),
-            ProfileItem(getString(R.string.gender), user.gender.toString()),
-            ProfileItem(getString(R.string.body_weight), "${user.bodyWeight} Kg"),
-            ProfileItem(getString(R.string.height), "${user.height} Cm")
+            ProfileItem(getString(R.string.username), firebaseAuth?.displayName ?: ""),
+            ProfileItem(getString(R.string.email), firebaseAuth?.email ?: ""),
+            ProfileItem(getString(R.string.age), perDay?.age.toString()),
+            ProfileItem(getString(R.string.gender), gender),
+            ProfileItem(getString(R.string.body_weight), "${perDay?.bodyWeight} Kg"),
+            ProfileItem(getString(R.string.height), "${perDay?.height} Cm")
         )
 
         val adapter = ProfileItemAdapter(profileItems)

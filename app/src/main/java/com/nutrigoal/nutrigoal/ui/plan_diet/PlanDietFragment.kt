@@ -74,17 +74,14 @@ class PlanDietFragment : Fragment() {
             binding.apply {
                 val lastPerDay = it.perDay?.lastIndex ?: -1
                 val perDay = it.perDay?.get(lastPerDay)
-                var hasGastricIssue = true
-                if (perDay?.hasGastricIssue == "No") {
-                    hasGastricIssue = false
-                }
+
                 val userEntity =
                     UserEntity(
                         id = it.userId,
                         height = perDay?.height,
                         bodyWeight = perDay?.bodyWeight,
                         dietCategory = perDay?.dietCategory,
-                        hasGastricIssue = hasGastricIssue,
+                        hasGastricIssue = perDay?.hasGastricIssue,
                         age = perDay?.age,
                         gender = it.gender,
                         activityLevel = perDay?.activityLevel,

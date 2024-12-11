@@ -20,13 +20,13 @@ data class RecommendedFoodBasedOnCalories(
     val rfbocWeightKg: Float? = null,
 
     @field:SerializedName("rfboc_gender")
-    val rfbocGender: String? = null,
+    val rfbocGender: Boolean? = null,
 
     @field:SerializedName("rfboc_bmr")
     val rfbocBmr: String? = null,
 
     @field:SerializedName("rfboc_history_of_gastritis_or_gerd")
-    val rfbocHistoryOfGastritisOrGerd: String? = null,
+    val rfbocHistoryOfGastritisOrGerd: Boolean? = null,
 
     @field:SerializedName("rfboc_bmi")
     val rfbocBmi: String? = null,

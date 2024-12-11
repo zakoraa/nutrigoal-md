@@ -23,6 +23,7 @@ import com.nutrigoal.nutrigoal.data.work.DailyReminderWorker
 import com.nutrigoal.nutrigoal.data.work.InsertDailyCheckInNotificationWorker
 import com.nutrigoal.nutrigoal.databinding.SettingBoxContentItemBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.profile.ProfileActivity
 import com.nutrigoal.nutrigoal.utils.AlertDialogUtil
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ class SettingBoxContentItemAdapter(
     private val items: List<SettingBoxContentItem>,
     private val viewModel: AuthViewModel,
     private val settingsViewModel: SettingsViewModel,
+    private val historyViewModel: HistoryViewModel,
     private val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<SettingBoxContentItemAdapter.SettingsBoxContentItemViewHolder>() {
@@ -191,7 +193,7 @@ class SettingBoxContentItemAdapter(
                         getString(context, R.string.profile) -> {
                             itemView.setOnClickListener {
                                 val intent = Intent(context, ProfileActivity::class.java)
-                                viewModel.currentUser.observe(lifecycleOwner) { user ->
+                                historyViewModel.historyResult.observe(lifecycleOwner) { user ->
                                     intent.putExtra(EXTRA_USER, user)
                                 }
                                 context.startActivity(intent)

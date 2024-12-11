@@ -29,7 +29,6 @@ import com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PER
 import com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PLAN_DIET_USER
 import com.nutrigoal.nutrigoal.ui.survey.FavoriteProcessedAdapter
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
-import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
 import com.nutrigoal.nutrigoal.utils.InputValidator
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -165,10 +164,10 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                     age = userEntity?.age ?: 0,
                     height = userEntity?.height ?: 0f,
                     weight = userEntity?.bodyWeight ?: 0f,
-                    gender = getGenderCode(userEntity?.gender.toString()),
+                    gender = userEntity?.gender ?: false,
                     activity_level = userEntity?.activityLevel ?: 1,
                     diet_category = userEntity?.dietCategory ?: DietCategory.KETO.toString(),
-                    has_gastric_issue = userEntity?.hasGastricIssue.toString(),
+                    has_gastric_issue = userEntity?.hasGastricIssue ?: false,
                     food_preference = userEntity?.foodPreference ?: emptyList()
                 )
                 surveyViewModel.getSurveyResult(surveyRequest)
@@ -454,7 +453,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                         height = userEntity?.height,
                         activityLevel = userEntity?.activityLevel,
                         dietCategory = userEntity?.dietCategory,
-                        hasGastricIssue = userEntity?.hasGastricIssue.toString(),
+                        hasGastricIssue = userEntity?.hasGastricIssue,
                         foodPreference = userEntity?.foodPreference,
                         mealSchedule = userEntity?.mealSchedule,
                         createdAt = createdAt,

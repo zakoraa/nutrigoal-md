@@ -40,7 +40,6 @@ import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import com.nutrigoal.nutrigoal.ui.survey.Survey1Activity
 import com.nutrigoal.nutrigoal.ui.survey.SurveyViewModel
-import com.nutrigoal.nutrigoal.utils.AppUtil.getGenderCode
 import com.nutrigoal.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -132,10 +131,10 @@ class MainActivity : AppCompatActivity() {
                 age = userEntity?.age ?: 0,
                 height = userEntity?.height ?: 0f,
                 weight = userEntity?.bodyWeight ?: 0f,
-                gender = getGenderCode(userEntity?.gender.toString()),
+                gender = userEntity?.gender ?: true,
                 activity_level = userEntity?.activityLevel ?: 1,
                 diet_category = userEntity?.dietCategory ?: DietCategory.VEGAN.toString(),
-                has_gastric_issue = userEntity?.hasGastricIssue.toString(),
+                has_gastric_issue = userEntity?.hasGastricIssue ?: false,
                 food_preference = userEntity?.foodPreference ?: emptyList()
             )
             surveyViewModel.getSurveyResult(surveyRequest)
@@ -236,12 +235,12 @@ class MainActivity : AppCompatActivity() {
                             age = perDay?.age ?: 0,
                             height = perDay?.height ?: 0f,
                             weight = perDay?.bodyWeight ?: 0f,
-                            gender = getGenderCode(it.gender.toString()),
+                            gender = it.gender ?: false,
                             activity_level = perDay?.activityLevel.toString()
                                 .split("")[0].toIntOrNull() ?: 1,
                             diet_category = perDay?.dietCategory
                                 ?: DietCategory.KETO.toString(),
-                            has_gastric_issue = perDay?.hasGastricIssue ?: "false",
+                            has_gastric_issue = perDay?.hasGastricIssue ?: false,
                             food_preference = perDay?.foodPreference ?: emptyList()
                         )
                         surveyViewModel.getSurveyResult(surveyRequest)

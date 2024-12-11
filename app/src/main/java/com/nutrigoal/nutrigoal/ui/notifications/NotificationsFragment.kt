@@ -17,6 +17,7 @@ import com.nutrigoal.nutrigoal.databinding.FragmentNotificationsBinding
 import com.nutrigoal.nutrigoal.ui.auth.AuthViewModel
 import com.nutrigoal.nutrigoal.ui.common.BoxSection
 import com.nutrigoal.nutrigoal.ui.common.BoxSectionAdapter
+import com.nutrigoal.nutrigoal.ui.common.HistoryViewModel
 import com.nutrigoal.nutrigoal.ui.settings.SettingsViewModel
 import com.nutrigoal.nutrigoal.utils.ToastUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,6 +34,7 @@ class NotificationsFragment : Fragment() {
     private lateinit var boxSectionAdapter: BoxSectionAdapter<NotificationBoxContentItem>
     private val viewModel: AuthViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by activityViewModels()
+    private val historyViewModel: HistoryViewModel by activityViewModels()
     private val notificationsViewModel: NotificationsViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -168,6 +170,7 @@ class NotificationsFragment : Fragment() {
                     viewModel,
                     settingsViewModel,
                     notificationsViewModel,
+                    historyViewModel,
                     viewLifecycleOwner
                 )
                 recyclerView.adapter = boxSectionAdapter
