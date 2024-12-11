@@ -19,4 +19,12 @@ object AppUtil {
             createdAtDate == today
         } ?: -1
     }
+
+    fun getDietTimeDataFromPerDay(historyResponse: HistoryResponse?): Int {
+        val dietTime = DateFormatter.getTodayDate()
+        return historyResponse?.perDay?.indexOfFirst { date ->
+            val dietTimeDate = DateFormatter.parseDate(date.dietTime)
+            dietTimeDate == dietTime
+        } ?: -1
+    }
 }
