@@ -448,7 +448,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
 
                     val perDayItem = PerDayItem(
                         id = UUID.randomUUID().toString(),
-                        bodyWeight = userEntity?.bodyWeight,
+                        bodyWeight = null,
                         age = userEntity?.age,
                         height = userEntity?.height,
                         activityLevel = userEntity?.activityLevel,

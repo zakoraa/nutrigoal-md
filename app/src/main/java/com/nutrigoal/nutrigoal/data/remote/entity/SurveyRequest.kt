@@ -3,7 +3,7 @@ package com.nutrigoal.nutrigoal.data.remote.entity
 data class SurveyRequest(
     val age: Int,
     val height: Float,
-    val weight: Float,
+    val weight: Float?,
     val gender: Boolean,
     val activity_level: Int,
     val diet_category: String,

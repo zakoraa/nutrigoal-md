@@ -79,15 +79,18 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setUpWeightProgressAdapter(historyResponse: HistoryResponse) {
-        val weightList = historyResponse.perDay?.mapIndexed { index, perDayItem ->
-            val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
-
-            WeightProgress(
-                month = month,
-                day = day,
-                title = "Day ${index + 1}",
-                bodyWeight = perDayItem.bodyWeight ?: 0f
-            )
+        val weightList = historyResponse.perDay?.mapIndexedNotNull { index, perDayItem ->
+            if (perDayItem.bodyWeight != null) {
+                val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
+                WeightProgress(
+                    month = month,
+                    day = day,
+                    title = "Day ${index + 1}",
+                    bodyWeight = perDayItem.bodyWeight ?: 0f
+                )
+            } else {
+                null
+            }
         } ?: emptyList()
 
         val adapter = BodyWeightProgressAdapter(weightList)
