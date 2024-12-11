@@ -129,31 +129,33 @@ class DashboardFragment : Fragment() {
             val carbohydratesEntries = mutableListOf<Entry>()
 
             historyResponse.perDay?.forEachIndexed { dayIndex, perDayItem ->
-                val dayNumber = dayIndex + 1
-                dates.add(dayNumber.toFloat())
-                dateLabels.add("Day $dayNumber")
+                if (perDayItem.selectedFoodRecommendation != null) {
+                    val dayNumber = dayIndex + 1
+                    dates.add(dayNumber.toFloat())
+                    dateLabels.add("Day $dayNumber")
 
-                tvNutrientsRange.text =
-                    if (dayNumber == 1) getString(R.string.today) else {
-                        getString(R.string.last_days, dayNumber.toString())
+                    tvNutrientsRange.text =
+                        if (dayNumber == 1) getString(R.string.today) else {
+                            getString(R.string.last_days, dayNumber.toString())
+                        }
+
+                    var totalCalories = 0f
+                    var totalProtein = 0f
+                    var totalFat = 0f
+                    var totalCarbs = 0f
+
+                    perDayItem.selectedFoodRecommendation?.forEach { foodItem ->
+                        totalCalories += foodItem.calories ?: 0f
+                        totalProtein += foodItem.protein ?: 0f
+                        totalFat += foodItem.fat ?: 0f
+                        totalCarbs += foodItem.carbohydrate ?: 0f
                     }
 
-                var totalCalories = 0f
-                var totalProtein = 0f
-                var totalFat = 0f
-                var totalCarbs = 0f
-
-                perDayItem.selectedFoodRecommendation?.forEach { foodItem ->
-                    totalCalories += foodItem.calories ?: 0f
-                    totalProtein += foodItem.protein ?: 0f
-                    totalFat += foodItem.fat ?: 0f
-                    totalCarbs += foodItem.carbohydrate ?: 0f
+                    caloriesEntries.add(Entry(dayNumber.toFloat(), totalCalories))
+                    proteinEntries.add(Entry(dayNumber.toFloat(), totalProtein))
+                    fatEntries.add(Entry(dayNumber.toFloat(), totalFat))
+                    carbohydratesEntries.add(Entry(dayNumber.toFloat(), totalCarbs))
                 }
-
-                caloriesEntries.add(Entry(dayNumber.toFloat(), totalCalories.toFloat()))
-                proteinEntries.add(Entry(dayNumber.toFloat(), totalProtein))
-                fatEntries.add(Entry(dayNumber.toFloat(), totalFat))
-                carbohydratesEntries.add(Entry(dayNumber.toFloat(), totalCarbs))
             }
 
             setupSingleChart(
@@ -162,7 +164,6 @@ class DashboardFragment : Fragment() {
                 dateLabels,
                 ContextCompat.getString(requireContext(), R.string.calories_title),
                 R.color.primary,
-                5f
             )
             setupSingleChart(
                 proteinChart,
