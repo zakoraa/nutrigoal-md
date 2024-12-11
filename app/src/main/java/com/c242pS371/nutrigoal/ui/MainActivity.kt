@@ -39,6 +39,7 @@ import com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.IS_NULL
 import com.c242pS371.nutrigoal.ui.settings.SettingsViewModel
 import com.c242pS371.nutrigoal.ui.survey.Survey1Activity
 import com.c242pS371.nutrigoal.ui.survey.SurveyViewModel
+import com.c242pS371.nutrigoal.utils.AppUtil.getDietTimeDataFromPerDay
 import com.c242pS371.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
 import com.c242pS371.nutrigoal.utils.InputValidator
 import com.c242pS371.nutrigoal.utils.ThemeUtil
@@ -253,12 +254,14 @@ class MainActivity : AppCompatActivity() {
                         )
                         val previousPerDay =
                             it.perDay?.get((it.perDay?.size?.minus(2) ?: 0).coerceAtLeast(0))
+                        val dietTimeIndex = getDietTimeDataFromPerDay(it)
+                        val dietTimePerDay = it.perDay?.get(dietTimeIndex)
                         if (perDay?.bodyWeight == null || perDay.height == null) {
-                            showMealTimePopup(perDay, previousPerDay)
+                            showMealTimePopup(dietTimePerDay, previousPerDay)
                         } else {
-                            val breakfastTime = perDay.mealSchedule?.breakfastTime
-                            val lunchTime = perDay.mealSchedule?.launchTime
-                            val dinnerTime = perDay.mealSchedule?.dinnerTime
+                            val breakfastTime = dietTimePerDay?.mealSchedule?.breakfastTime
+                            val lunchTime = dietTimePerDay?.mealSchedule?.launchTime
+                            val dinnerTime = dietTimePerDay?.mealSchedule?.dinnerTime
                             saveMealTimes(breakfastTime, lunchTime, dinnerTime)
                         }
                         surveyViewModel.getSurveyResult(surveyRequest)
