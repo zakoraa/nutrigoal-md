@@ -68,6 +68,10 @@ class DailyReminderService : Service() {
                 val countdown = calculateCountdown(mealTime)
 
                 if (countdown == "00:00:00") {
+                    val workRequest = OneTimeWorkRequest.Builder(TimeToEatAlarmWorker::class.java)
+                        .addTag("SoundWorker")
+                        .build()
+                    WorkManager.getInstance(applicationContext).enqueue(workRequest)
                     insertNotificationToDatabase(mealTitle)
                     currentMealIndex = (currentMealIndex + 1) % times.size
                 }
