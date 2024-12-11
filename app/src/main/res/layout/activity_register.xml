@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/margin_bottom_to_edge">
 
-        <com.nutrigoal.nutrigoal.ui.auth.AuthDecorationView
+        <com.c242pS371.nutrigoal.ui.auth.AuthDecorationView
             android:id="@+id/decoration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             app:layout_constraintStart_toStartOf="@id/tv_title"
             app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-        <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+        <com.c242pS371.nutrigoal.ui.common.TextFieldView
             android:id="@+id/ed_username"
             android:layout_width="0dp"
             android:layout_height="@dimen/edt_height"
@@ -74,7 +74,7 @@
             app:layout_constraintTop_toBottomOf="@id/ed_username"
             tools:text="Wrong input" />
 
-        <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+        <com.c242pS371.nutrigoal.ui.common.TextFieldView
             android:id="@+id/ed_email"
             android:layout_width="0dp"
             android:layout_height="@dimen/edt_height"
@@ -98,7 +98,7 @@
             app:layout_constraintTop_toBottomOf="@id/ed_email"
             tools:text="Wrong input" />
 
-        <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+        <com.c242pS371.nutrigoal.ui.common.TextFieldView
             android:id="@+id/ed_password"
             android:layout_width="0dp"
             android:layout_height="@dimen/edt_height"

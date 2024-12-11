@@ -18,7 +18,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/margin_bottom_to_edge">
+            android:paddingBottom="80dp">
 
             <ImageView
                 android:id="@+id/iv_back"
@@ -64,16 +64,27 @@
                 app:layout_constraintStart_toStartOf="@id/tv_title"
                 app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <TextView
+                android:id="@+id/tv_age"
+                style="@style/TextLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/your_age"
+                app:layout_constraintEnd_toEndOf="@id/tv_title"
+                app:layout_constraintStart_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_age"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"
-                android:layout_marginTop="@dimen/edt_gap"
+                android:layout_marginTop="10dp"
                 android:hint="@string/age"
                 android:inputType="number"
                 app:layout_constraintEnd_toEndOf="@id/tv_title"
                 app:layout_constraintStart_toStartOf="@id/tv_title"
-                app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+                app:layout_constraintTop_toBottomOf="@id/tv_age" />
 
             <TextView
                 android:id="@+id/tv_error_age"
@@ -188,6 +199,89 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:id="@+id/ll_meal_schedule"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="@id/tv_title"
+                app:layout_constraintStart_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toBottomOf="@id/dropdown_activity_level">
+
+                <TextView
+                    android:id="@+id/tv_breakfast"
+                    style="@style/TextLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/breakfast_time" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_breakfast"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdown_breakfast_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/outline_button"
+                        android:hint="@null"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    style="@style/TextLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/lunch_time" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdown_lunch_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/outline_button"
+                        android:hint="@null"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    style="@style/TextLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/dinner_time" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdown_dinner_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/outline_button"
+                        android:hint="@null"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+
             <TextView
                 android:id="@+id/tv_favorite_processed_food"
                 style="@style/TextLabel"
@@ -197,7 +291,7 @@
                 android:text="@string/what_is_your_favorite_processed_food"
                 app:layout_constraintEnd_toEndOf="@id/tv_title"
                 app:layout_constraintStart_toStartOf="@id/tv_title"
-                app:layout_constraintTop_toBottomOf="@id/dropdown_activity_level" />
+                app:layout_constraintTop_toBottomOf="@id/ll_meal_schedule" />
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"
@@ -224,32 +318,44 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_save"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/survey_btn_height"
-        android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
-        android:gravity="center"
-        android:text="@string/save"
-        android:textStyle="bold"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:elevation="10dp"
+        android:paddingVertical="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_percent="0.5" />
+        app:layout_constraintStart_toStartOf="parent">
 
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmer_btn_save"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/btn_height"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_percent="0.5"
-        app:shimmer_duration="3000">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/survey_btn_height"
+            android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
+            android:gravity="center"
+            android:text="@string/save"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <include layout="@layout/shimmer_button" />
-    </com.facebook.shimmer.ShimmerFrameLayout>
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_btn_save"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/btn_height"
+            android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shimmer_duration="3000">
+
+            <include layout="@layout/shimmer_button" />
+        </com.facebook.shimmer.ShimmerFrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

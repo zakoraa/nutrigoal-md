@@ -60,6 +60,7 @@
     <string name="description">Description</string>
 
     <string name="app_logo_desc">display the app logo</string>
+    <string name="meal_schedule_count">%s times a day</string>
     <string name="continue_with_google">Continue with Google</string>
     <string name="continue_with_facebook">Continue with Facebook</string>
     <string name="or">OR</string>
@@ -352,10 +353,10 @@
     <string name="select_your_activity_level">Select your activity level</string>
     <string name="nutrients_title">Nutrients Progress</string>
     <string name="daily_check_in">Daily Check-in</string>
-    <string name="breakfast_time">Breakfast Time</string>
+    <string name="breakfast_time">Breakfast time</string>
     <string name="select_time">Select Time</string>
-    <string name="lunch_time">Lunch Time</string>
-    <string name="dinner_time">Dinner Time</string>
+    <string name="lunch_time">Lunch time</string>
+    <string name="dinner_time">Dinner time</string>
     <string name="done">Done</string>
     <string name="no_activity">No Activity</string>
     <string name="iv_header_image_desc">Display header image</string>
@@ -374,5 +375,12 @@
     <string name="save">Save</string>
     <string name="add_food_recommendation_title">Add Food Recommendation for The Next Day</string>
     <string name="add_food_recommendation_desc">Your input will be used to generate a personalized food recommendation for the day after the selected date.</string>
+    <string name="meal_schedule">Meal Schedule</string>
+    <string name="clock_icon_desc">Display clock icon</string>
+    <string name="your_age">Your age</string>
+    <string name="daily_meals_have_not_been_selected">Daily meals have not been selected</string>
+    <string name="yout_body_weight">Yout Body Weight</string>
+    <string name="your_height">Your Height</string>
+    <string name="daily_check_in_desc">Please update your weight and height for today to keep track of your health progress.</string>
 
 </resources>

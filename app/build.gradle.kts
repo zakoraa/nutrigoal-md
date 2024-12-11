@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nutrigoal.nutrigoal"
+    namespace = "com.c242pS371.nutrigoal"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.nutrigoal.nutrigoal"
+        applicationId = "com.c242pS371.nutrigoal"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -24,12 +24,12 @@ android {
         buildConfigField(
             "String",
             "WEB_CLIENT_ID",
-            "\"526047333608-aibmtojeq8r985t7alvp4gd5ct6ctg74.apps.googleusercontent.com\""
+            "\"1024521178030-u32rhrm2ckmpmnve5bkug718v3dqdiog.apps.googleusercontent.com\""
         )
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"http://192.168.100.85:5000/\""
+            "\"https://model-nutrigoal-usbd2ygyiq-as.a.run.app/\""
         )
     }
 
@@ -70,10 +70,12 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.activity)
-    implementation(libs.firebase.auth)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -93,12 +95,10 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.shimmer)
-    implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.startup.runtime)
-    implementation(libs.firebase.firestore)
 }

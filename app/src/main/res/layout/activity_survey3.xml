@@ -178,6 +178,88 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:id="@+id/ll_meal_schedule"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="@id/tv_title"
+                app:layout_constraintStart_toStartOf="@id/tv_title"
+                app:layout_constraintTop_toBottomOf="@id/dropdown_activity_level">
+
+                <TextView
+                    android:id="@+id/tv_breakfast"
+                    style="@style/TextLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/breakfast_time" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/input_layout_breakfast"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdown_breakfast_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/outline_button"
+                        android:hint="@null"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    style="@style/TextLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/lunch_time" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdown_lunch_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/outline_button"
+                        android:hint="@null"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    style="@style/TextLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/dinner_time" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdown_dinner_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/outline_button"
+                        android:hint="@null"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tv_favorite_processed_food"
                 style="@style/TextLabel"
@@ -187,7 +269,7 @@
                 android:text="@string/what_is_your_favorite_processed_food"
                 app:layout_constraintEnd_toEndOf="@id/progress_line"
                 app:layout_constraintStart_toStartOf="@id/progress_line"
-                app:layout_constraintTop_toBottomOf="@id/dropdown_activity_level" />
+                app:layout_constraintTop_toBottomOf="@id/ll_meal_schedule" />
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"
@@ -214,32 +296,40 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_back"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/survey_outline_btn_height"
-        android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/outline_button"
-        android:text="@string/back"
-        android:textColor="@color/primary"
-        android:textStyle="bold"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:paddingVertical="10dp"
+        android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_percent="0.44" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_next"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/survey_btn_height"
-        android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
-        android:gravity="center"
-        android:text="@string/next"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/btn_back"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btn_back"
-        app:layout_constraintWidth_percent="0.44" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/survey_outline_btn_height"
+            android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
+            android:layout_weight="1"
+            android:background="@drawable/outline_button"
+            android:text="@string/back"
+            android:textColor="@color/primary"
+            android:textStyle="bold"
+            app:layout_constraintWidth_percent="0.5" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_next"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/survey_btn_height"
+            android:layout_marginHorizontal="@dimen/screen_horizontal_margin"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/next"
+            android:textStyle="bold"
+            app:layout_constraintWidth_percent="0.5" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

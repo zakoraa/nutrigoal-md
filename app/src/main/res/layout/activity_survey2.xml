@@ -85,14 +85,14 @@
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_body_weight"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"
                 android:layout_marginTop="30dp"
                 android:drawableEnd="@drawable/ic_kg"
                 android:hint="@string/body_weight"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 app:layout_constraintEnd_toEndOf="@id/progress_base_line"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/tv_desc" />
@@ -109,14 +109,14 @@
                 app:layout_constraintTop_toBottomOf="@id/ed_body_weight"
                 tools:text="Wrong input" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_height"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"
                 android:layout_marginTop="@dimen/edt_gap"
                 android:drawableEnd="@drawable/ic_cm"
                 android:hint="@string/height"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 app:layout_constraintEnd_toEndOf="@id/progress_base_line"
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/tv_error_body_weight" />
@@ -133,7 +133,7 @@
                 app:layout_constraintTop_toBottomOf="@id/ed_height"
                 tools:text="Wrong input" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_age"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"
