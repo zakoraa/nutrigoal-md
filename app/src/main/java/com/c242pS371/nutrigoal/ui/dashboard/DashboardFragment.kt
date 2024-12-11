@@ -131,44 +131,79 @@ class DashboardFragment : Fragment() {
             val carbohydratesEntries = mutableListOf<Entry>()
 
             historyResponse.perDay?.forEachIndexed { dayIndex, perDayItem ->
-                if (perDayItem.selectedFoodRecommendation != null) {
-                    tvNoDataNutrients.visibility = View.GONE
-                    llNutrients.visibility = View.VISIBLE
-                    val dayNumber = dayIndex + 1
+                if (dayIndex == 0) {
+                    if (perDayItem.selectedFoodRecommendation == null) {
+                        tvNoDataNutrients.visibility = View.VISIBLE
+                        llNutrients.visibility = View.GONE
+                    } else {
+                        tvNoDataNutrients.visibility = View.GONE
+                        llNutrients.visibility = View.VISIBLE
+                        val dayNumber = 1
 
-                    val dateFormatInput = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
-                    val dateFormatOutput = SimpleDateFormat("d MMM", Locale.ENGLISH)
+                        val dateFormatInput =
+                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+                        val dateFormatOutput = SimpleDateFormat("d MMM", Locale.ENGLISH)
 
-                    val dietTimeString = perDayItem.dietTime
-                    val date = dateFormatInput.parse(dietTimeString.toString())
+                        val dietTimeString = perDayItem.dietTime
+                        val date = dateFormatInput.parse(dietTimeString.toString())
 
-                    val formattedDate = dateFormatOutput.format(date ?: "")
-                    dateLabels.add(formattedDate)
+                        val formattedDate = dateFormatOutput.format(date ?: "")
+                        dateLabels.add(formattedDate)
 
-                    tvNutrientsRange.text =
-                        if (dayNumber == 1) getString(R.string.today) else {
-                            getString(R.string.last_days, dayNumber.toString())
+                        tvNutrientsRange.text = getString(R.string.today)
+                        var totalCalories = 0f
+                        var totalProtein = 0f
+                        var totalFat = 0f
+                        var totalCarbs = 0f
+
+                        perDayItem.selectedFoodRecommendation?.forEach { foodItem ->
+                            totalCalories += foodItem.calories ?: 0f
+                            totalProtein += foodItem.protein ?: 0f
+                            totalFat += foodItem.fat ?: 0f
+                            totalCarbs += foodItem.carbohydrate ?: 0f
                         }
 
-                    var totalCalories = 0f
-                    var totalProtein = 0f
-                    var totalFat = 0f
-                    var totalCarbs = 0f
-
-                    perDayItem.selectedFoodRecommendation?.forEach { foodItem ->
-                        totalCalories += foodItem.calories ?: 0f
-                        totalProtein += foodItem.protein ?: 0f
-                        totalFat += foodItem.fat ?: 0f
-                        totalCarbs += foodItem.carbohydrate ?: 0f
+                        caloriesEntries.add(Entry(dayNumber.toFloat(), totalCalories))
+                        proteinEntries.add(Entry(dayNumber.toFloat(), totalProtein))
+                        fatEntries.add(Entry(dayNumber.toFloat(), totalFat))
+                        carbohydratesEntries.add(Entry(dayNumber.toFloat(), totalCarbs))
                     }
-
-                    caloriesEntries.add(Entry(dayNumber.toFloat(), totalCalories))
-                    proteinEntries.add(Entry(dayNumber.toFloat(), totalProtein))
-                    fatEntries.add(Entry(dayNumber.toFloat(), totalFat))
-                    carbohydratesEntries.add(Entry(dayNumber.toFloat(), totalCarbs))
                 } else {
-                    tvNoDataNutrients.visibility = View.VISIBLE
-                    llNutrients.visibility = View.GONE
+                    if (perDayItem.selectedFoodRecommendation != null) {
+
+                        val dayNumber = dayIndex + 1
+
+                        val dateFormatInput =
+                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+                        val dateFormatOutput = SimpleDateFormat("d MMM", Locale.ENGLISH)
+
+                        val dietTimeString = perDayItem.dietTime
+                        val date = dateFormatInput.parse(dietTimeString.toString())
+
+                        val formattedDate = dateFormatOutput.format(date ?: "")
+                        dateLabels.add(formattedDate)
+
+                        tvNutrientsRange.text =
+                            getString(R.string.last_days, dayNumber.toString())
+
+
+                        var totalCalories = 0f
+                        var totalProtein = 0f
+                        var totalFat = 0f
+                        var totalCarbs = 0f
+
+                        perDayItem.selectedFoodRecommendation?.forEach { foodItem ->
+                            totalCalories += foodItem.calories ?: 0f
+                            totalProtein += foodItem.protein ?: 0f
+                            totalFat += foodItem.fat ?: 0f
+                            totalCarbs += foodItem.carbohydrate ?: 0f
+                        }
+
+                        caloriesEntries.add(Entry(dayNumber.toFloat(), totalCalories))
+                        proteinEntries.add(Entry(dayNumber.toFloat(), totalProtein))
+                        fatEntries.add(Entry(dayNumber.toFloat(), totalFat))
+                        carbohydratesEntries.add(Entry(dayNumber.toFloat(), totalCarbs))
+                    }
                 }
             }
 
