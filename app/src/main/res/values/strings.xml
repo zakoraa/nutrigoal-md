@@ -378,5 +378,6 @@
     <string name="meal_schedule">Meal Schedule</string>
     <string name="clock_icon_desc">Display clock icon</string>
     <string name="your_age">Your age</string>
+    <string name="daily_meals_have_not_been_selected">Daily meals have not been selected</string>
 
 </resources>

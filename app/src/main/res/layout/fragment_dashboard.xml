@@ -408,11 +408,11 @@
                         style="@style/TextTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="10%"
                         android:textColor="@color/onPrimary"
                         app:layout_constraintEnd_toEndOf="@id/tv_weight_gain_title"
                         app:layout_constraintStart_toStartOf="@id/tv_weight_gain_title"
-                        app:layout_constraintTop_toBottomOf="@id/tv_weight_gain_title" />
+                        app:layout_constraintTop_toBottomOf="@id/tv_weight_gain_title"
+                        tools:text="10%" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -498,81 +498,88 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            tools:text="@string/last_7_days"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/last_7_days" />
 
         <TextView
-            android:id="@+id/tv_calories"
-            style="@style/TextLabel"
+            android:id="@+id/tv_no_data_nutrients"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:text="@string/calories_title"
+            android:layout_marginTop="30dp"
+            android:text="@string/daily_meals_have_not_been_selected"
+            android:textColor="@color/grey"
+            android:visibility="gone"
+            android:paddingBottom="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_nutrients_title" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart_calories"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_calories" />
-
-        <TextView
-            android:id="@+id/tv_protein"
-            style="@style/TextLabel"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/ll_nutrients"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:text="@string/protein_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chart_calories" />
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart_protein"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_protein" />
+            app:layout_constraintTop_toBottomOf="@id/tv_nutrients_title">
 
-        <TextView
-            android:id="@+id/tv_fat"
-            style="@style/TextLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:text="@string/fat_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chart_protein" />
+            <TextView
+                android:id="@+id/tv_calories"
+                style="@style/TextLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:text="@string/calories_title" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart_fat"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_fat" />
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_calories"
+                android:layout_width="match_parent"
+                android:layout_height="180dp" />
 
-        <TextView
-            android:id="@+id/tv_carbohydrates"
-            style="@style/TextLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:text="@string/carbohydrates_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chart_fat" />
+            <TextView
+                android:id="@+id/tv_protein"
+                style="@style/TextLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:text="@string/protein_title" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart_carbohydrates"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_carbohydrates" />
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_protein"
+                android:layout_width="match_parent"
+                android:layout_height="180dp" />
+
+            <TextView
+                android:id="@+id/tv_fat"
+                style="@style/TextLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:text="@string/fat_title" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_fat"
+                android:layout_width="match_parent"
+                android:layout_height="180dp" />
+
+            <TextView
+                android:id="@+id/tv_carbohydrates"
+                style="@style/TextLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:text="@string/carbohydrates_title" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_carbohydrates"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_carbohydrates" />
+        </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

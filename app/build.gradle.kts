@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nutrigoal.nutrigoal"
+    namespace = "com.c242pS371.nutrigoal"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.nutrigoal.nutrigoal"
+        applicationId = "com.c242pS371.nutrigoal"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -24,7 +24,7 @@ android {
         buildConfigField(
             "String",
             "WEB_CLIENT_ID",
-            "\"526047333608-aibmtojeq8r985t7alvp4gd5ct6ctg74.apps.googleusercontent.com\""
+            "\"1024521178030-u32rhrm2ckmpmnve5bkug718v3dqdiog.apps.googleusercontent.com\""
         )
         buildConfigField(
             "String",

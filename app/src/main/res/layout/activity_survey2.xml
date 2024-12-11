@@ -85,7 +85,7 @@
                 app:layout_constraintStart_toStartOf="@id/progress_base_line"
                 app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_body_weight"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"
@@ -109,7 +109,7 @@
                 app:layout_constraintTop_toBottomOf="@id/ed_body_weight"
                 tools:text="Wrong input" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_height"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"
@@ -133,7 +133,7 @@
                 app:layout_constraintTop_toBottomOf="@id/ed_height"
                 tools:text="Wrong input" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_age"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"

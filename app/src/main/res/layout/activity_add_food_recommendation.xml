@@ -75,7 +75,7 @@
                 app:layout_constraintStart_toStartOf="@id/tv_title"
                 app:layout_constraintTop_toBottomOf="@id/tv_desc" />
 
-            <com.nutrigoal.nutrigoal.ui.common.TextFieldView
+            <com.c242pS371.nutrigoal.ui.common.TextFieldView
                 android:id="@+id/ed_age"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/edt_height"

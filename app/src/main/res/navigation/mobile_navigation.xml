@@ -7,25 +7,25 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.nutrigoal.nutrigoal.ui.dashboard.DashboardFragment"
+        android:name="com.c242pS371.nutrigoal.ui.dashboard.DashboardFragment"
         android:label="@string/dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_plan_diet"
-        android:name="com.nutrigoal.nutrigoal.ui.plan_diet.PlanDietFragment"
+        android:name="com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment"
         android:label="fragment_plan_diet"
         tools:layout="@layout/fragment_plan_diet" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.nutrigoal.nutrigoal.ui.notifications.NotificationsFragment"
+        android:name="com.c242pS371.nutrigoal.ui.notifications.NotificationsFragment"
         android:label="@string/notifications"
         tools:layout="@layout/fragment_notifications" />
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.nutrigoal.nutrigoal.ui.settings.SettingsFragment"
+        android:name="com.c242pS371.nutrigoal.ui.settings.SettingsFragment"
         android:label="@string/settings"
         tools:layout="@layout/fragment_settings" />
 
