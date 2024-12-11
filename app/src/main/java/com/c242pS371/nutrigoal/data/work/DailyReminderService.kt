@@ -58,23 +58,57 @@ class DailyReminderService : Service() {
 
     private fun startCountdown() {
         val times = getMealTimes()
-        var currentMealIndex = 0
+        val currentTime = Calendar.getInstance(Locale.ENGLISH)
+
+        var currentMealIndex = getNextMealTimeIndex(times, currentTime)
 
         handler.postDelayed(object : Runnable {
             override fun run() {
                 val (mealTitle, mealTime) = times[currentMealIndex]
                 val countdown = calculateCountdown(mealTime)
 
-                updateNotification(mealTitle, countdown)
-
                 if (countdown == "00:00:00") {
-                    currentMealIndex = (currentMealIndex + 1) % times.size
                     insertNotificationToDatabase(mealTitle)
+                    currentMealIndex = (currentMealIndex + 1) % times.size
                 }
+
+                updateNotification(mealTitle, countdown)
 
                 handler.postDelayed(this, 1000L)
             }
         }, 1000L)
+    }
+
+    private fun getNextMealTimeIndex(
+        times: List<Pair<String, String>>,
+        currentTime: Calendar
+    ): Int {
+        val dateFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
+
+        val formattedCurrentTime =
+            SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(currentTime.time)
+        val currentCalendar = Calendar.getInstance(Locale.ENGLISH).apply {
+            time = dateFormat.parse(formattedCurrentTime)!!
+        }
+
+        for (i in times.indices) {
+            val (_, mealTime) = times[i]
+
+            val targetCalendar = Calendar.getInstance(Locale.ENGLISH).apply {
+                time = dateFormat.parse(mealTime)!!
+            }
+
+            if (currentCalendar.after(targetCalendar)) {
+                if (i == times.size - 1) {
+                    return 0
+                }
+                continue
+            }
+
+            return i
+        }
+
+        return 0
     }
 
 
