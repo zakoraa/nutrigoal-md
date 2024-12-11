@@ -97,7 +97,7 @@ class DashboardFragment : Fragment() {
 
         val adapter = BodyWeightProgressAdapter(weightList)
         with(binding) {
-            tvWeightGainPercentage.text = "${calculateWeightPercentage(weightList)}%"
+            tvWeightGainPercentage.text = "${String.format("%.1f", calculateWeightPercentage(weightList))}%"
             tvBodyWeightProgressRange.text =
                 if (weightList.size == 1) getString(R.string.today) else {
                     getString(R.string.last_days, weightList.size.toString())

@@ -3,9 +3,9 @@ package com.c242pS371.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
-import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -16,10 +16,6 @@ import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
 import com.c242pS371.nutrigoal.R
 import com.c242pS371.nutrigoal.data.ResultState
 import com.c242pS371.nutrigoal.data.local.database.DailyCheckInPreference
@@ -37,11 +33,21 @@ import com.c242pS371.nutrigoal.ui.auth.AuthViewModel
 import com.c242pS371.nutrigoal.ui.auth.LoginActivity
 import com.c242pS371.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.c242pS371.nutrigoal.ui.common.HistoryViewModel
+import com.c242pS371.nutrigoal.ui.plan_diet.AddFoodRecommendationActivity
+import com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PER_DAY
+import com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PLAN_DIET_USER
+import com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.IS_NULL
 import com.c242pS371.nutrigoal.ui.settings.SettingsViewModel
 import com.c242pS371.nutrigoal.ui.survey.Survey1Activity
 import com.c242pS371.nutrigoal.ui.survey.SurveyViewModel
 import com.c242pS371.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
+import com.c242pS371.nutrigoal.utils.InputValidator
+import com.c242pS371.nutrigoal.utils.ThemeUtil
 import com.c242pS371.nutrigoal.utils.ToastUtil
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -59,16 +65,20 @@ class MainActivity : AppCompatActivity() {
     private val historyViewModel: HistoryViewModel by viewModels()
     private val historyResponse = HistoryResponse()
     private var index = 0
-    private var userEntity : UserEntity? = null
+    private var userEntity: UserEntity? = null
+    private val inputValidator: InputValidator by lazy { InputValidator(this@MainActivity) }
 
     @Inject
     lateinit var dailyCheckInPreference: DailyCheckInPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getAppThemes()
+        val themeUtil =
+            ThemeUtil(lifecycleOwner = this@MainActivity, settingsViewModel = settingsViewModel)
+        themeUtil.getAppThemes()
 
         installSplashScreen()
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -82,6 +92,12 @@ class MainActivity : AppCompatActivity() {
         bottomNavScrollAnimation()
         setUpView()
         setUpAction()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
     }
 
     private fun setUpView() {
@@ -115,7 +131,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getSurveyResult() {
-         userEntity = if (Build.VERSION.SDK_INT >= 33) {
+        userEntity = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra(
                 EXTRA_SURVEY,
                 UserEntity::class.java
@@ -151,15 +167,6 @@ class MainActivity : AppCompatActivity() {
             is ResultState.Loading -> showLoading(true)
             is ResultState.Success -> {
                 if (index == 0) {
-                    showLoading(false)
-
-                    lifecycleScope.launch {
-                        val hasCheckedInToday = dailyCheckInPreference.hasCheckedInToday()
-
-                        if (!hasCheckedInToday) {
-                            showMealTimePopup()
-                        }
-                    }
                     val calendar = Calendar.getInstance()
                     val dateFormat =
                         SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
@@ -190,9 +197,10 @@ class MainActivity : AppCompatActivity() {
                             fat = item?.fatG
                         )
                     }
+                    val perDayId = UUID.randomUUID().toString()
                     historyResponse.perDay = listOf(
                         PerDayItem(
-                            id = UUID.randomUUID().toString(),
+                            id = perDayId,
                             bodyWeight = data?.rfbocWeightKg,
                             age = data?.rfbocAge,
                             height = data?.rfbocHeightCm,
@@ -207,9 +215,11 @@ class MainActivity : AppCompatActivity() {
                             dietTime = dietTime,
                         ),
                     )
+
                     historyViewModel.addHistory(historyResponse)
                 }
                 index += 1
+                showLoading(false)
             }
 
             is ResultState.Error -> {
@@ -236,14 +246,40 @@ class MainActivity : AppCompatActivity() {
                             height = perDay?.height ?: 0f,
                             weight = perDay?.bodyWeight ?: 0f,
                             gender = it.gender ?: false,
-                            activity_level = perDay?.activityLevel.toString()
-                                .split("")[0].toIntOrNull() ?: 1,
+                            activity_level = perDay?.activityLevel ?: 1,
                             diet_category = perDay?.dietCategory
                                 ?: DietCategory.KETO.toString(),
                             has_gastric_issue = perDay?.hasGastricIssue ?: false,
                             food_preference = perDay?.foodPreference ?: emptyList()
                         )
+                        val previousPerDay =
+                            it.perDay?.get((it.perDay?.size?.minus(2) ?: 0).coerceAtLeast(0))
+                        Log.d("FLORAAAAA", "piww: ${previousPerDay}")
+                        lifecycleScope.launch {
+                            if (perDay?.bodyWeight == null || perDay.height == null) {
+                                showMealTimePopup(perDay, previousPerDay)
+                            }
+                        }
                         surveyViewModel.getSurveyResult(surveyRequest)
+                    } else {
+                        val perDay =
+                            it.perDay?.get((it.perDay?.size?.minus(1) ?: 0).coerceAtLeast(0))
+                        val user =
+                            UserEntity(
+                                id = it.userId,
+                                height = perDay?.height,
+                                bodyWeight = perDay?.bodyWeight,
+                                dietCategory = perDay?.dietCategory,
+                                hasGastricIssue = perDay?.hasGastricIssue,
+                                age = perDay?.age,
+                                gender = it.gender,
+                                activityLevel = perDay?.activityLevel,
+                            )
+                        val intent = Intent(this, AddFoodRecommendationActivity::class.java)
+                        intent.putExtra(EXTRA_PLAN_DIET_USER, user)
+                        intent.putExtra(EXTRA_PER_DAY, perDay)
+                        intent.putExtra(IS_NULL, true)
+                        startActivity(intent)
                     }
                 } else {
                     val userEntity = UserEntity(
@@ -269,42 +305,59 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun showMealTimePopup() {
+    private fun showMealTimePopup(perDay: PerDayItem?, previousPerDay: PerDayItem?) {
         val bindingPopup = PopUpCheckInBinding.inflate(LayoutInflater.from(this))
-        val breakfastTimes = resources.getStringArray(R.array.breakfast_times)
-        val launchTimes = resources.getStringArray(R.array.launch_times)
-        val dinnerTimes = resources.getStringArray(R.array.dinner_times)
-
-        val breakfastAdapter =
-            ArrayAdapter(this, R.layout.dropdown_item, breakfastTimes)
-        val launchAdapter = ArrayAdapter(this, R.layout.dropdown_item, launchTimes)
-        val dinnerAdapter = ArrayAdapter(this, R.layout.dropdown_item, dinnerTimes)
 
         with(bindingPopup) {
-            dropdownBreakfastTime.setText(breakfastTimes[0])
-            dropdownLunchTime.setText(launchTimes[0])
-            dropdownDinnerTime.setText(dinnerTimes[0])
-
-            dropdownBreakfastTime.setAdapter(breakfastAdapter)
-            dropdownLunchTime.setAdapter(launchAdapter)
-            dropdownDinnerTime.setAdapter(dinnerAdapter)
-
+            edHeight.setText(previousPerDay?.height.toString())
+            edBodyWeight.setText(previousPerDay?.bodyWeight.toString())
             val alertDialog = AlertDialog.Builder(this@MainActivity)
                 .setView(root)
                 .setCancelable(false)
-                .setPositiveButton("Check-in") { dialog, _ ->
-                    val breakfastTime = dropdownBreakfastTime.text.toString()
-                    val lunchTime = dropdownLunchTime.text.toString()
-                    val dinnerTime = dropdownDinnerTime.text.toString()
-
-                    saveMealTimes(breakfastTime, lunchTime, dinnerTime)
-                    lifecycleScope.launch {
-                        dailyCheckInPreference.saveCheckInDate()
-                    }
-                    dialog.dismiss()
-                }
+                .setPositiveButton("Check-in", null)
                 .create()
+
             alertDialog.show()
+
+            val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            positiveButton.setOnClickListener {
+
+                val height = edHeight.text?.trim().toString()
+                val bodyWeight = edBodyWeight.text?.trim().toString()
+
+                val breakfastTime = perDay?.mealSchedule?.breakfastTime
+                val lunchTime = perDay?.mealSchedule?.launchTime
+                val dinnerTime = perDay?.mealSchedule?.dinnerTime
+
+                userEntity?.height = height.toFloatOrNull()
+                userEntity?.bodyWeight = bodyWeight.toFloatOrNull()
+
+                val heightError =
+                    inputValidator.validateInput(edHeight, getString(R.string.height))
+                val bodyWeightError =
+                    inputValidator.validateInput(edBodyWeight, getString(R.string.body_weight))
+
+                inputValidator.checkValidation(tvErrorHeight, heightError)
+                inputValidator.checkValidation(tvErrorBodyWeight, bodyWeightError)
+
+                if (heightError == null && bodyWeightError == null) {
+                    historyViewModel.updateUserBodyWeightAndHeight(
+                        Firebase.auth.currentUser?.uid ?: "",
+                        perDay?.id ?: "",
+                        height.toFloat(),
+                        bodyWeight.toFloat()
+                    )
+                    saveMealTimes(breakfastTime, lunchTime, dinnerTime)
+
+                    lifecycleScope.launch {
+                        historyViewModel.updateUserBodyWeightAndHeightState.collect { result ->
+                            handleUpdateBodyWeightAndHeight(result, alertDialog)
+                        }
+                    }
+
+                }
+            }
+
 
             alertDialog.window?.setBackgroundDrawable(
                 ResourcesCompat.getDrawable(
@@ -316,29 +369,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveMealTimes(
-        breakfastTime: String,
-        lunchTime: String,
-        dinnerTime: String
+    private fun handleUpdateBodyWeightAndHeight(
+        result: ResultState<Unit?>,
+        alertDialog: AlertDialog
     ) {
-        val sharedPreferences = getSharedPreferences("MealTimes", MODE_PRIVATE)
-        sharedPreferences.edit().apply {
-            putString("Breakfast", breakfastTime)
-            putString("Lunch", lunchTime)
-            putString("Dinner", dinnerTime)
-            apply()
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                binding.swipeRefreshLayout.isRefreshing = true
+
+                refreshHistoryData()
+                alertDialog.dismiss()
+                showLoading(false)
+            }
+
+            is ResultState.Error -> showLoading(false)
+            is ResultState.Initial -> {}
         }
     }
 
-    private fun getAppThemes() {
-        settingsViewModel.getThemeSettings()
-            .observe(this@MainActivity) { isDarkModeActive: Boolean ->
-                if (isDarkModeActive) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                }
-            }
+    private fun saveMealTimes(
+        breakfastTime: String?,
+        lunchTime: String?,
+        dinnerTime: String?
+    ) {
+        val sharedPreferences = getSharedPreferences("MealTimes", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        if (breakfastTime != null) {
+            editor.putString("Breakfast", breakfastTime)
+        }
+
+        if (lunchTime != null) {
+            editor.putString("Lunch", lunchTime)
+        }
+
+        if (dinnerTime != null) {
+            editor.putString("Dinner", dinnerTime)
+        }
+
+        editor.apply()
     }
 
     private fun handleGetUser(result: ResultState<UserEntity?>) {
@@ -400,16 +470,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showLoading(isLoading: Boolean) {
-//        with(binding) {
-//            if (isLoading) {
-//                progressBar.visibility = View.VISIBLE
-//            } else {
-//                progressBar.visibility = View.GONE
-//            }
-//        }
-
-    }
+    private fun showLoading(isLoading: Boolean) {}
 
     private fun setUpAction() {
         binding.swipeRefreshLayout.setOnRefreshListener {

@@ -13,7 +13,9 @@ import com.c242pS371.nutrigoal.data.remote.entity.UserEntity
 import com.c242pS371.nutrigoal.databinding.ActivitySurvey1Binding
 import com.c242pS371.nutrigoal.ui.auth.LoginActivity.Companion.EXTRA_SURVEY
 import com.c242pS371.nutrigoal.utils.AnimationUtil
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class Survey1Activity : AppCompatActivity() {
     private lateinit var binding: ActivitySurvey1Binding
 

@@ -46,11 +46,35 @@ class HistoryViewModel @Inject constructor(
         MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
     val updateSelectedFoodRecommendationState: StateFlow<ResultState<Unit?>> get() = _updateSelectedFoodRecommendationState
 
+    private val _updateUserBodyWeightAndHeightState =
+        MutableStateFlow<ResultState<Unit?>>(ResultState.Initial)
+    val updateUserBodyWeightAndHeightState: StateFlow<ResultState<Unit?>> get() = _updateUserBodyWeightAndHeightState
+
     fun addPerDayItem(userId: String, perDayItem: PerDayItem) {
         _isLoading.value = true
         viewModelScope.launch {
             historyRepository.addPerDayItem(userId, perDayItem).collect { result ->
                 _addPerDayItemState.value = result
+            }
+        }
+        _isLoading.value = false
+    }
+
+    fun updateUserBodyWeightAndHeight(
+        userId: String,
+        perDayId: String,
+        height: Float,
+        bodyWeight: Float
+    ) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            historyRepository.updateUserBodyWeightAndHeight(
+                userId,
+                perDayId,
+                height,
+                bodyWeight
+            ).collect { result ->
+                _updateUserBodyWeightAndHeightState.value = result
             }
         }
         _isLoading.value = false
@@ -79,6 +103,7 @@ class HistoryViewModel @Inject constructor(
         calorieNeeds: Float,
         foodRecommendation: List<FoodRecommendationItem>
     ) {
+        _isLoading.value = true
         viewModelScope.launch {
             _addFoodRecommendationState.value = ResultState.Loading
             historyRepository.addFoodRecommendation(userId, calorieNeeds, foodRecommendation)
@@ -86,6 +111,7 @@ class HistoryViewModel @Inject constructor(
                     _addFoodRecommendationState.value = result
                 }
         }
+        _isLoading.value = false
     }
 
 

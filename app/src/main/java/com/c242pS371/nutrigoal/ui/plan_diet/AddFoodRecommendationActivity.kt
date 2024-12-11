@@ -1,5 +1,6 @@
 package com.c242pS371.nutrigoal.ui.plan_diet
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -24,9 +25,11 @@ import com.c242pS371.nutrigoal.data.remote.entity.SurveyRequest
 import com.c242pS371.nutrigoal.data.remote.entity.UserEntity
 import com.c242pS371.nutrigoal.data.remote.response.SurveyResponse
 import com.c242pS371.nutrigoal.databinding.ActivityAddFoodRecommendationBinding
+import com.c242pS371.nutrigoal.ui.MainActivity
 import com.c242pS371.nutrigoal.ui.common.HistoryViewModel
 import com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PER_DAY
 import com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.EXTRA_PLAN_DIET_USER
+import com.c242pS371.nutrigoal.ui.plan_diet.PlanDietFragment.Companion.IS_NULL
 import com.c242pS371.nutrigoal.ui.survey.FavoriteProcessedAdapter
 import com.c242pS371.nutrigoal.ui.survey.SurveyViewModel
 import com.c242pS371.nutrigoal.utils.InputValidator
@@ -48,6 +51,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
     private lateinit var adapter: FavoriteProcessedAdapter
     private var userEntity: UserEntity? = null
     private var perDay: PerDayItem? = null
+    private var isNull: Boolean? = null
     private val historyViewModel: HistoryViewModel by viewModels()
     private val surveyViewModel: SurveyViewModel by viewModels()
     private val inputValidator: InputValidator by lazy { InputValidator(this@AddFoodRecommendationActivity) }
@@ -104,7 +108,17 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                     getString(R.string.add_food_recommendation_success)
                 )
                 showLoading(false)
-                finish()
+                if (isNull == true) {
+                    startActivity(
+                        Intent(
+                            this@AddFoodRecommendationActivity,
+                            MainActivity::class.java
+                        )
+                    )
+                    finish()
+                } else {
+                    finish()
+                }
             }
 
             is ResultState.Error -> {
@@ -261,7 +275,16 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
             intent.getParcelableExtra(EXTRA_PER_DAY)
         }
 
+        isNull = intent.getBooleanExtra(IS_NULL, false)
+
         with(binding) {
+            if (isNull == true) {
+                ivBack.visibility = View.GONE
+                line.visibility = View.GONE
+            } else {
+                ivBack.visibility = View.VISIBLE
+                line.visibility = View.VISIBLE
+            }
             userEntity?.age?.let { edAge.setText(it.toString()) }
 
             val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId

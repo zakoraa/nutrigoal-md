@@ -92,6 +92,7 @@ class PlanDietFragment : Fragment() {
                         Intent(requireActivity(), AddFoodRecommendationActivity::class.java)
                     intent.putExtra(EXTRA_PLAN_DIET_USER, userEntity)
                     intent.putExtra(EXTRA_PER_DAY, perDay)
+                    intent.putExtra(IS_NULL, false)
                     startActivity(intent)
                 }
 
@@ -137,5 +138,6 @@ class PlanDietFragment : Fragment() {
     companion object {
         const val EXTRA_PLAN_DIET_USER = "extra_plan_diet_user"
         const val EXTRA_PER_DAY = "extra_per_day"
+        const val IS_NULL = "is_null"
     }
 }

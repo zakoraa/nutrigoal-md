@@ -379,5 +379,8 @@
     <string name="clock_icon_desc">Display clock icon</string>
     <string name="your_age">Your age</string>
     <string name="daily_meals_have_not_been_selected">Daily meals have not been selected</string>
+    <string name="yout_body_weight">Yout Body Weight</string>
+    <string name="your_height">Your Height</string>
+    <string name="daily_check_in_desc">Please update your weight and height for today to keep track of your health progress.</string>
 
 </resources>

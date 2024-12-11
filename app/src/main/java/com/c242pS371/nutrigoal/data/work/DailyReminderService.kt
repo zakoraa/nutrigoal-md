@@ -115,22 +115,32 @@ class DailyReminderService : Service() {
     }
 
     private fun getMealTimes(): List<Pair<String, String>> {
-        val breakfastTime = getUserMealTime("Breakfast", "09:00 AM")
-        val lunchTime = getUserMealTime("Lunch", "02:00 PM")
-        val dinnerTime = getUserMealTime("Dinner", "08:00 PM")
+        val times = mutableListOf<Pair<String, String>>()
 
-        return listOf(
-            "Time to enjoy your Breakfast at $breakfastTime!" to breakfastTime,
-            "Let's have a great Lunch at $lunchTime!" to lunchTime,
-            "Dinner is waiting for you at $dinnerTime!" to dinnerTime
-        )
+        val breakfastTime = getUserMealTime("Breakfast")
+        val lunchTime = getUserMealTime("Lunch")
+        val dinnerTime = getUserMealTime("Dinner")
+
+        breakfastTime?.let {
+            times.add("Time to enjoy your Breakfast at $it!" to it)
+        }
+        lunchTime?.let {
+            times.add("Let's have a great Lunch at $it!" to it)
+        }
+        dinnerTime?.let {
+            times.add("Dinner is waiting for you at $it!" to it)
+        }
+
+        return times
     }
 
-    private fun getUserMealTime(meal: String, defaultTime: String): String {
+
+    private fun getUserMealTime(meal: String): String? {
         val sharedPreferences =
             applicationContext.getSharedPreferences("MealTimes", Context.MODE_PRIVATE)
-        return sharedPreferences.getString(meal, defaultTime) ?: defaultTime
+        return sharedPreferences.getString(meal, null)
     }
+
 
     private fun updateNotification(title: String, countdown: String) {
         val notificationManager =

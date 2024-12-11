@@ -1,6 +1,5 @@
 package com.c242pS371.nutrigoal.data.remote.repository
 
-import com.google.firebase.firestore.FirebaseFirestore
 import com.c242pS371.nutrigoal.data.ResultState
 import com.c242pS371.nutrigoal.data.extension.asResultState
 import com.c242pS371.nutrigoal.data.extension.historiesCollection
@@ -8,6 +7,7 @@ import com.c242pS371.nutrigoal.data.remote.entity.FoodRecommendationItem
 import com.c242pS371.nutrigoal.data.remote.entity.PerDayItem
 import com.c242pS371.nutrigoal.data.remote.response.HistoryResponse
 import com.c242pS371.nutrigoal.utils.DateFormatter
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -66,6 +66,33 @@ class HistoryRepository(private val firestore: FirebaseFirestore) {
                 if (perDayItem != null) {
                     perDayItem.selectedFoodRecommendation =
                         foodRecommendationItem
+                    documentRef.set(historyResponse).await()
+                    emit(Unit)
+                }
+            }
+        }.asResultState()
+    }
+
+    fun updateUserBodyWeightAndHeight(
+        userId: String,
+        perDayId: String,
+        height: Float,
+        bodyWeight: Float
+    ): Flow<ResultState<Unit?>> {
+        return flow {
+            val documentRef = firestore.historiesCollection()
+                .document(userId)
+
+            val snapshot = documentRef.get().await()
+
+            if (snapshot.exists()) {
+                val historyResponse = snapshot.toObject(HistoryResponse::class.java)
+
+                val perDayItem = historyResponse?.perDay?.find { it.id == perDayId }
+
+                if (perDayItem != null) {
+                    perDayItem.height = height
+                    perDayItem.bodyWeight = bodyWeight
                     documentRef.set(historyResponse).await()
                     emit(Unit)
                 }
