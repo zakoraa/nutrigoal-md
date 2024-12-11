@@ -3,7 +3,6 @@ package com.c242pS371.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
@@ -254,11 +253,13 @@ class MainActivity : AppCompatActivity() {
                         )
                         val previousPerDay =
                             it.perDay?.get((it.perDay?.size?.minus(2) ?: 0).coerceAtLeast(0))
-                        Log.d("FLORAAAAA", "piww: ${previousPerDay}")
-                        lifecycleScope.launch {
-                            if (perDay?.bodyWeight == null || perDay.height == null) {
-                                showMealTimePopup(perDay, previousPerDay)
-                            }
+                        if (perDay?.bodyWeight == null || perDay.height == null) {
+                            showMealTimePopup(perDay, previousPerDay)
+                        } else {
+                            val breakfastTime = perDay.mealSchedule?.breakfastTime
+                            val lunchTime = perDay.mealSchedule?.launchTime
+                            val dinnerTime = perDay.mealSchedule?.dinnerTime
+                            saveMealTimes(breakfastTime, lunchTime, dinnerTime)
                         }
                         surveyViewModel.getSurveyResult(surveyRequest)
                     } else {
