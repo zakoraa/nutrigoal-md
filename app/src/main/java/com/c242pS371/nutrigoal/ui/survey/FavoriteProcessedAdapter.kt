@@ -1,17 +1,22 @@
 package com.c242pS371.nutrigoal.ui.survey
 
-import android.util.Log
+import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.c242pS371.nutrigoal.R
 import com.c242pS371.nutrigoal.databinding.FavoriteProcessedFoodItemBinding
+import com.c242pS371.nutrigoal.utils.ToastUtil
 
 class FavoriteProcessedAdapter(
     private var items: List<String>,
+    private val context: Context
 ) : RecyclerView.Adapter<FavoriteProcessedAdapter.ItemViewHolder>() {
 
     private val checkedItems = mutableSetOf<String>()
     private var filteredItems = items.toList()
+    private val maxCheckedItems = 4
 
     inner class ItemViewHolder(
         private val binding: FavoriteProcessedFoodItemBinding
@@ -23,7 +28,16 @@ class FavoriteProcessedAdapter(
                 checkBox.isChecked = checkedItems.contains(item)
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        checkedItems.add(item)
+                        if (checkedItems.size < maxCheckedItems) {
+                            checkedItems.add(item)
+                        } else {
+                            ToastUtil.showToast(
+                                context,
+                                context.getString(R.string.error_maximum_selected_favorite_food)
+                            )
+                            checkBox.isChecked =
+                                false
+                        }
                     } else {
                         checkedItems.remove(item)
                     }
@@ -32,10 +46,10 @@ class FavoriteProcessedAdapter(
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateItems(newItems: Collection<String>) {
         this.items = newItems.toList()
         filteredItems = this.items
-        Log.d("FLORAAA", "updateItems: ${filteredItems}")
         notifyDataSetChanged()
     }
 
@@ -58,11 +72,13 @@ class FavoriteProcessedAdapter(
 
     override fun getItemCount(): Int = filteredItems.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun clearCheckedItems() {
         checkedItems.clear()
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun filter(query: String) {
         filteredItems = if (query.isEmpty()) {
             items
@@ -71,5 +87,4 @@ class FavoriteProcessedAdapter(
         }
         notifyDataSetChanged()
     }
-
 }

@@ -8,9 +8,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.c242pS371.nutrigoal.R
+import com.c242pS371.nutrigoal.data.ResultState
+import com.c242pS371.nutrigoal.data.local.entity.UserLocalEntity
+import com.c242pS371.nutrigoal.data.remote.entity.UserEntity
 import com.c242pS371.nutrigoal.data.remote.response.HistoryResponse
+import com.c242pS371.nutrigoal.data.remote.response.SurveyResponse
 import com.c242pS371.nutrigoal.databinding.FragmentDashboardBinding
 import com.c242pS371.nutrigoal.ui.auth.AuthViewModel
 import com.c242pS371.nutrigoal.ui.common.HistoryViewModel
@@ -23,6 +28,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -41,25 +47,72 @@ class DashboardFragment : Fragment() {
     ): View {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        setUpView()
 
+        setUpView()
         return root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+
     private fun setUpView() {
-        historyViewModel.isLoading.observe(viewLifecycleOwner) {
-            showLoading(it)
+        lifecycleScope.launch {
+            viewModel.userLocalEntitySessionState.collect { result ->
+                handleGetUserSession(result)
+            }
         }
 
-        surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            showLoading(isLoading)
+        lifecycleScope.launch {
+            viewModel.currentUserState.collect { result ->
+                handleGetUser(result)
+            }
         }
 
-        historyViewModel.historyResult.observe(viewLifecycleOwner) {
-            setUpWeightProgressAdapter(it)
-            setUpNutrientsCharts(it)
-        }
+    }
 
+    private fun handleGetUser(result: ResultState<UserEntity?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> {
+                historyViewModel.isLoading.observe(viewLifecycleOwner) {
+                    showLoading(it)
+                    surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+                        showLoading(isLoading)
+                    }
+                }
+
+                historyViewModel.historyResult.observe(viewLifecycleOwner) {
+                    setUpWeightProgressAdapter(it)
+                    setUpNutrientsCharts(it)
+                    handleShowCurrentUserData(it)
+                }
+            }
+
+            is ResultState.Error -> showLoading(false)
+            is ResultState.Initial -> {}
+
+        }
+    }
+
+    private fun handleGetSurveyResult(result: ResultState<SurveyResponse?>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> showLoading(false)
+            is ResultState.Error -> showLoading(false)
+            is ResultState.Initial -> {}
+        }
+    }
+
+    private fun handleGetUserSession(result: ResultState<UserLocalEntity>) {
+        when (result) {
+            is ResultState.Loading -> showLoading(true)
+            is ResultState.Success -> showLoading(false)
+            is ResultState.Error -> showLoading(false)
+            is ResultState.Initial -> {}
+        }
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -74,14 +127,12 @@ class DashboardFragment : Fragment() {
                 cardBodyWeightProgress.visibility = View.VISIBLE
                 cardBodyWeightInfo.visibility = View.VISIBLE
                 shimmerLoading.visibility = View.GONE
-                handleShowCurrentUserData()
             }
         }
-
     }
 
-    private fun setUpWeightProgressAdapter(historyResponse: HistoryResponse) {
-        val weightList = historyResponse.perDay?.mapIndexedNotNull { index, perDayItem ->
+    private fun setUpWeightProgressAdapter(historyResponse: HistoryResponse?) {
+        val weightList = historyResponse?.perDay?.mapIndexedNotNull { index, perDayItem ->
             if (perDayItem.bodyWeight != null) {
                 val (month, day) = parseDateToMonthAndDay(perDayItem.createdAt)
                 WeightProgress(
@@ -97,7 +148,10 @@ class DashboardFragment : Fragment() {
 
         val adapter = BodyWeightProgressAdapter(weightList)
         with(binding) {
-            tvWeightGainPercentage.text = "${String.format("%.1f", calculateWeightPercentage(weightList))}%"
+            tvWeightGainPercentage.text = getString(
+                R.string.weight_percentage_format,
+                calculateWeightPercentage(weightList)
+            )
             tvBodyWeightProgressRange.text =
                 if (weightList.size == 1) getString(R.string.today) else {
                     getString(R.string.last_days, weightList.size.toString())
@@ -115,14 +169,13 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun setUpNutrientsCharts(historyResponse: HistoryResponse) {
+    private fun setUpNutrientsCharts(historyResponse: HistoryResponse?) {
         binding.apply {
             val caloriesChart = chartCalories
             val proteinChart = chartProtein
             val fatChart = chartFat
             val carbohydratesChart = chartCarbohydrates
 
-            val dates = mutableListOf<Float>()
             val dateLabels = mutableListOf<String>()
 
             val caloriesEntries = mutableListOf<Entry>()
@@ -130,7 +183,7 @@ class DashboardFragment : Fragment() {
             val fatEntries = mutableListOf<Entry>()
             val carbohydratesEntries = mutableListOf<Entry>()
 
-            historyResponse.perDay?.forEachIndexed { dayIndex, perDayItem ->
+            historyResponse?.perDay?.forEachIndexed { dayIndex, perDayItem ->
                 if (dayIndex == 0) {
                     if (perDayItem.selectedFoodRecommendation == null) {
                         tvNoDataNutrients.visibility = View.VISIBLE
@@ -271,23 +324,21 @@ class DashboardFragment : Fragment() {
         chart.invalidate()
     }
 
-    private fun handleShowCurrentUserData() {
+    private fun handleShowCurrentUserData(historyResponse: HistoryResponse?) {
         with(binding) {
             viewModel.currentUser.observe(viewLifecycleOwner) {
                 tvGreetings.text =
                     getString(R.string.dashboard_greetings, it?.username)
             }
-            historyViewModel.historyResult.observe(viewLifecycleOwner) {
-                val index = AppUtil.getTodayDataFromPerDay(it)
-                val perDay = it?.perDay?.get(index)
-                tvCurrentWeight.text = perDay?.bodyWeight.toString()
-                setBMILineWidths(
-                    perDay?.bodyWeight
-                        ?: 0f,
-                    perDay?.height
-                        ?: 0f
-                )
-            }
+            val index = AppUtil.getTodayDataFromPerDay(historyResponse)
+            val perDay = historyResponse?.perDay?.get(index)
+            tvCurrentWeight.text = perDay?.bodyWeight.toString()
+            setBMILineWidths(
+                perDay?.bodyWeight
+                    ?: 0f,
+                perDay?.height
+                    ?: 0f
+            )
         }
 
     }
@@ -317,7 +368,7 @@ class DashboardFragment : Fragment() {
         val extremeObesityPercent = 1f
 
         with(binding) {
-            tvCurrentBmiValue.text = String.format("%.1f", bmiValue)
+            tvCurrentBmiValue.text = getString(R.string.bmi_value_format, bmiValue)
 
             bmiMarker.layoutParams =
                 (bmiMarker.layoutParams as ConstraintLayout.LayoutParams).apply {
@@ -403,11 +454,6 @@ class DashboardFragment : Fragment() {
             tvBmiType.text = bmiType.toString()
             tvBmiType.setTextColor(resources.getColor(color, null))
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun calculateWeightPercentage(weightList: List<WeightProgress>): Float {

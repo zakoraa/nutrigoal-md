@@ -74,7 +74,7 @@ data class RecommendedFoodBasedOnCalories(
     val rfbocTotalSaturatedFatG: String? = null,
 
     @field:SerializedName("rfboc_activity_level")
-    val rfbocActivityLevel: String? = null,
+    val rfbocActivityLevel: Int? = null,
 
     @field:SerializedName("rfboc_id")
     val rfbocId: String? = null

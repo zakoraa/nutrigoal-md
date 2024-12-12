@@ -9,14 +9,14 @@ import com.c242pS371.nutrigoal.ui.plan_diet.FoodRecommendationFragment
 class FoodPagerAdapter(
     fragment: Fragment,
     private val dateList: List<DateItem>,
-    private val historyResponse: HistoryResponse,
+    private val historyResponse: HistoryResponse?,
 ) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = dateList.size
 
     override fun createFragment(position: Int): Fragment {
         val fragment = FoodRecommendationFragment()
-        val perDayItem = historyResponse.perDay?.get(position)
+        val perDayItem = historyResponse?.perDay?.get(position)
 
         fragment.arguments = Bundle().apply {
             putParcelable(HISTORY_DATA, historyResponse)

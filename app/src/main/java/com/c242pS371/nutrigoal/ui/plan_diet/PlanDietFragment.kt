@@ -29,14 +29,8 @@ class PlanDietFragment : Fragment() {
     ): View {
         _binding = FragmentPlanDietBinding.inflate(inflater, container, false)
 
-        setUpAction()
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         setUpView()
+        return binding.root
     }
 
     override fun onDestroyView() {
@@ -45,24 +39,16 @@ class PlanDietFragment : Fragment() {
     }
 
     private fun setUpView() {
+        setUpDateAdapter()
+
         historyViewModel.isLoading.observe(viewLifecycleOwner) {
             showLoading(it)
         }
-
         surveyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             showLoading(isLoading)
         }
 
-        setUpDateAdapter()
-
     }
-
-    private fun setUpAction() {
-        binding.apply {
-
-        }
-    }
-
 
     private fun setUpDateAdapter() {
         historyViewModel.historyResult.observe(viewLifecycleOwner) {

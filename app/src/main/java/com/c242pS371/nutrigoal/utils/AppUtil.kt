@@ -1,17 +1,8 @@
 package com.c242pS371.nutrigoal.utils
 
-import com.c242pS371.nutrigoal.data.remote.entity.Gender
 import com.c242pS371.nutrigoal.data.remote.response.HistoryResponse
 
 object AppUtil {
-    fun getGenderCode(gender: String): Int {
-        return if (gender == Gender.FEMALE.toString()) {
-            2
-        } else {
-            1
-        }
-    }
-
     fun getTodayDataFromPerDay(historyResponse: HistoryResponse?): Int {
         val today = DateFormatter.getTodayDate()
         return historyResponse?.perDay?.indexOfFirst { date ->
@@ -21,10 +12,16 @@ object AppUtil {
     }
 
     fun getDietTimeDataFromPerDay(historyResponse: HistoryResponse?): Int {
+
         val dietTime = DateFormatter.getTodayDate()
-        return historyResponse?.perDay?.indexOfFirst { date ->
-            val dietTimeDate = DateFormatter.parseDate(date.dietTime)
-            dietTimeDate == dietTime
-        } ?: -1
+        historyResponse?.perDay?.mapIndexed { index, perDayItem ->
+            val dietTimeCreated = DateFormatter.parseDate(perDayItem.dietTime)
+            return if (dietTimeCreated == dietTime) {
+                index
+            } else {
+                0
+            }
+        }
+        return 0
     }
 }
