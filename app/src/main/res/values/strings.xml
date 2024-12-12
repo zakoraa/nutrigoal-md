@@ -15,6 +15,7 @@
     <string name="error_get_user">Get user failed. Please try again.</string>
     <string name="error_login">Login failed. Please try again.</string>
     <string name="error_register">Register failed. Please try again.</string>
+    <string name="error_account_already_exist">Account already registered</string>
     <string name="error_logout">Logout failed. Please try again.</string>
     <string name="error_cancel_login_provider">Cancelled by User</string>
     <string name="error_email_already_registered">Register failed. Email already registered.</string>
