@@ -8,13 +8,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.c242pS371.nutrigoal.R
 import com.c242pS371.nutrigoal.data.remote.entity.Gender
 import com.c242pS371.nutrigoal.data.remote.response.HistoryResponse
 import com.c242pS371.nutrigoal.databinding.ActivityProfileBinding
 import com.c242pS371.nutrigoal.ui.settings.SettingBoxContentItemAdapter
+import com.c242pS371.nutrigoal.utils.AppUtil
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,8 +61,8 @@ class ProfileActivity : AppCompatActivity() {
             .placeholder(R.drawable.photo_profile)
             .into(binding.ivPhotoProfile)
 
-        val lastPerDay = user.perDay?.lastIndex ?: -1
-        val perDay = user.perDay?.get(lastPerDay)
+        val index = AppUtil.getTodayDataFromPerDay(user)
+        val perDay = user.perDay?.get(index)
 
         val userGender = user.gender ?: false
 
