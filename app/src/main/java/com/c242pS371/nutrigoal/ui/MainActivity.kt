@@ -3,7 +3,6 @@ package com.c242pS371.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
@@ -222,7 +221,11 @@ class MainActivity : AppCompatActivity() {
                             food_preference = perDay?.foodPreference ?: emptyList()
                         )
                         val lastWeightIndex = getLastWeightFromPerDay(it)
-                        val lastWeight = it.perDay?.get(lastWeightIndex)
+                        val lastWeight = if (lastWeightIndex == -1) {
+                            it.perDay?.get(0)
+                        } else {
+                            it.perDay?.get(lastWeightIndex)
+                        }
                         val dietTimeIndex = getDietTimeDataFromPerDay(it)
                         val dietTimePerDay = it.perDay?.get(dietTimeIndex)
                         val sharedPreferences = getSharedPreferences("firstDietTime", MODE_PRIVATE)
