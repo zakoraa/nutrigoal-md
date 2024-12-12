@@ -221,11 +221,7 @@ class MainActivity : AppCompatActivity() {
                             food_preference = perDay?.foodPreference ?: emptyList()
                         )
                         val lastWeightIndex = getLastWeightFromPerDay(it)
-                        val lastWeight = if (lastWeightIndex == -1) {
-                            it.perDay?.get(0)
-                        } else {
-                            it.perDay?.get(lastWeightIndex)
-                        }
+                        val lastWeight = it.perDay?.get(lastWeightIndex)
                         val dietTimeIndex = getDietTimeDataFromPerDay(it)
                         val dietTimePerDay = it.perDay?.get(dietTimeIndex)
                         val sharedPreferences = getSharedPreferences("firstDietTime", MODE_PRIVATE)

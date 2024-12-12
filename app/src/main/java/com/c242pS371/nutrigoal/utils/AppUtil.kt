@@ -22,7 +22,7 @@ object AppUtil {
                 return index - 1
             }
         }
-        return -1
+        return 0
     }
 
     fun getDietTimeDataFromPerDay(historyResponse: HistoryResponse?): Int {
@@ -33,6 +33,6 @@ object AppUtil {
                 return index
             }
         }
-        return -1
+        return 0
     }
 }
