@@ -386,6 +386,8 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("MealTimes", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
+        editor.clear()
+
         if (breakfastTime != null) {
             editor.putString("Breakfast", breakfastTime)
         }
