@@ -1,6 +1,7 @@
 package com.c242pS371.nutrigoal.data.remote.repository
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 
 class AuthRepository(
+    private val context: Context,
     private val auth: FirebaseAuth,
     private val authPreference: AuthPreference,
     private val settingPreference: SettingPreference,
@@ -130,6 +132,10 @@ class AuthRepository(
 
     fun logout(): Flow<ResultState<Unit>> {
         return flow {
+            val sharedPreferences = context.getSharedPreferences("firstDietTime", MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.clear()
+            editor.apply()
             Firebase.auth.signOut()
             settingPreference.clearSettings()
             emit(authPreference.logout())

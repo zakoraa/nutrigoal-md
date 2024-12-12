@@ -27,6 +27,17 @@ object DateFormatter {
 
     }
 
+    fun parseDateToDay(dateString: String?): Int {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+        val date = dateFormat.parse(dateString ?: "")
+
+        val calendar = Calendar.getInstance()
+        if (date != null) {
+            calendar.time = date
+        }
+        return calendar.get(Calendar.DAY_OF_MONTH)
+    }
+
     fun parseDate(dateString: String?): String? {
         if (dateString == null) return null
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
