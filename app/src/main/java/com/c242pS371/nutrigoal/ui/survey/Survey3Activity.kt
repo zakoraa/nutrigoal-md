@@ -215,7 +215,9 @@ class Survey3Activity : AppCompatActivity() {
                 if (selectedFoodPreferences.isNotEmpty()) {
                     val intent = Intent(this@Survey3Activity, MainActivity::class.java)
                     intent.putExtra(EXTRA_SURVEY, userEntity)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
+                    finishAffinity()
                 } else {
                     ToastUtil.showToast(
                         this@Survey3Activity, getString(R.string.error_favorite_food)
