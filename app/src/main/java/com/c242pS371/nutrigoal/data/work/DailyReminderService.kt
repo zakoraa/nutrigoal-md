@@ -112,7 +112,6 @@ class DailyReminderService : Service() {
                 }
                 continue
             }
-
             return i
         }
 
