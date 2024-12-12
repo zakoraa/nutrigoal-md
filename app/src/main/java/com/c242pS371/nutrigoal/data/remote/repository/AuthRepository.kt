@@ -5,15 +5,18 @@ import android.content.Context.MODE_PRIVATE
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import com.c242pS371.nutrigoal.R
 import com.c242pS371.nutrigoal.data.ResultState
 import com.c242pS371.nutrigoal.data.extension.asResultState
 import com.c242pS371.nutrigoal.data.local.database.AuthPreference
 import com.c242pS371.nutrigoal.data.local.database.SettingPreference
 import com.c242pS371.nutrigoal.data.local.entity.UserLocalEntity
 import com.c242pS371.nutrigoal.data.remote.entity.UserEntity
+import com.c242pS371.nutrigoal.utils.ToastUtil
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -95,15 +98,25 @@ class AuthRepository(
         password: String
     ): Flow<ResultState<FirebaseUser?>> {
         return flow {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-            val user = result.user
-            if (user !== null) {
-                val profileUpdates = UserProfileChangeRequest.Builder()
-                    .setDisplayName(username)
-                    .build()
-                user.updateProfile(profileUpdates).await()
-                emit(user)
-            } else {
+            try {
+                val result = auth.createUserWithEmailAndPassword(email, password).await()
+                val user = result.user
+                if (user != null) {
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(username)
+                        .build()
+                    user.updateProfile(profileUpdates).await()
+                    emit(user)
+                } else {
+                    emit(null)
+                }
+            } catch (e: FirebaseAuthException) {
+                if (e.errorCode == "ERROR_EMAIL_ALREADY_IN_USE") {
+                    ToastUtil.showToast(
+                        context,
+                        context.getString(R.string.error_account_already_exist)
+                    )
+                }
                 emit(null)
             }
         }.asResultState()
