@@ -16,7 +16,7 @@ object AppUtil {
 
     fun getLastWeightFromPerDay(historyResponse: HistoryResponse?): Int {
         historyResponse?.perDay?.mapIndexed { index, perDayItem ->
-            if (historyResponse.perDay?.size == 0) {
+            if (historyResponse.perDay?.size == 1) {
                 return 0
             } else if (perDayItem.bodyWeight == null) {
                 return index - 1
