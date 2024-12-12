@@ -3,6 +3,7 @@ package com.c242pS371.nutrigoal.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
@@ -38,6 +39,7 @@ import com.c242pS371.nutrigoal.ui.settings.SettingsViewModel
 import com.c242pS371.nutrigoal.ui.survey.Survey1Activity
 import com.c242pS371.nutrigoal.ui.survey.SurveyViewModel
 import com.c242pS371.nutrigoal.utils.AppUtil.getDietTimeDataFromPerDay
+import com.c242pS371.nutrigoal.utils.AppUtil.getLastWeightFromPerDay
 import com.c242pS371.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
 import com.c242pS371.nutrigoal.utils.DateFormatter
 import com.c242pS371.nutrigoal.utils.InputValidator
@@ -219,8 +221,8 @@ class MainActivity : AppCompatActivity() {
                             has_gastric_issue = perDay?.hasGastricIssue ?: false,
                             food_preference = perDay?.foodPreference ?: emptyList()
                         )
-                        val previousPerDay =
-                            it.perDay?.get((it.perDay?.size?.minus(2) ?: 0).coerceAtLeast(0))
+                        val lastWeightIndex = getLastWeightFromPerDay(it)
+                        val lastWeight = it.perDay?.get(lastWeightIndex)
                         val dietTimeIndex = getDietTimeDataFromPerDay(it)
                         val dietTimePerDay = it.perDay?.get(dietTimeIndex)
                         val sharedPreferences = getSharedPreferences("firstDietTime", MODE_PRIVATE)
@@ -231,7 +233,7 @@ class MainActivity : AppCompatActivity() {
                         val dateTimeDate = DateFormatter.parseDateToDay(dietTimePerDay?.dietTime)
 
                         if (perDay?.bodyWeight == null || perDay.height == null) {
-                            showMealTimePopup(perDay, previousPerDay)
+                            showMealTimePopup(perDay, lastWeight)
                             if (nowDate == dateTimeDate) {
                                 editor.putBoolean("isNew", false)
                                 editor.apply()
@@ -287,7 +289,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             is ResultState.Error -> {
-
                 ToastUtil.showToast(this, getString(R.string.error_get_user))
             }
 
