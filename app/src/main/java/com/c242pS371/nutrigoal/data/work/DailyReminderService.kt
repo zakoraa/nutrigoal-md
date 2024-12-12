@@ -60,7 +60,11 @@ class DailyReminderService : Service() {
         val times = getMealTimes()
         val currentTime = Calendar.getInstance(Locale.ENGLISH)
 
-        var currentMealIndex = getNextMealTimeIndex(times, currentTime)
+        var currentMealIndex = if (getFirstDietTIme()) {
+            0
+        } else {
+            getNextMealTimeIndex(times, currentTime)
+        }
 
         handler.postDelayed(object : Runnable {
             override fun run() {
@@ -177,6 +181,12 @@ class DailyReminderService : Service() {
         val sharedPreferences =
             applicationContext.getSharedPreferences("MealTimes", Context.MODE_PRIVATE)
         return sharedPreferences.getString(meal, null)
+    }
+
+    private fun getFirstDietTIme(): Boolean {
+        val sharedPreferences =
+            applicationContext.getSharedPreferences("firstDietTime", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean("isNew", false)
     }
 
 

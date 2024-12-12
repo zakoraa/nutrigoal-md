@@ -98,11 +98,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAuthRepository(
+        context: Context,
         auth: FirebaseAuth,
         authPreference: AuthPreference,
         settingPreference: SettingPreference,
     ): AuthRepository =
-        AuthRepository(auth, authPreference, settingPreference)
+        AuthRepository(context, auth, authPreference, settingPreference)
 
     @Provides
     @Singleton

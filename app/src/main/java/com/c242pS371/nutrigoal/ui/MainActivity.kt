@@ -39,6 +39,7 @@ import com.c242pS371.nutrigoal.ui.survey.Survey1Activity
 import com.c242pS371.nutrigoal.ui.survey.SurveyViewModel
 import com.c242pS371.nutrigoal.utils.AppUtil.getDietTimeDataFromPerDay
 import com.c242pS371.nutrigoal.utils.AppUtil.getTodayDataFromPerDay
+import com.c242pS371.nutrigoal.utils.DateFormatter
 import com.c242pS371.nutrigoal.utils.InputValidator
 import com.c242pS371.nutrigoal.utils.ThemeUtil
 import com.c242pS371.nutrigoal.utils.ToastUtil
@@ -223,12 +224,33 @@ class MainActivity : AppCompatActivity() {
                             it.perDay?.get((it.perDay?.size?.minus(2) ?: 0).coerceAtLeast(0))
                         val dietTimeIndex = getDietTimeDataFromPerDay(it)
                         val dietTimePerDay = it.perDay?.get(dietTimeIndex)
+                        val sharedPreferences = getSharedPreferences("firstDietTime", MODE_PRIVATE)
+                        val editor = sharedPreferences.edit()
+                        val calendar = Calendar.getInstance()
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+                        val nowDate = DateFormatter.parseDateToDay(dateFormat.format(calendar.time))
+                        val dateTimeDate = DateFormatter.parseDateToDay(dietTimePerDay?.dietTime)
+
                         if (perDay?.bodyWeight == null || perDay.height == null) {
-                            showMealTimePopup(dietTimePerDay, previousPerDay)
+                            showMealTimePopup(perDay, previousPerDay)
+                            if (nowDate == dateTimeDate) {
+                                editor.putBoolean("isNew", false)
+                                editor.apply()
+                            } else {
+                                editor.putBoolean("isNew", true)
+                                editor.apply()
+                            }
                         } else {
                             val breakfastTime = dietTimePerDay?.mealSchedule?.breakfastTime
                             val lunchTime = dietTimePerDay?.mealSchedule?.launchTime
                             val dinnerTime = dietTimePerDay?.mealSchedule?.dinnerTime
+                            if (nowDate == dateTimeDate) {
+                                editor.putBoolean("isNew", false)
+                                editor.apply()
+                            } else {
+                                editor.putBoolean("isNew", true)
+                                editor.apply()
+                            }
                             saveMealTimes(breakfastTime, lunchTime, dinnerTime)
                         }
                         surveyViewModel.getSurveyResult(surveyRequest)

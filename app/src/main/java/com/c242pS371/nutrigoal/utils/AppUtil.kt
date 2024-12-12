@@ -5,10 +5,15 @@ import com.c242pS371.nutrigoal.data.remote.response.HistoryResponse
 object AppUtil {
     fun getTodayDataFromPerDay(historyResponse: HistoryResponse?): Int {
         val today = DateFormatter.getTodayDate()
-        return historyResponse?.perDay?.indexOfFirst { date ->
-            val createdAtDate = DateFormatter.parseDate(date.createdAt)
-            createdAtDate == today
-        } ?: -1
+        historyResponse?.perDay?.mapIndexed { index, perDayItem ->
+            val createdAt = DateFormatter.parseDate(perDayItem.createdAt)
+            return if (createdAt == today) {
+                index
+            } else {
+                0
+            }
+        }
+        return -1
     }
 
     fun getDietTimeDataFromPerDay(historyResponse: HistoryResponse?): Int {
@@ -22,6 +27,6 @@ object AppUtil {
                 0
             }
         }
-        return 0
+        return -1
     }
 }
