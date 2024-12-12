@@ -7,24 +7,30 @@ object AppUtil {
         val today = DateFormatter.getTodayDate()
         historyResponse?.perDay?.mapIndexed { index, perDayItem ->
             val createdAt = DateFormatter.parseDate(perDayItem.createdAt)
-            return if (createdAt == today) {
-                index
-            } else {
-                0
+            if (createdAt == today) {
+                return index
+            }
+        }
+        return -1
+    }
+
+    fun getLastWeightFromPerDay(historyResponse: HistoryResponse?): Int {
+        historyResponse?.perDay?.mapIndexed { index, perDayItem ->
+            if (historyResponse.perDay?.size == 0) {
+                return 0
+            } else if (perDayItem.bodyWeight == null) {
+                return index - 1
             }
         }
         return -1
     }
 
     fun getDietTimeDataFromPerDay(historyResponse: HistoryResponse?): Int {
-
         val dietTime = DateFormatter.getTodayDate()
         historyResponse?.perDay?.mapIndexed { index, perDayItem ->
             val dietTimeCreated = DateFormatter.parseDate(perDayItem.dietTime)
-            return if (dietTimeCreated == dietTime) {
-                index
-            } else {
-                0
+            if (dietTimeCreated == dietTime) {
+                return index
             }
         }
         return -1
