@@ -235,7 +235,6 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
     private fun setUpAction() {
         with(binding) {
 
-
             ivBack.setOnClickListener {
                 finish()
             }
@@ -285,7 +284,7 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
                 ivBack.visibility = View.VISIBLE
                 line.visibility = View.VISIBLE
             }
-            userEntity?.age?.let { edAge.setText(it.toString()) }
+            userEntity?.age?.let { edAge.setText(String.format(it.toString())) }
 
             val selectedDietCategoryId = rgDietCategory.checkedRadioButtonId
 
@@ -430,7 +429,6 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
 
                 val selectedHistoryMagId = rgHistoryMag.checkedRadioButtonId
 
-
                 userEntity?.hasGastricIssue = when (selectedHistoryMagId) {
                     R.id.rb_yes -> true
                     R.id.rb_no -> false
@@ -501,7 +499,10 @@ class AddFoodRecommendationActivity : AppCompatActivity() {
         with(binding) {
             autoCompleteTextView.setText(instantFoods[0])
             autoCompleteTextView.setAdapter(arrayAdapter)
-            adapter = FavoriteProcessedAdapter(items = favoriteProcessedList)
+            adapter = FavoriteProcessedAdapter(
+                items = favoriteProcessedList,
+                context = this@AddFoodRecommendationActivity
+            )
 
             searchView.onActionViewExpanded()
             recyclerView.adapter = adapter

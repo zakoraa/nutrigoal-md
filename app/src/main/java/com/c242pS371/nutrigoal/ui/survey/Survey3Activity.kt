@@ -287,7 +287,10 @@ class Survey3Activity : AppCompatActivity() {
         with(binding) {
             autoCompleteTextView.setText(instantFoods[0])
             autoCompleteTextView.setAdapter(arrayAdapter)
-            adapter = FavoriteProcessedAdapter(items = favoriteProcessedList)
+            adapter = FavoriteProcessedAdapter(
+                items = favoriteProcessedList,
+                context = this@Survey3Activity
+            )
 
             searchView.onActionViewExpanded()
             recyclerView.adapter = adapter

@@ -20,11 +20,11 @@ class HistoryViewModel @Inject constructor(
     private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
-    private val _isLoading = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
-
     private val _historyResult = MutableLiveData<HistoryResponse>()
     val historyResult: LiveData<HistoryResponse> = _historyResult
+
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
 
     private val _historyResponseState =
         MutableStateFlow<ResultState<HistoryResponse?>>(ResultState.Initial)
@@ -51,13 +51,11 @@ class HistoryViewModel @Inject constructor(
     val updateUserBodyWeightAndHeightState: StateFlow<ResultState<Unit?>> get() = _updateUserBodyWeightAndHeightState
 
     fun addPerDayItem(userId: String, perDayItem: PerDayItem) {
-        _isLoading.value = true
         viewModelScope.launch {
             historyRepository.addPerDayItem(userId, perDayItem).collect { result ->
                 _addPerDayItemState.value = result
             }
         }
-        _isLoading.value = false
     }
 
     fun updateUserBodyWeightAndHeight(
@@ -66,7 +64,6 @@ class HistoryViewModel @Inject constructor(
         height: Float,
         bodyWeight: Float
     ) {
-        _isLoading.value = true
         viewModelScope.launch {
             historyRepository.updateUserBodyWeightAndHeight(
                 userId,
@@ -74,10 +71,10 @@ class HistoryViewModel @Inject constructor(
                 height,
                 bodyWeight
             ).collect { result ->
+                _isLoading.value = result is ResultState.Loading
                 _updateUserBodyWeightAndHeightState.value = result
             }
         }
-        _isLoading.value = false
     }
 
     fun updateSelectedFoodRecommendation(
@@ -85,17 +82,16 @@ class HistoryViewModel @Inject constructor(
         perDayId: String,
         foodRecommendationItem: List<FoodRecommendationItem>
     ) {
-        _isLoading.value = true
         viewModelScope.launch {
             historyRepository.updateSelectedFoodRecommendation(
                 userId,
                 perDayId,
                 foodRecommendationItem
             ).collect { result ->
+                _isLoading.value = result is ResultState.Loading
                 _updateSelectedFoodRecommendationState.value = result
             }
         }
-        _isLoading.value = false
     }
 
     fun addFoodRecommendation(
@@ -103,64 +99,47 @@ class HistoryViewModel @Inject constructor(
         calorieNeeds: Float,
         foodRecommendation: List<FoodRecommendationItem>
     ) {
-        _isLoading.value = true
         viewModelScope.launch {
-            _addFoodRecommendationState.value = ResultState.Loading
             historyRepository.addFoodRecommendation(userId, calorieNeeds, foodRecommendation)
                 .collect { result ->
+                    _isLoading.value = result is ResultState.Loading
                     _addFoodRecommendationState.value = result
                 }
         }
-        _isLoading.value = false
     }
-
 
     fun getHistoryResult(userId: String) {
         viewModelScope.launch {
-            _isLoading.value = true
             historyRepository.getHistoryById(userId).collect { result ->
                 _historyResponseState.value = result
+                _isLoading.value = result is ResultState.Loading
                 if (result is ResultState.Success) {
                     _historyResult.value = result.data
                 }
             }
-            _isLoading.value = false
         }
     }
 
     fun addHistory(historyResponse: HistoryResponse) {
         viewModelScope.launch {
-            _isLoading.value = true
             val userId = historyResponse.userId ?: return@launch
             val isAlreadyAdded = historyRepository.isHistoryAlreadyAdded(userId)
 
             isAlreadyAdded.collect { result ->
                 when (result) {
-                    is ResultState.Loading -> {
-                    }
-
+                    is ResultState.Loading -> {}
                     is ResultState.Success -> {
-                        _isLoading.value = true
-
                         if (!result.data) {
                             historyRepository.addHistory(historyResponse).collect { addResult ->
                                 _addHistoryResponseState.value = addResult
                             }
                         }
-                        _isLoading.value = true
                     }
 
-                    is ResultState.Error -> {
-                        _isLoading.value = false
-                    }
-
-                    is ResultState.Initial -> {
-                    }
+                    is ResultState.Error -> {}
+                    is ResultState.Initial -> {}
                 }
             }
-            _isLoading.value = false
         }
     }
-
-
 }

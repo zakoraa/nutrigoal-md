@@ -9,7 +9,3 @@ annotation class AuthDataStore
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class SettingDataStore
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class DailyCheckInDataStore

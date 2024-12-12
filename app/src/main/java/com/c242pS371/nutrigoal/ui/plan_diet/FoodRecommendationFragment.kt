@@ -48,9 +48,6 @@ class FoodRecommendationFragment : Fragment() {
     }
 
     private fun setUpView() {
-        historyViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            showLoading(isLoading)
-        }
         setUpSurveyResultData()
         lifecycleScope.launch {
             historyViewModel.updateSelectedFoodRecommendationState.collect {

@@ -29,12 +29,6 @@ class NotificationsViewModel @Inject constructor(
         }
     }
 
-    fun insertNotification(notificationLocalEntity: NotificationLocalEntity) {
-        viewModelScope.launch {
-            notificationRepository.insert(notificationLocalEntity)
-        }
-    }
-
     fun updateNotificationAsConfirmed(id: Int?) {
         viewModelScope.launch(Dispatchers.IO) {
             notificationRepository.updateIsConfirmed(id)

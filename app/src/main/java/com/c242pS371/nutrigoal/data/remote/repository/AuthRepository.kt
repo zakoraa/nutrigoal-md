@@ -4,6 +4,12 @@ import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import com.c242pS371.nutrigoal.data.ResultState
+import com.c242pS371.nutrigoal.data.extension.asResultState
+import com.c242pS371.nutrigoal.data.local.database.AuthPreference
+import com.c242pS371.nutrigoal.data.local.database.SettingPreference
+import com.c242pS371.nutrigoal.data.local.entity.UserLocalEntity
+import com.c242pS371.nutrigoal.data.remote.entity.UserEntity
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -11,13 +17,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
-import com.c242pS371.nutrigoal.data.ResultState
-import com.c242pS371.nutrigoal.data.extension.asResultState
-import com.c242pS371.nutrigoal.data.local.database.AuthPreference
-import com.c242pS371.nutrigoal.data.local.database.DailyCheckInPreference
-import com.c242pS371.nutrigoal.data.local.database.SettingPreference
-import com.c242pS371.nutrigoal.data.local.entity.UserLocalEntity
-import com.c242pS371.nutrigoal.data.remote.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -26,7 +25,6 @@ class AuthRepository(
     private val auth: FirebaseAuth,
     private val authPreference: AuthPreference,
     private val settingPreference: SettingPreference,
-    private  val dailyCheckInPreference: DailyCheckInPreference
 ) {
 
     fun getCredentialResponse(
@@ -53,7 +51,7 @@ class AuthRepository(
     fun getCurrentUser(): Flow<ResultState<UserEntity>> {
         return flow {
             val currentUser = Firebase.auth.currentUser
-            lateinit var user: UserEntity;
+            lateinit var user: UserEntity
             currentUser?.let {
                 user = UserEntity(
                     id = it.uid,
@@ -134,7 +132,6 @@ class AuthRepository(
         return flow {
             Firebase.auth.signOut()
             settingPreference.clearSettings()
-            dailyCheckInPreference.clearCheckInDate()
             emit(authPreference.logout())
         }.asResultState()
     }

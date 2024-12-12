@@ -8,7 +8,6 @@ import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.widget.NestedScrollView
@@ -17,7 +16,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.c242pS371.nutrigoal.R
 import com.c242pS371.nutrigoal.data.ResultState
-import com.c242pS371.nutrigoal.data.local.database.DailyCheckInPreference
 import com.c242pS371.nutrigoal.data.local.entity.UserLocalEntity
 import com.c242pS371.nutrigoal.data.remote.entity.DietCategory
 import com.c242pS371.nutrigoal.data.remote.entity.FoodRecommendationItem
@@ -54,7 +52,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.UUID
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -64,12 +61,8 @@ class MainActivity : AppCompatActivity() {
     private val surveyViewModel: SurveyViewModel by viewModels()
     private val historyViewModel: HistoryViewModel by viewModels()
     private val historyResponse = HistoryResponse()
-    private var index = 0
     private var userEntity: UserEntity? = null
     private val inputValidator: InputValidator by lazy { InputValidator(this@MainActivity) }
-
-    @Inject
-    lateinit var dailyCheckInPreference: DailyCheckInPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,12 +87,6 @@ class MainActivity : AppCompatActivity() {
         setUpAction()
     }
 
-    override fun onStart() {
-        super.onStart()
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-    }
-
     private fun setUpView() {
         viewModel.getSession()
 
@@ -119,13 +106,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleAddHistory(result: ResultState<Unit?>) {
         when (result) {
-            is ResultState.Loading -> showLoading(true)
+            is ResultState.Loading -> {}
             is ResultState.Success -> {
                 historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
-                showLoading(false)
             }
 
-            is ResultState.Error -> showLoading(false)
+            is ResultState.Error -> {}
             is ResultState.Initial -> {}
         }
     }
@@ -142,7 +128,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (userEntity !== null) {
-
             val surveyRequest = SurveyRequest(
                 age = userEntity?.age ?: 0,
                 height = userEntity?.height ?: 0f,
@@ -155,75 +140,57 @@ class MainActivity : AppCompatActivity() {
             )
             surveyViewModel.getSurveyResult(surveyRequest)
         } else {
-            if (index == 0) {
-                historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
-            }
+            historyViewModel.getHistoryResult(Firebase.auth.currentUser?.uid ?: "")
         }
     }
 
-
     private fun handleGetSurveyResult(result: ResultState<SurveyResponse?>) {
         when (result) {
-            is ResultState.Loading -> showLoading(true)
+            is ResultState.Loading -> {}
             is ResultState.Success -> {
-                if (index == 0) {
-                    val calendar = Calendar.getInstance()
-                    val dateFormat =
-                        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
+                val calendar = Calendar.getInstance()
+                val dateFormat =
+                    SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)
 
-                    val createdAt = dateFormat.format(calendar.time)
-                    calendar.add(Calendar.DAY_OF_YEAR, 1)
-                    val dietTime = dateFormat.format(calendar.time)
-                    val it = result.data
-                    val data = it?.recommendedFoodBasedOnCalories
-                    historyResponse.gender = data?.rfbocGender
-                    val activityLevels = resources.getStringArray(R.array.activity_levels)
-                    val activityLevel = when (data?.rfbocActivityLevel) {
-                        activityLevels[0] -> 1
-                        activityLevels[1] -> 2
-                        activityLevels[2] -> 3
-                        activityLevels[3] -> 4
-                        activityLevels[4] -> 5
-                        else -> 1
-                    }
+                val createdAt = dateFormat.format(calendar.time)
+                calendar.add(Calendar.DAY_OF_YEAR, 1)
+                val dietTime = dateFormat.format(calendar.time)
+                val it = result.data
+                val data = it?.recommendedFoodBasedOnCalories
+                historyResponse.gender = data?.rfbocGender
 
-                    val foodRecommendationList = it?.recommendedFoodPreference?.map { item ->
-                        FoodRecommendationItem(
-                            id = item?.rfpId,
-                            name = item?.name,
-                            calories = item?.calories,
-                            protein = item?.proteinG,
-                            carbohydrate = item?.carbohydrateG,
-                            fat = item?.fatG
-                        )
-                    }
-                    val perDayId = UUID.randomUUID().toString()
-                    historyResponse.perDay = listOf(
-                        PerDayItem(
-                            id = perDayId,
-                            bodyWeight = data?.rfbocWeightKg,
-                            age = data?.rfbocAge,
-                            height = data?.rfbocHeightCm,
-                            activityLevel = activityLevel,
-                            dietCategory = data?.rfbocDietType,
-                            hasGastricIssue = data?.rfbocHistoryOfGastritisOrGerd,
-                            foodPreference = it?.favoriteFoodName?.ffnName,
-                            foodRecommendation = foodRecommendationList,
-                            mealSchedule = userEntity?.mealSchedule,
-                            calorieNeeds = it?.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds?.toFloatOrNull(),
-                            createdAt = createdAt,
-                            dietTime = dietTime,
-                        ),
+                val foodRecommendationList = it?.recommendedFoodPreference?.map { item ->
+                    FoodRecommendationItem(
+                        id = item?.rfpId,
+                        name = item?.name,
+                        calories = item?.calories,
+                        protein = item?.proteinG,
+                        carbohydrate = item?.carbohydrateG,
+                        fat = item?.fatG
                     )
-
-                    historyViewModel.addHistory(historyResponse)
                 }
-                index += 1
-                showLoading(false)
+                val perDayId = UUID.randomUUID().toString()
+                historyResponse.perDay = listOf(
+                    PerDayItem(
+                        id = perDayId,
+                        bodyWeight = data?.rfbocWeightKg,
+                        age = data?.rfbocAge,
+                        height = data?.rfbocHeightCm,
+                        activityLevel = data?.rfbocActivityLevel,
+                        dietCategory = data?.rfbocDietType,
+                        hasGastricIssue = data?.rfbocHistoryOfGastritisOrGerd,
+                        foodPreference = it?.favoriteFoodName?.ffnName,
+                        foodRecommendation = foodRecommendationList,
+                        mealSchedule = userEntity?.mealSchedule,
+                        calorieNeeds = it?.recommendedFoodBasedOnCalories?.rfbocDailyCalorieNeeds?.toFloatOrNull(),
+                        createdAt = createdAt,
+                        dietTime = dietTime,
+                    ),
+                )
+                historyViewModel.addHistory(historyResponse)
             }
 
             is ResultState.Error -> {
-                showLoading(false)
                 ToastUtil.showToast(this, getString(R.string.error_get_user))
             }
 
@@ -234,7 +201,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleGetHistoryResult(result: ResultState<HistoryResponse?>) {
         when (result) {
-            is ResultState.Loading -> showLoading(true)
+            is ResultState.Loading -> {}
             is ResultState.Success -> {
                 val it = result.data
                 if (it !== null) {
@@ -299,7 +266,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             is ResultState.Error -> {
-                showLoading(false)
+
                 ToastUtil.showToast(this, getString(R.string.error_get_user))
             }
 
@@ -362,7 +329,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-
             alertDialog.window?.setBackgroundDrawable(
                 ResourcesCompat.getDrawable(
                     resources,
@@ -378,16 +344,15 @@ class MainActivity : AppCompatActivity() {
         alertDialog: AlertDialog
     ) {
         when (result) {
-            is ResultState.Loading -> showLoading(true)
+            is ResultState.Loading -> {}
             is ResultState.Success -> {
                 binding.swipeRefreshLayout.isRefreshing = true
-
                 refreshHistoryData()
                 alertDialog.dismiss()
-                showLoading(false)
+
             }
 
-            is ResultState.Error -> showLoading(false)
+            is ResultState.Error -> {}
             is ResultState.Initial -> {}
         }
     }
@@ -441,10 +406,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            is ResultState.Error -> {
-                ToastUtil.showToast(this, getString(R.string.error_get_user))
-            }
-
+            is ResultState.Error -> ToastUtil.showToast(this, getString(R.string.error_get_user))
             is ResultState.Initial -> {}
 
         }
@@ -452,7 +414,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleGetUserSession(result: ResultState<UserLocalEntity>) {
         when (result) {
-            is ResultState.Loading -> showLoading(true)
+            is ResultState.Loading -> {}
             is ResultState.Success -> {
                 if (!result.data.isLogin) {
                     val intent = Intent(this, LoginActivity::class.java)
@@ -461,20 +423,15 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     viewModel.getCurrentUser()
                 }
-                showLoading(false)
+
             }
 
-            is ResultState.Error -> {
-                showLoading(false)
-                ToastUtil.showToast(this, getString(R.string.error_login))
-            }
-
+            is ResultState.Error -> ToastUtil.showToast(this, getString(R.string.error_login))
             is ResultState.Initial -> {}
 
         }
     }
 
-    private fun showLoading(isLoading: Boolean) {}
 
     private fun setUpAction() {
         binding.swipeRefreshLayout.setOnRefreshListener {

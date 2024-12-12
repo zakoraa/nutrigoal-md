@@ -5,26 +5,23 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.c242pS371.nutrigoal.BuildConfig
 import com.c242pS371.nutrigoal.data.local.database.AuthPreference
-import com.c242pS371.nutrigoal.data.local.database.DailyCheckInPreference
 import com.c242pS371.nutrigoal.data.local.database.NotificationDao
 import com.c242pS371.nutrigoal.data.local.database.NotificationLocalEntityRoomDatabase
 import com.c242pS371.nutrigoal.data.local.database.SettingPreference
 import com.c242pS371.nutrigoal.data.local.database.authDataStore
-import com.c242pS371.nutrigoal.data.local.database.dailyCheckInDataStore
 import com.c242pS371.nutrigoal.data.local.database.settingDataStore
 import com.c242pS371.nutrigoal.data.local.repository.NotificationRepository
 import com.c242pS371.nutrigoal.data.remote.repository.AuthRepository
 import com.c242pS371.nutrigoal.data.remote.repository.HistoryRepository
 import com.c242pS371.nutrigoal.data.remote.repository.SurveyRepository
 import com.c242pS371.nutrigoal.data.remote.retrofit.SurveyService
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -104,9 +101,8 @@ object AppModule {
         auth: FirebaseAuth,
         authPreference: AuthPreference,
         settingPreference: SettingPreference,
-        dailyCheckInPreference: DailyCheckInPreference
     ): AuthRepository =
-        AuthRepository(auth, authPreference, settingPreference, dailyCheckInPreference)
+        AuthRepository(auth, authPreference, settingPreference)
 
     @Provides
     @Singleton
@@ -141,20 +137,6 @@ object AppModule {
     @Singleton
     @SettingDataStore
     fun provideSettingDataStore(context: Context): DataStore<Preferences> = context.settingDataStore
-
-    @Provides
-    @Singleton
-    @DailyCheckInDataStore
-    fun provideDailyCheckInDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return context.dailyCheckInDataStore
-    }
-
-    @Provides
-    @Singleton
-    fun provideDailyCheckInPreference(@DailyCheckInDataStore dailyCheckInDataStore: DataStore<Preferences>): DailyCheckInPreference {
-        return DailyCheckInPreference.getInstance(dailyCheckInDataStore)
-    }
-
 
     @Provides
     @Singleton

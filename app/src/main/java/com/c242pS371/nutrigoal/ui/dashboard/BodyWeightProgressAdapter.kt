@@ -56,7 +56,7 @@ class BodyWeightProgressAdapter(private val weightList: List<WeightProgress>) :
                     tvDay.setTextColor(binding.root.context.getColor(R.color.grey))
                 }
                 tvDayTitle.text = item.title
-                tvBodyWeight.text = "${item.bodyWeight} kg"
+                tvBodyWeight.text = String.format("${item.bodyWeight} kg")
 
                 val weightChange = calculateWeightChange(item.bodyWeight, previousWeight)
 

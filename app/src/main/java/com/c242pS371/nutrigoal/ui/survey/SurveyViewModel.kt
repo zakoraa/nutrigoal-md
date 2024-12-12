@@ -18,26 +18,18 @@ import javax.inject.Inject
 class SurveyViewModel @Inject constructor(
     private val surveyRepository: SurveyRepository
 ) : ViewModel() {
-
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
-
-    private val _surveyResult = MutableLiveData<SurveyResponse>()
-    val surveyResult: LiveData<SurveyResponse> = _surveyResult
 
     private val _surveyResponseState =
         MutableStateFlow<ResultState<SurveyResponse?>>(ResultState.Initial)
     val surveyResponseState: StateFlow<ResultState<SurveyResponse?>> get() = _surveyResponseState
 
     fun getSurveyResult(surveyRequest: SurveyRequest) {
-        _isLoading.value = true
         viewModelScope.launch {
             surveyRepository.getSurveyResult(surveyRequest).collect { result ->
-                _surveyResponseState.value = result
                 _isLoading.value = result is ResultState.Loading
-                if (result is ResultState.Success) {
-                    _surveyResult.value = result.data
-                }
+                _surveyResponseState.value = result
             }
         }
     }
