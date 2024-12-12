@@ -47,9 +47,6 @@ class Survey1Activity : AppCompatActivity() {
         }
 
         with(binding) {
-            btnBack.setOnClickListener {
-                finish()
-            }
 
             btnNext.setOnClickListener {
                 val intent = Intent(this@Survey1Activity, Survey2Activity::class.java)
