@@ -29,7 +29,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"https://model-nutrigoal-usbd2ygyiq-as.a.run.app/\""
+            "\"https://nutrigoal-cc-usbd2ygyiq-et.a.run.app/\""
         )
     }
 
