@@ -6,7 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface SurveyService {
-    @POST("predictjson")
+    @POST("predict")
     suspend fun getSurveyResult(
         @Body request: SurveyRequest
     ): SurveyResponse
